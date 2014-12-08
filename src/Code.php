@@ -11,7 +11,7 @@ use \InvalidArgumentException;
 class Code
 {
    /**
-    * Status codes and their respective status codes
+    * Status codes and their respective status texts
     * 
     * @var array.<integer,string>
     */
