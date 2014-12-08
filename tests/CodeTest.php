@@ -22,5 +22,22 @@ class CodeTest extends PHPUnit_Framework_TestCase
       $this->assertNull(Code::getStatusText(600));
       $this->assertNull(Code::getStatusText(0));
    }
+
+   public function testMatches()
+   {
+      $this->assertTrue(Code::matches(200, '2xx'));
+      $this->assertTrue(Code::matches(200, 200));
+      $this->assertFalse(Code::matches(200, 201));
+      $this->assertFalse(Code::matches(200, '21x'));
+      $this->assertFalse(Code::matches(404, '2xx'));
+   }
+
+   /**
+    * @expectedException InvalidArgumentException
+    */
+   public function testMatchesIntegerException()
+   {
+      Code::matches(200, 'abs');
+   }
 }
 

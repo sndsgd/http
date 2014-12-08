@@ -2,6 +2,8 @@
 
 namespace sndsgd\http;
 
+use \InvalidArgumentException;
+
 
 /**
  * A dictionary of http codes
@@ -77,6 +79,28 @@ class Code
       return array_key_exists($code, self::$codes)
          ? static::$codes[$code]
          : null;
+   }
+
+   /**
+    * Determine if a status code matches a pattern
+    *
+    * @param integer $code A status code to test
+    * @param string|integer $match A combination of numbers and wildcards
+    * @return boolean
+    */
+   public static function matches($code, $match)
+   {
+      if (is_string($match) && preg_match('/[0-9x]{3}/i', $match)) {
+         $match = str_replace('x', '[0-9]', $match);
+      }
+      else if (!is_int($match) || $match < 100 || $match > 599) {
+         throw new InvalidArgumentException(
+            "invalid value provided for 'match'; ".
+            "expecting a match target that contains only numbers and 'x'"
+         );
+      }
+
+      return (preg_match('/^'.$match.'$/i', $code) === 1);
    }
 }
 
