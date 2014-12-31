@@ -15,7 +15,7 @@
       "source": "https://github.com/sndsgd/sndsgd-http/tree/master"
    },
    "require": {
-      "php": ">=5.5.0",
+      "php": ">=5.4.0",
       "sndsgd/util": "dev-master",
       "sndsgd/issue": "dev-master"
    },
