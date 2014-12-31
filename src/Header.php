@@ -52,7 +52,7 @@ class Header
       $parts = explode("\r\n", $header, 2);
       if (count($parts) !== 2) {
          throw new InvalidArgumentException(
-            "invaliud value provided for 'header'; expecting a string that ".
+            "invalid value provided for 'header'; expecting a string that ".
             "utilizes \\r\\n line breaks"
          );
       }
