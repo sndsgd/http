@@ -22,8 +22,8 @@
    </logging>
 
    <filter>
-        <blacklist>
-              <directory>./vendor</directory>
-        </blacklist>
+      <blacklist>
+         <directory>./vendor</directory>
+      </blacklist>
     </filter>
 </phpunit>

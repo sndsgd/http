@@ -1,6 +1,6 @@
-.DS_Store
-.fuse_hidden*
 docs
 vendor
 composer.lock
 bin/dev.php
+tests/coverage-clover.xml
+tests/coverage-coveralls.json
