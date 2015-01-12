@@ -4,16 +4,19 @@ php:
   - 5.4
   - 5.5
   - 5.6
+  - hhvm
+  - hhvm-nightly
 
-before_install:
-  - composer self-update
+matrix:
+  allow_failures:
+    - php: hhvm
+    - php: hhvm-nightly
 
 install:
   - composer install --no-interaction --prefer-source --dev
-  - composer require satooshi/php-coveralls:dev-master
 
 script:
   - phpunit --coverage-clover tests/coverage-clover.xml
 
 after_script:
-  - vendor/bin/coveralls -v
+  - bin/aftertest

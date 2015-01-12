@@ -3,7 +3,7 @@
 namespace sndsgd\http;
 
 use \InvalidArgumentException;
-use \sndsgd\util\Arr;
+use \sndsgd\Arr;
 
 
 class Header

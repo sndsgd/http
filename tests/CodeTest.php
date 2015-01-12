@@ -1,10 +1,16 @@
 <?php
 
-use sndsgd\http\Code;
+namespace sndsgd\http;
 
 
-class CodeTest extends PHPUnit_Framework_TestCase
+/**
+ * @coversDefaultClass \sndsgd\http\Code
+ */
+class CodeTest extends \PHPUnit_Framework_TestCase
 {
+   /**
+    * @covers ::getStatusText
+    */
    public function testGetStatusText()
    {
       $this->assertEquals('OK', Code::getStatusText(200));
@@ -23,6 +29,9 @@ class CodeTest extends PHPUnit_Framework_TestCase
       $this->assertNull(Code::getStatusText(0));
    }
 
+   /**
+    * @covers ::matches
+    */
    public function testMatches()
    {
       $this->assertTrue(Code::matches(200, '2xx'));
@@ -33,6 +42,7 @@ class CodeTest extends PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::matches
     * @expectedException InvalidArgumentException
     */
    public function testMatchesIntegerException()

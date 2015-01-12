@@ -2,7 +2,7 @@
 
 namespace sndsgd\http;
 
-use \sndsgd\util\Temp;
+use \sndsgd\Temp;
 
 
 /**
@@ -14,35 +14,35 @@ class UploadedFile
 
    /**
     * The name of the input field
-    * 
+    *
     * @var string
     */
    protected $name;
 
    /**
     * The basename of the uploaded file (filename.ext)
-    * 
+    *
     * @var string
     */
    protected $filename;
 
    /**
     * The absolute path to the uploaded file in the temp directory
-    * 
+    *
     * @var string
     */
    protected $tempPath;
 
    /**
     * The content type of the file
-    * 
+    *
     * @var string
     */
    protected $contentType;
 
    /**
     * The bytesize of the file
-    * 
+    *
     * @var integer
     */
    protected $size;
@@ -61,20 +61,20 @@ class UploadedFile
 
    /**
     * Get the temp path to the file
-    * 
+    *
     * @return string An absolute file path
     */
    public function getTempPath()
    {
       if ($this->tempPath === null) {
-         $this->tempPath = Temp::file("upload-{$this->filename}"); 
+         $this->tempPath = Temp::file("uploaded-file-{$this->filename}");
       }
       return $this->tempPath;
    }
 
    /**
     * Get the name of the file as it was saved on the client computer
-    * 
+    *
     * @return string
     */
    public function getFilename()
@@ -84,7 +84,7 @@ class UploadedFile
 
    /**
     * Set the size of the file
-    * 
+    *
     * @param integer $bytes
     * @return sndsgd\http\UploadedFile
     */
@@ -96,7 +96,7 @@ class UploadedFile
 
    /**
     * Rename the file to move it from the temp path
-    * 
+    *
     * @param string $path The absolute path to move the file to
     * @return boolean
     */
