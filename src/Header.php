@@ -58,7 +58,7 @@ class Header
       }
 
       list($info, $fields) = $parts;
-      list($protocol, $code, $message) = preg_split('/\s+/', $info, 3);
+      list($protocol, $code, $message) = preg_split("/\s+/", $info, 3);
       $this->protocol = $protocol;
       $this->statusCode = intval($code);
 

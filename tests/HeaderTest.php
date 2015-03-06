@@ -31,11 +31,11 @@ class HeaderTest extends \PHPUnit_Framework_TestCase
     */
    public function testParseHttpGoogle()
    {
-      $h = Header::parse(self::$headers['http://google.com']);
-      $this->assertEquals('HTTP/1.1', $h->getProtocol());
+      $h = Header::parse(self::$headers["http://google.com"]);
+      $this->assertEquals("HTTP/1.1", $h->getProtocol());
       $this->assertEquals(301, $h->getStatusCode());
-      $this->assertEquals('Moved Permanently', $h->getStatusText());
-      $this->assertEquals(219, $h->getFieldValue('content-length'));
+      $this->assertEquals("Moved Permanently", $h->getStatusText());
+      $this->assertEquals(219, $h->getFieldValue("content-length"));
    }
 
    /**
@@ -43,11 +43,11 @@ class HeaderTest extends \PHPUnit_Framework_TestCase
     */
    public function testParseHttpsGoogle()
    {
-      $h = Header::parse(self::$headers['https://www.google.com']);
-      $this->assertEquals('HTTP/1.1', $h->getProtocol());
+      $h = Header::parse(self::$headers["https://www.google.com"]);
+      $this->assertEquals("HTTP/1.1", $h->getProtocol());
       $this->assertEquals(200, $h->getStatusCode());
-      $this->assertEquals('OK', $h->getStatusText());
-      $this->assertNull($h->getFieldValue('content-length'));
+      $this->assertEquals("OK", $h->getStatusText());
+      $this->assertNull($h->getFieldValue("content-length"));
    }
 
    /**
@@ -61,7 +61,7 @@ class HeaderTest extends \PHPUnit_Framework_TestCase
 }
 
 
-HeaderTest::addHeader('http://google.com', <<<HEADER
+HeaderTest::addHeader("http://google.com", <<<HEADER
 HTTP/1.1 301 Moved Permanently
 Alternate-Protocol: 80:quic,p=0.01
 Cache-Control: public, max-age=2592000
@@ -76,7 +76,7 @@ X-XSS-Protection: 1; mode=block
 HEADER
 );
 
-HeaderTest::addHeader('https://www.google.com', <<<HEADER
+HeaderTest::addHeader("https://www.google.com", <<<HEADER
 HTTP/1.1 200 OK
 Alternate-Protocol: 443:quic,p=0.01
 Cache-Control: private, max-age=0
