@@ -13,7 +13,7 @@ class Code
    /**
     * Status codes and their respective status texts
     * 
-    * @var array.<integer,string>
+    * @var array<integer,string>
     */
    private static $codes = [
       # success

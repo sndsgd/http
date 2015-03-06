@@ -38,7 +38,7 @@ class Header
    /**
     * The fields in the header
     *
-    * @var array.<string,string>
+    * @var array<string,string>
     */
    protected $fields = [];
 
@@ -107,7 +107,7 @@ class Header
     * Get a field value
     * 
     * @param string $name The name of the header field to retrieve
-    * @return string|array.<string>|null
+    * @return string|array<string>|null
     */
    public function getFieldValue($name)
    {
