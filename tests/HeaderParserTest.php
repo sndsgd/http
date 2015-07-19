@@ -4,9 +4,9 @@ namespace sndsgd\http;
 
 
 /**
- * @coversDefaultClass \sndsgd\http\Header
+ * @coversDefaultClass \sndsgd\http\HeaderParser
  */
-class HeaderTest extends \PHPUnit_Framework_TestCase
+class HeaderParserTest extends \PHPUnit_Framework_TestCase
 {
    protected static $headers = [];
 
@@ -64,37 +64,40 @@ HEADER
       self::$headers = null;
    }
 
-   /**
-    * @covers \sndsgd\http\Header
-    */
+
    public function testParseHttpGoogle()
    {
-      $h = Header::parse(self::$headers["http://google.com"]);
-      $this->assertEquals("HTTP/1.1", $h->getProtocol());
-      $this->assertEquals(301, $h->getStatusCode());
-      $this->assertEquals("Moved Permanently", $h->getStatusText());
-      $this->assertEquals(219, $h->getFieldValue("content-length"));
+      $parser = new HeaderParser;
+      $parser->parse(self::$headers["http://google.com"]);
+      $this->assertEquals("HTTP/1.1", $parser->getProtocol());
+      $this->assertEquals(301, $parser->getStatusCode());
+      $this->assertEquals("Moved Permanently", $parser->getStatusText());
+
+      $fields = $parser->getFields();
+      $this->assertTrue(is_array($fields));
    }
 
-   /**
-    * @covers \sndsgd\http\Header
-    */
    public function testParseHttpsGoogle()
    {
-      $h = Header::parse(self::$headers["https://www.google.com"]);
-      $this->assertEquals("HTTP/1.1", $h->getProtocol());
-      $this->assertEquals(200, $h->getStatusCode());
-      $this->assertEquals("OK", $h->getStatusText());
-      $this->assertNull($h->getFieldValue("content-length"));
+      $parser = new HeaderParser;
+      $parser->parse(self::$headers["https://www.google.com"]);
+      $this->assertEquals("HTTP/1.1", $parser->getProtocol());
+      $this->assertEquals(200, $parser->getStatusCode());
+      $this->assertEquals("OK", $parser->getStatusText());
+
+      $fields = $parser->getFields();
+      $this->assertTrue(is_array($fields));
+      $this->assertEquals("chunked", $fields["transfer-encoding"]);
    }
 
    /**
-    * @covers \sndsgd\http\Header
+    * @covers ::parse
     * @expectedException InvalidArgumentException
     */
    public function testBadHeader()
    {
-      Header::parse("HTTP/1.1 200 OK\nContent-Length: 219\n");
+      $parser = new HeaderParser;
+      $parser->parse("HTTP/1.1 200 OK\nContent-Length: 219\n");
    }
 }
 
