@@ -2,6 +2,7 @@
 
 namespace sndsgd\http;
 
+use \Exception;
 use \sndsgd\http\Code as HttpCode;
 use \sndsgd\http\HeaderParser;
 use \sndsgd\http\HeaderTrait;

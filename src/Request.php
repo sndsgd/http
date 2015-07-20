@@ -145,7 +145,6 @@ class Request
    public function prepare()
    {
       $ch = curl_init();
-      curl_setopt_array($ch, $this->getCurlOptions());
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($ch, CURLOPT_HEADER, true);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -169,6 +168,7 @@ class Request
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->data));
          }
       }
+      curl_setopt_array($ch, $this->getCurlOptions());
       return $ch;
    }
 
