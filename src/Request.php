@@ -5,6 +5,7 @@ namespace sndsgd\http;
 use \CurlFile;
 use \Exception;
 use \InvalidArgumentException;
+use \sndsgd\Arr;
 use \sndsgd\data\Manager as DataTrait;
 use \sndsgd\fs\File;
 use \sndsgd\Mime;
@@ -176,17 +177,19 @@ class Request
    {
       $count = 0;
       $tmp = [];
-      foreach ($this->data as $key => $value) {
-         if (strpos($value, "@/") === 0) {
-            $count++;
-            $path = substr($value, 1);
-            $ext = pathinfo($path, PATHINFO_EXTENSION);
-            $mime = Mime::getTypeFromExtension($ext);
-            $file = new CurlFile($path, $mime, basename($path));
-            $tmp[$key] = $file;
-         }
-         else {
-            $tmp[$key] = $value;
+      foreach ($this->data as $key => $values) {
+         foreach ((array) $values as $value) {
+            if (strpos($value, "@/") === 0) {
+               $count++;
+               $path = substr($value, 1);
+               $ext = pathinfo($path, PATHINFO_EXTENSION);
+               $mime = Mime::getTypeFromExtension($ext);
+               $file = new CurlFile($path, $mime, basename($path));
+               Arr::addValue($tmp, $key, $value);
+            }
+            else {
+               Arr::addValue($tmp, $key, $value);
+            }   
          }
       }
 
