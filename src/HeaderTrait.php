@@ -78,5 +78,22 @@ trait HeaderTrait
    {
       return $this->headers;
    }
+
+   /**
+    * Retrieve an array of headers as strings
+    *
+    * @return array<string>
+    */
+   public function stringifyHeaders()
+   {
+      $ret = [];
+      foreach ($this->headers as $header => $value) {
+         if (is_array($value)) {
+            $value = implode(", ", $value);
+         }
+         $ret[] = "$header: $value";
+      }
+      return $ret;
+   }
 }
 

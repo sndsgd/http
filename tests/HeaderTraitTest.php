@@ -114,5 +114,16 @@ class HeaderTraitTest extends \PHPUnit_Framework_TestCase
       $this->test->addHeaders(static::$testHeaders);
       $this->assertEquals(static::$testHeaders, $this->test->getHeaders());
    }
+
+   public function testStringifyHeaders()
+   {
+      $this->test->addHeaders(static::$testHeaders);
+      $res = $this->test->stringifyHeaders();
+      $this->assertEquals([
+         "one: 1",
+         "two: two",
+         "three: 1, 2, 3"
+      ], $res);
+   }
 }
 
