@@ -13,12 +13,13 @@ abstract class Request
     *
     * @var array<string,string>
     */
-   protected static $bodyDataTypes = [
+   protected static $dataTypes = [
       "application/json" => "sndsgd\\http\\data\\decoder\\JsonDecoder",
       "multipart/form-data" => "sndsgd\\http\\data\\decoder\\MultipartDataDecoder",
       "application/x-www-form-urlencoded" => "sndsgd\\http\\data\\decoder\\UrlDecoder",
       "text/html" => "sndsgd\\http\\data\\decoder\\HtmlDecoder"
    ];
+
 
    /**
     * Request query parameters are stashed here after the are decoded
@@ -28,28 +29,17 @@ abstract class Request
    protected $queryParameters;
 
    /**
-    * Determine if the request is using basic authentication
-    *
-    * @return boolean
-    */
-   public function usesBasicAuth()
-   {
-      return (
-         array_key_exists("PHP_AUTH_USER", $_SERVER) &&
-         array_key_exists("PHP_AUTH_PW", $_SERVER)
-      );
-   }
-
-   /**
     * Get the basic auth credentials
     *
-    * @return array<string>
+    * @return array<string|null>
     */
    public function getBasicAuth()
    {
       return [
-         $_SERVER["PHP_AUTH_USER"],
-         $_SERVER["PHP_AUTH_PW"]
+         array_key_exists("PHP_AUTH_USER", $_SERVER) 
+            ? $_SERVER["PHP_AUTH_USER"] : null,
+         array_key_exists("PHP_AUTH_PW", $_SERVER) 
+            ? $_SERVER["PHP_AUTH_PW"] : null,
       ];
    }
 
@@ -87,11 +77,11 @@ abstract class Request
          return [];
       }
 
-      if (!array_key_exists($contentType, static::$bodyDataTypes)) {
+      if (!array_key_exists($contentType, static::$dataTypes)) {
          throw new Exception("Unknown Content-Type '$contentType'", 400);
       }
 
-      $class = static::$bodyDataTypes[$contentType];
+      $class = static::$dataTypes[$contentType];
       $decoder = new $class;
       return $decoder->getDecodedData();
    }
