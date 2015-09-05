@@ -11,14 +11,18 @@ class Host
    use HeaderTrait;
 
    /**
+    * The base url for all requests
+    *
     * @var \sndsgd\Url
     */
    protected $url;
 
    /**
+    * Options to pass to request instances
+    *
     * @var array<mixed,mixed>
     */
-   protected $curlOptions = [];
+   protected $options = [];
 
    /**
     * @param string $url A url to extract scheme, host, port, and path from
@@ -55,17 +59,17 @@ class Host
    /**
     * @param array<mixed,mixed> $options
     */
-   public function setCurlOptions(array $options)
+   public function setOptions(array $options)
    {
-      $this->curlOptions = $options;
+      $this->options = $options;
    }
 
    /**
     * @return array<mixed,mixed>
     */
-   public function getCurlOptions()
+   public function getOptions()
    {
-      return $this->curlOptions;
+      return $this->options;
    }
 }
 

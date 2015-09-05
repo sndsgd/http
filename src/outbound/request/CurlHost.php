@@ -9,7 +9,7 @@ use \sndsgd\Url;
 /**
  * Host information for use across multiple requests
  */
-class CurlHost
+class CurlHost extends \sndsgd\http\Host
 {
    use HeaderTrait;
 
@@ -25,7 +25,7 @@ class CurlHost
     *
     * @var array<mixed,mixed>
     */
-   protected $curlOptions = [];
+   protected $options = [];
 
    /**
     * @param string $url A url to extract scheme, host, port, and path from
@@ -62,16 +62,16 @@ class CurlHost
    /**
     * @param array<mixed,mixed> $options
     */
-   public function setCurlOptions(array $options)
+   public function setOptions(array $options)
    {
-      $this->curlOptions = $options;
+      $this->options = $options;
    }
 
    /**
     * @return array<mixed,mixed>
     */
-   public function getCurlOptions()
+   public function getOptions()
    {
-      return $this->curlOptions;
+      return $this->options;
    }
 }

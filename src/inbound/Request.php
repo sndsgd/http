@@ -2,6 +2,8 @@
 
 namespace sndsgd\http\inbound;
 
+use \Exception;
+
 
 /**
  * Base class for inbound requests
@@ -17,9 +19,17 @@ abstract class Request
       "application/json" => "sndsgd\\http\\data\\decoder\\JsonDecoder",
       "multipart/form-data" => "sndsgd\\http\\data\\decoder\\MultipartDataDecoder",
       "application/x-www-form-urlencoded" => "sndsgd\\http\\data\\decoder\\UrlDecoder",
-      "text/html" => "sndsgd\\http\\data\\decoder\\HtmlDecoder"
    ];
 
+
+   protected $basicAuth;
+
+   /**
+    * The request content type without a charset
+    *
+    * @var string
+    */
+   protected $contentType;
 
    /**
     * Request query parameters are stashed here after the are decoded
@@ -29,18 +39,39 @@ abstract class Request
    protected $queryParameters;
 
    /**
+    * Get the content type
+    *
+    * @return string|null
+    */
+   public function getContentType()
+   {
+      if ($this->contentType === null) {
+         $contentType = $this->getHeader("content-type") ?: "";
+         $pos = strpos($contentType, ";");
+         $contentType = ($pos !== false) 
+            ? substr($contentType, 0, $pos) 
+            : $contentType;   
+         $this->contentType = $contentType;         
+      }
+      return $this->contentType;
+   }
+
+   /**
     * Get the basic auth credentials
     *
     * @return array<string|null>
     */
    public function getBasicAuth()
    {
-      return [
-         array_key_exists("PHP_AUTH_USER", $_SERVER) 
-            ? $_SERVER["PHP_AUTH_USER"] : null,
-         array_key_exists("PHP_AUTH_PW", $_SERVER) 
-            ? $_SERVER["PHP_AUTH_PW"] : null,
-      ];
+      if ($this->basicAuth === null) {
+         $this->basicAuth = [
+            array_key_exists("PHP_AUTH_USER", $_SERVER) 
+               ? $_SERVER["PHP_AUTH_USER"] : null,
+            array_key_exists("PHP_AUTH_PW", $_SERVER) 
+               ? $_SERVER["PHP_AUTH_PW"] : null,
+         ];
+      }
+      return $this->basicAuth;
    }
 
    /**

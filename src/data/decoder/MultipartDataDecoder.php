@@ -4,11 +4,8 @@ namespace sndsgd\http\data\decoder;
 
 use \Exception;
 use \sndsgd\Arr;
-use \sndsgd\Cli;
-use \sndsgd\fs\File;
 use \sndsgd\http\UploadedFile;
 use \sndsgd\Mime;
-use \sndsgd\Temp;
 
 
 class MultipartDataDecoder extends \sndsgd\http\data\Decoder
@@ -45,7 +42,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\Decoder
    private $lastBoundary;
 
    /**
-    * The contents of the input stream that are read, but not processed
+    * The contents of the input stream that have been read, but not processed
     *
     * @var string
     */
