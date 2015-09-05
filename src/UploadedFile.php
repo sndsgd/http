@@ -2,7 +2,9 @@
 
 namespace sndsgd\http;
 
+use \sndsgd\ErrorTrait;
 use \sndsgd\Temp;
+
 
 
 /**
@@ -10,7 +12,7 @@ use \sndsgd\Temp;
  */
 class UploadedFile
 {
-   use \sndsgd\issue\Manager;
+   use ErrorTrait;
 
    /**
     * The name of the input field

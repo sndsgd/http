@@ -1,0 +1,18 @@
+------WebKitFormBoundarycYfYH3MSwO27MIu0
+Content-Disposition: form-data; name="name"
+
+asd
+------WebKitFormBoundarycYfYH3MSwO27MIu0
+Content-Disposition: form-data; name="email"
+
+asd@asd.com
+------WebKitFormBoundarycYfYH3MSwO27MIu0
+Content-Disposition: form-data; name="file"; filename=""
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundarycYfYH3MSwO27MIu0
+Content-Disposition: form-data; name="submit"
+
+submit
+------WebKitFormBoundarycYfYH3MSwO27MIu0--

@@ -1,29 +1,30 @@
 {
-   "name": "sndsgd/http",
-   "description": "A collection of tools for working with HTTP",
-   "type": "library",
-   "homepage": "https://github.com/sndsgd/sndsgd-http",
-   "license": "MIT",
-   "authors": [
-      {
-         "name": "Russell B",
-         "homepage": "http://snds.gd/"
-      }
-   ],
-   "support": {
-      "issues": "https://github.com/sndsgd/sndsgd-http/issues",
-      "source": "https://github.com/sndsgd/sndsgd-http/tree/master"
-   },
-   "require": {
-      "php": ">=5.4.0",
-      "sndsgd/util": "~0.5"
-   },
-   "require-dev": {
-      "phpunit/phpunit": "~4.0"
-   },
-   "autoload": {
-      "psr-4": {
-         "sndsgd\\http\\": "src/"
-      }
-   }
+    "name": "sndsgd/http",
+    "description": "A collection of tools for working with HTTP",
+    "type": "library",
+    "homepage": "https://github.com/sndsgd/sndsgd-http",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Russell B",
+            "homepage": "http://snds.gd/"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/sndsgd/sndsgd-http/issues",
+        "source": "https://github.com/sndsgd/sndsgd-http/tree/master"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "sndsgd/util": "~0.5",
+        "sndsgd/fs": "0.1.7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "sndsgd\\http\\": "src/"
+        }
+    }
 }

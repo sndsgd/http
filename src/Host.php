@@ -1,7 +1,8 @@
 <?php
 
-namespace sndsgd\http\request;
+namespace sndsgd\http;
 
+use \InvalidArgumentException;
 use \sndsgd\http\HeaderTrait;
 use \sndsgd\Url;
 
