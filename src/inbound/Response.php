@@ -44,7 +44,7 @@ abstract class Response
    {
       $ret = $this->getHeader("content-type");
       if ($ret === null) {
-         return null
+         return null;
       }
       $pos = strpos($ret, ";");
       return ($pos !== false) ? substr($ret, 0, $pos) : $ret;

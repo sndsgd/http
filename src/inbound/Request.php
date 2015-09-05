@@ -21,9 +21,6 @@ abstract class Request
       "application/x-www-form-urlencoded" => "sndsgd\\http\\data\\decoder\\UrlDecoder",
    ];
 
-
-   protected $basicAuth;
-
    /**
     * The request content type without a charset
     *
@@ -32,7 +29,21 @@ abstract class Request
    protected $contentType;
 
    /**
-    * Request query parameters are stashed here after the are decoded
+    * Basic auth details are stashed here
+    * 
+    * @var array<string|null>
+    */
+   protected $basicAuth;
+
+   /**
+    * Parameters included in the uri are stashed here after
+    *
+    * @var array<string,mixed>
+    */
+   protected $uriParameters;
+
+   /**
+    * Request query parameters are stashed here after they are decoded
     *
     * @var array<string,mixed>
     */
@@ -75,11 +86,25 @@ abstract class Request
    }
 
    /**
-    * Get the query parameters decoded as an array
-    *
+    * @param array<string,mixed> $params
+    */
+   public function setUriParameters(array $params)
+   {
+      $this->uriParameters = $params;
+   }
+
+   /**
     * @return array<string,mixed>
     */
-   protected function getQueryParameters()
+   public function getUriParameters()
+   {
+      return $this->uriParameters;
+   }
+
+   /**
+    * @return array<string,mixed>
+    */
+   public function getQueryParameters()
    {
       if ($this->queryParameters === null) {
          $result = [];
@@ -101,7 +126,7 @@ abstract class Request
     * @return array
     * @throws Exception If the provided content type is not acceptable
     */
-   protected function getRequestData()
+   protected function getDecodedBody()
    {
       $contentType = $this->getContentType();
       if ($contentType === null) {

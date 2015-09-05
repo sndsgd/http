@@ -31,7 +31,7 @@ class CurlRequest extends \sndsgd\http\outbound\Request
     *
     * @var array<integer,boolean|integer|string>
     */
-   protected $curlOptions = [];
+   protected $options = [];
 
    /**
     * Close the curl object if it is still open
@@ -49,9 +49,9 @@ class CurlRequest extends \sndsgd\http\outbound\Request
     * @param string $opt
     * @param mixed $value
     */
-   public function setCurlOption($opt, $value)
+   public function setOption($opt, $value)
    {
-      $this->curlOptions[$opt] = $value;
+      $this->options[$opt] = $value;
    }
 
    /**
@@ -59,9 +59,9 @@ class CurlRequest extends \sndsgd\http\outbound\Request
     *
     * @param array<integer,boolean|integer|string> $opts
     */
-   public function setCurlOptions(array $opts)
+   public function setOptions(array $opts)
    {
-      $this->curlOptions = $opts;
+      $this->options = $opts;
    }
 
    /**
@@ -70,9 +70,9 @@ class CurlRequest extends \sndsgd\http\outbound\Request
     * @param array $opts Base curl options, generally provided by the crawler
     * @return array
     */
-   public function getCurlOptions(array $opts = [])
+   public function getOptions(array $opts = [])
    {
-      foreach ($this->curlOptions as $key => $value) {
+      foreach ($this->options as $key => $value) {
          $opts[$key] = $value;
       }
       $opts[CURLOPT_HTTPHEADER] = $this->stringifyHeaders();
@@ -95,7 +95,7 @@ class CurlRequest extends \sndsgd\http\outbound\Request
       curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
       curl_setopt($this->curl, CURLOPT_HEADER, true);
       curl_setopt($this->curl, CURLOPT_ENCODING, "");
-      curl_setopt_array($this->curl, $this->getCurlOptions());
+      curl_setopt_array($this->curl, $this->getOptions());
       return $this->curl;
    }
 
@@ -108,18 +108,18 @@ class CurlRequest extends \sndsgd\http\outbound\Request
          $queryParams = ($this->data)
             ? "?".Url::encodeQueryString($this->data)
             : "";
-         curl_setopt($ch, CURLOPT_URL, $this->url.$queryParams);
+         curl_setopt($this->curl, CURLOPT_URL, $this->url.$queryParams);
       }
       else {
-         curl_setopt($ch, CURLOPT_URL, $this->url);
-         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
+         curl_setopt($this->curl, CURLOPT_URL, $this->url);
+         curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $this->method);
          if ($this->hasUploadFiles()) {
             $this->setHeader("Expect", "");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->data);
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $this->data);
          }
          else {
             $this->setHeader("Content-Type", "application/json; charset=UTF-8");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->data));
+            curl_setopt($this->curl, CURLOPT_POSTFIELDS, json_encode($this->data));
          }
       }
    }
@@ -151,16 +151,16 @@ class CurlRequest extends \sndsgd\http\outbound\Request
    /**
     * {@inheritdoc}
     */
-   public function getResponse($class = null)
+   public function getResponse($classname = null)
    {
-      $validclass = "sndsgd\\http\\inbound\\response\\CurlResponse";
-      if ($class === null) {
-         $class = $validclass;
+      $validClassname = "sndsgd\\http\\inbound\\response\\CurlResponse";
+      if ($classname === null) {
+         $classname = $validClassname;
       }
-      else if (!is_a($class, $validclass, true)) {
+      else if (!is_a($classname, $validClassname, true)) {
          throw new InvalidArgumentException(
             "invalid value provided for 'classname'; ".
-            "expecting an subclass of '$validclass'"
+            "expecting an subclass of '$validClassname'"
          );
       }
 
@@ -168,7 +168,6 @@ class CurlRequest extends \sndsgd\http\outbound\Request
       $response = new $classname;
       $response->setBody(curl_exec($ch));
       $response->setCurlInfo(curl_getinfo($ch));
-      $response->parseHeaders();
       return $response;
    }
 }
