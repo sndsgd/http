@@ -35,14 +35,17 @@ class RouteTask extends \sndsgd\Task
    {
       parent::__construct($fields);
       $this->addFields([
+         (new StringField("filename"))
+            ->addAliases("f")
+            ->setDescription("the resulting filename relative to the app directory"),
          (new StringField("path-match"))
-            ->setDescription("a regex to use for matching route paths")
+            ->addAliases("m")
+            ->setDescription("a regex for including/excluding route paths")
       ]);
    }
 
    public function run()
    {
-
       $options = $this->exportValues();
       var_dump($options);
 
@@ -54,7 +57,7 @@ class RouteTask extends \sndsgd\Task
       $contents = $this->createRouteConfigContents();
       if ($options["update"]) {
          Env::log("updating routes config... ");
-         $file = new File(APP_DIR."/config/routes.php");
+         $file = new File(APP_DIR."/init/routes.php");
          if (!$file->write($contents)) {
             Env::log("\n");
             Env::err("failed to update routes; ".$file->getError()."\n");
