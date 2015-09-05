@@ -1,0 +1,30 @@
+#!/usr/bin/env php
+<?php
+
+# find and require the autoloader
+# 1. use the parent project bootstrap.php
+# 2. use the parent project autoload.php
+# ...
+call_user_func(function() {
+   $search = [
+      __DIR__."/../../../../bootstrap.php",
+      __DIR__."/../../../../autoload.php",
+      __DIR__."/../../../autoload.php",
+      __DIR__."/../../autoload.php",
+      __DIR__."/../bootstrap.php"
+   ];
+
+   foreach ($search as $path) {
+      if (file_exists($path) && is_file($path)) {
+         require $path;
+         return;
+      }
+   }
+
+   die("failed to locate autoload script\n");
+});
+
+
+$runner = new \sndsgd\cli\task\Runner("sndsgd\\http\\task\\RouteTask");
+$runner->run($argv);
+

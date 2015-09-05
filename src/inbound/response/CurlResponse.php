@@ -2,6 +2,8 @@
 
 namespace sndsgd\http\inbound\response;
 
+use \sndsgd\http\HeaderParser;
+
 
 /**
  * A response to a request made with an instance of CurlRequest
@@ -26,9 +28,9 @@ class CurlResponse extends \sndsgd\http\inbound\Response
       # remove them from the body, and parse them into the HeaderTrait
       if (
          $info["header_size"] &&
-         $header = trim(substr($this->body, 0, $info["header_size"]))
+         $header = trim(substr($this->body, 0, $this->curlInfo["header_size"]))
       ) {
-         $this->body = substr($this->body, $this->info["header_size"]);
+         $this->body = substr($this->body, $this->curlInfo["header_size"]);
          $parser = new HeaderParser($header);
          $parser->parse($header);
          $this->setHeaders($parser->getFields());

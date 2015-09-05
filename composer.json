@@ -26,5 +26,8 @@
         "psr-4": {
             "sndsgd\\http\\": "src/"
         }
-    }
+    },
+    "bin": [
+      "bin/routes"
+   ]
 }

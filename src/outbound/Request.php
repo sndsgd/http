@@ -3,6 +3,7 @@
 namespace sndsgd\http\outbound;
 
 use \sndsgd\http\HeaderTrait;
+use \sndsgd\http\MethodTrait;
 
 
 /**
@@ -10,7 +11,7 @@ use \sndsgd\http\HeaderTrait;
  */
 abstract class Request
 {
-   use HeaderTrait;
+   use HeaderTrait, MethodTrait;
 
    /**
     * The request url
@@ -18,13 +19,6 @@ abstract class Request
     * @var string
     */
    protected $url;
-
-   /**
-    * The request method
-    *
-    * @var string
-    */
-   protected $method = "GET";
 
    /**
     * @param string $url
@@ -40,22 +34,6 @@ abstract class Request
    public function getUrl()
    {
       return $this->url;
-   }
-
-   /**
-    * @param string $method
-    */
-   public function setMethod($method)
-   {
-      $this->method = $method;
-   }
-
-   /**
-    * @return string
-    */
-   public function getMethod()
-   {
-      return $this->method;
    }
 
    /**
