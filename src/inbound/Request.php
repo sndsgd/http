@@ -3,6 +3,8 @@
 namespace sndsgd\http\inbound;
 
 use \Exception;
+use \sndsgd\http\data\decoder\UrlDecoder;
+use \sndsgd\Url;
 
 
 /**
@@ -118,7 +120,7 @@ abstract class Request
          $pos = strpos($_SERVER["REQUEST_URI"], "?");
          if ($pos !== false) {
             $queryString = substr($_SERVER["REQUEST_URI"], $pos + 1);
-            $rfc = UrlEncodedParser::getRfc();
+            $rfc = UrlDecoder::getRfc();
             $result = Url::decodeQueryString($queryString, $rfc);
          }
          $this->queryParameters = $result;

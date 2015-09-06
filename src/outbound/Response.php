@@ -15,6 +15,14 @@ abstract class Response
    use HeaderTrait;
 
    /**
+    * The name of the class that will be used to 'write' the response
+    * Note: 
+    *
+    * @var string
+    */
+   protected $writerClassname = "sndsgd\\http\\outbound\\response\\writer\\RawWriter";
+
+   /**
     * The http status code
     *
     * @var integer
