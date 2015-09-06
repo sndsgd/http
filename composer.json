@@ -17,9 +17,9 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
-        "sndsgd/util": "~0.5",
-        "sndsgd/cli": "0.5.3",
-        "sndsgd/fs": "0.1.7",
+        "sndsgd/util": "dev-dev",
+        "sndsgd/cli": "dev-dev",
+        "sndsgd/fs": "dev-dev",
         "sndsgd/user": "dev-dev"
     },
     "require-dev": {},
