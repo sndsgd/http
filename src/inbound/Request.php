@@ -50,6 +50,13 @@ abstract class Request
    protected $queryParameters;
 
    /**
+    * In some cases a response will be generated, and then stashed here
+    * 
+    * @var \sndsgd\http\outbound\Response
+    */
+   protected $response;
+
+   /**
     * Get the content type
     *
     * @return string|null
@@ -126,19 +133,22 @@ abstract class Request
     * @return array
     * @throws Exception If the provided content type is not acceptable
     */
-   protected function getDecodedBody()
+   protected function getBodyParameters()
    {
-      $contentType = $this->getContentType();
-      if ($contentType === null) {
-         return [];
-      }
+      if ($this->bodyParameters === null) {
+         $contentType = $this->getContentType();
+         if ($contentType === null) {
+            return [];
+         }
 
-      if (!array_key_exists($contentType, static::$dataTypes)) {
-         throw new Exception("Unknown Content-Type '$contentType'", 400);
-      }
+         if (!array_key_exists($contentType, static::$dataTypes)) {
+            throw new Exception("Unknown Content-Type '$contentType'", 400);
+         }
 
-      $class = static::$dataTypes[$contentType];
-      $decoder = new $class;
-      return $decoder->getDecodedData();
+         $class = static::$dataTypes[$contentType];
+         $decoder = new $class;
+         $this->bodyParameters = $decoder->getDecodedData();   
+      }
+      return $this->bodyParameters;
    }
 }
