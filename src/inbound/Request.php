@@ -13,6 +13,13 @@ use \sndsgd\Url;
 abstract class Request
 {
    /**
+    * Subclasses *MAY* force a request handler to ignore rate limiting
+    *
+    * @var string
+    */
+   const IGNORE_RATE_LIMIT = false;
+
+   /**
     * Request body decoders
     *
     * @var array<string,string>
