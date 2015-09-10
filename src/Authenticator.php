@@ -72,10 +72,9 @@ class Authenticator
     */
    public function useCookie()
    {
-      if (!array_key_exists(self::COOKIE_NAME, $_COOKIE)) {
-         return null;
-      }
-      return $this->loadUserFromSessionToken($_COOKIE[self::COOKIE_NAME]);
+      return (array_key_exists(APP_SESSION_COOKIE_NAME, $_COOKIE))
+         ? $this->loadUserFromSessionToken($_COOKIE[APP_SESSION_COOKIE_NAME])
+         : null;
    }
 
    /**
@@ -202,7 +201,6 @@ class Authenticator
    {
       $name = APP_SESSION_COOKIE_NAME;
       $path = APP_SESSION_COOKIE_PATH;
-
       return setcookie($name, $value, $expiration, $path);
    }
 }

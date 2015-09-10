@@ -38,6 +38,13 @@ abstract class Request
    protected $basicAuth;
 
    /**
+    * The uri path
+    *
+    * @var string
+    */
+   protected $path;
+
+   /**
     * Parameters included in the uri are stashed here after
     *
     * @var array<string,mixed>
@@ -92,6 +99,22 @@ abstract class Request
          ];
       }
       return $this->basicAuth;
+   }
+
+   /**
+    * @param string $path
+    */
+   public function setPath($path)
+   {
+      $this->path = $path;
+   }
+   
+   /**
+    * @return string
+    */
+   public function getPath()
+   {
+      return $this->path;
    }
 
    /**
