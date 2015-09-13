@@ -96,7 +96,7 @@ class RateLimiter
    {
       $count = $this->redis->incr($this->cacheKey);
       if ($count === 1) {
-         $this->redis->setTimeout($key, $this->duration);
+         $this->redis->setTimeout($this->cacheKey, $this->duration);
       }
       $this->remainingRequests = $this->count - $count;
       $this->expiration = $this->redis->ttl($this->cacheKey);

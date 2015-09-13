@@ -66,11 +66,25 @@ abstract class Request
    protected $queryParameters;
 
    /**
+    * Request body parameters are stashed here after they are decoded
+    *
+    * @var array<string,mixed>
+    */
+   protected $bodyParameters;
+
+   /**
     * In some cases a response will be generated, and then stashed here
     * 
     * @var \sndsgd\http\outbound\Response
     */
    protected $response;
+
+   public function getHeader($name, $default = "")
+   {
+      $name = strtoupper($name);
+      $name = "HTTP_".preg_replace("~[^A-Z0-9]~", "_", $name);
+      return (array_key_exists($name, $_SERVER)) ? $_SERVER[$name] : $default;
+   }
 
    /**
     * Get the content type
@@ -182,5 +196,14 @@ abstract class Request
          $this->bodyParameters = $decoder->getDecodedData();   
       }
       return $this->bodyParameters;
+   }
+
+   protected function getParameters()
+   {
+      return array_merge(
+         $this->getQueryParameters(),
+         $this->getBodyParameters(),
+         $this->getUriParameters()
+      );
    }
 }

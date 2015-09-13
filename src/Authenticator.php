@@ -2,6 +2,7 @@
 
 namespace sndsgd\http;
 
+use \sndsgd\Container;
 use \sndsgd\user\model\User;
 use \sndsgd\user\model\Session;
 
@@ -19,9 +20,16 @@ class Authenticator
    protected $userClassname = APP_USER_MODEL;
 
    /**
+    * The classname of the session model to use
+    *
+    * @var string
+    */
+   protected $sessionClassname = APP_SESSION_MODEL;
+
+   /**
     * The current session instance
     * 
-    * @var \sndsgd\user\model\user\Session
+    * @var \sndsgd\user\model\Session
     */   
    protected $session;
 
@@ -46,23 +54,21 @@ class Authenticator
     * Attempt to authenticate using basic authentication
     * uses the user's `username` and `apikey`
     *
-    * @return array|null
+    * @param string $username
+    * @param string $apikey
+    * @return boolean
     */
-   public function useBasicAuth(array $basicAuth)
+   public function useBasicAuth($username, $apikey)
    {
-      list($username, $apikey) = $basicAuth;
-
       # if only the password exists, assume its a session token
-      if ($username === "" && $apikey !== "") {
-         return $this->loadUserFromSessionToken($apikey);
+      if ($username === null && $apikey !== null) {
+         return $this->loadFromSessionToken($apikey);
       }
 
       # otherwise load the user by username and compare the apikeys
       spl_autoload_call("DoctrineProxies\\__CG__\\sndsgd\\user\\model\\User");
       spl_autoload_call("DoctrineProxies\\__CG__\\sndsgd\\user\\model\\Role");
-      return ($this->loginWithApikey($username, $apikey))
-         ? $this->user->toArray()
-         : null;
+      return $this->loginWithApikey($username, $apikey);
    }
 
    /**
@@ -72,45 +78,27 @@ class Authenticator
     */
    public function useCookie()
    {
-      return (array_key_exists(APP_SESSION_COOKIE_NAME, $_COOKIE))
-         ? $this->loadUserFromSessionToken($_COOKIE[APP_SESSION_COOKIE_NAME])
-         : null;
+      return (
+         array_key_exists(APP_SESSION_COOKIE_NAME, $_COOKIE) &&
+         $this->loadFromSessionToken($_COOKIE[APP_SESSION_COOKIE_NAME])
+      );
    }
 
    /**
     * @param string $token
-    * @return array
+    * @return boolean
     */
    public function loadFromSessionToken($token)
    {
-      $this->session = Session::readCache($token);
       if (!$this->session) {
-         $doctrine = Container::get("doctrine");
-         $query = $doctrine->createQuery(
-            "SELECT e FROM sndsgd\user\\model\\user\\Session e WHERE
-            e.deletedAt is NULL AND
-            e.token = :token"
+         $query = Container::get("doctrine")->createQuery(
+            "SELECT s FROM {$this->sessionClassname} s
+            WHERE s.dateDeleted is NULL AND s.token = ?1"
          );
-         $query->setParameter("token", $token);
+         $query->setParameter(1, $token);
          $this->session = $query->getOneOrNullResult();
-         if ($this->session !== null) {
-            $this->session = $this->session->writeCache();
-         }
       }
-      return $this->session;
-   }
-
-   /**
-    * Get the user from a session instance
-    * Note: will return an array, as the doctrine objects cannot be cached
-    * 
-    * @param string $token
-    * @return array
-    */
-   public function loadUserFromSessionToken($token)
-   {
-      $session = $this->loadFromSessionToken($token);
-      return ($session === null) ? null : $session["user"];
+      return ($this->session !== null);
    }
 
    /**
@@ -121,11 +109,9 @@ class Authenticator
     */
    private function loadUser($username)
    {
-      $doctrine = Container::get("doctrine");
-      $query = $doctrine->createQuery(
-         "SELECT u FROM {$this->userClassname} u WHERE
-         u.dateDeleted is NULL AND
-         u.username = ?1"
+      $query = Container::get("doctrine")->createQuery(
+         "SELECT u FROM {$this->userClassname} u 
+         WHERE u.dateDeleted is NULL AND u.username = ?1"
       );
       $query->setParameter(1, $username);
       $this->user = $query->getOneOrNullResult();
@@ -145,7 +131,13 @@ class Authenticator
     */
    public function getUser()
    {
-      return $this->user;
+      if ($this->user !== null) {
+         return $this->user;
+      }
+      else if ($this->session !== null) {
+         return $this->session->getUser();
+      }
+      return null;
    }
 
    /**
