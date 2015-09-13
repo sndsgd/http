@@ -205,7 +205,7 @@ abstract class Request
    {
       if ($this->bodyParameters === null) {
          $contentType = $this->getContentType();
-         if ($contentType === null) {
+         if ($contentType === "") {
             return [];
          }
 
@@ -218,14 +218,5 @@ abstract class Request
          $this->bodyParameters = $decoder->getDecodedData();
       }
       return $this->bodyParameters;
-   }
-
-   protected function getParameters()
-   {
-      return array_merge(
-         $this->getQueryParameters(),
-         $this->getBodyParameters(),
-         $this->getUriParameters()
-      );
    }
 }

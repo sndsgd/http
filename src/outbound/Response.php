@@ -20,7 +20,7 @@ abstract class Response
     *
     * @var string
     */
-   protected $writerClassname = "sndsgd\\http\\outbound\\response\\writer\\RawWriter";
+   protected $writerClassname = "sndsgd\\http\\outbound\\response\\Writer";
 
    /**
     * The http status code
@@ -63,6 +63,17 @@ abstract class Response
    public function getStatusText()
    {
       return $this->statusText;
+   }
+
+   /**
+    * Create a writer to 'write' the response
+    * 
+    * @return \sndsgd\http\response\Writer
+    */
+   public function createWriter()
+   {
+      $classname = $this->writerClassname;
+      return new $classname($this);
    }
 
    /**
