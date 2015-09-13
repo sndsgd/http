@@ -2,7 +2,7 @@
 
 namespace sndsgd\http;
 
-use \sndsgd\Container;
+use \sndsgd\Storage;
 use \sndsgd\user\model\User;
 use \sndsgd\user\model\Session;
 
@@ -91,7 +91,7 @@ class Authenticator
    public function loadFromSessionToken($token)
    {
       if (!$this->session) {
-         $query = Container::get("doctrine")->createQuery(
+         $query = Storage::getInstance()->get("doctrine")->createQuery(
             "SELECT s FROM {$this->sessionClassname} s
             WHERE s.dateDeleted is NULL AND s.token = ?1"
          );
@@ -109,8 +109,10 @@ class Authenticator
     */
    private function loadUser($username)
    {
-      $query = Container::get("doctrine")->createQuery(
+      $query = Storage::getInstance()->get("doctrine")->createQuery(
          "SELECT u FROM {$this->userClassname} u 
+         JOIN sndsgd\\user\\model\\Role r WITH r = u.role
+         JOIN sndsgd\\user\\model\\Status s WITH s = u.status
          WHERE u.dateDeleted is NULL AND u.username = ?1"
       );
       $query->setParameter(1, $username);

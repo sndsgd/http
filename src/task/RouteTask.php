@@ -2,15 +2,23 @@
 
 namespace sndsgd\http\task;
 
+use \DateTime;
 use \RecursiveDirectoryIterator as RDI;
 use \RecursiveIteratorIterator as RII;
 use \ReflectionClass;
 use \SplFileInfo;
 use \sndsgd\Classname;
 use \sndsgd\Env;
+use \sndsgd\Field;
 use \sndsgd\field\BooleanField;
 use \sndsgd\field\StringField;
+use \sndsgd\field\rule\PathTestRule;
+use \sndsgd\field\rule\RequiredRule;
+use \sndsgd\field\rule\ClosureRule;
+use \sndsgd\field\rule\MaxValueCountRule;
+use \sndsgd\fs\Dir;
 use \sndsgd\fs\File;
+use \sndsgd\http\model\Route;
 
 
 class RouteTask extends \sndsgd\Task
@@ -19,12 +27,12 @@ class RouteTask extends \sndsgd\Task
    const VERSION = "1.0.0";
 
    /**
-    * @var array<string,\genome\model\Route>
+    * @var array<string,\sndsgd\http\model\Route>
     */
    protected $routes = [];
 
    /**
-    * @var array<string,\genome\model\UserRole>
+    * @var array<string,\sndsgd\user\model\Role>
     */
    protected $userRoles = [];
 
@@ -35,34 +43,59 @@ class RouteTask extends \sndsgd\Task
    {
       parent::__construct($fields);
       $this->addFields([
+         (new StringField("app-directory"))
+            ->addAliases("a")
+            ->setDescription("the app directory")
+            ->addRules([
+               new RequiredRule,
+               new MaxValueCountRule(1),
+               new PathTestRule(Dir::EXISTS | Dir::READABLE)
+            ]),
          (new StringField("filename"))
             ->addAliases("f")
-            ->setDescription("the resulting filename relative to the app directory"),
-         (new StringField("path-match"))
-            ->addAliases("m")
-            ->setDescription("a regex for including/excluding route paths")
+            ->setDescription("the resulting filename relative to the app directory")
+            ->addRules([
+               new MaxValueCountRule(1),
+               new ClosureRule(function() {
+                  $dir = $this->collection->exportFieldValue("app-directory");
+                  $file = new File("$dir/{$this->value}");
+                  $file->normalize();
+                  if (!$file->canWrite()) {
+                     $this->message = $file->getError();
+                     return false;
+                  }
+                  $this->value = $file;
+                  return true;
+               })
+            ]),
+         (new StringField("search-dir"))
+            ->addAliases("d")
+            ->setDescription("directories to search for request handlers")
+            ->setExportHandler(Field::EXPORT_ARRAY)
+            ->addRules([
+               new RequiredRule,
+               new PathTestRule(Dir::EXISTS | Dir::READABLE)
+            ])
       ]);
    }
 
    public function run()
    {
-      $options = $this->exportValues();
-      var_dump($options);
+      $this->opts = $this->exportValues();
+      $this->search();
 
-      exit;
-
-      $this->routes = $this->findRoutes($doctrine);
-      
-
-      $contents = $this->createRouteConfigContents();
-      if ($options["update"]) {
+      if ($this->opts["filename"]) {
          Env::log("updating routes config... ");
-         $file = new File(APP_DIR."/init/routes.php");
+         $contents = $this->createRouteConfigContents();
+         $file = new File($this->opts["filename"]);
          if (!$file->write($contents)) {
             Env::log("\n");
             Env::err("failed to update routes; ".$file->getError()."\n");
          }
          Env::log("@[green]done@[reset]\n");
+
+         # require the router to update the cache file
+         $router = require $file->getPath();
       }
    }
 
@@ -82,18 +115,11 @@ class RouteTask extends \sndsgd\Task
     * 
     * @return array<genome\model\Route>
     */
-   private function findRoutes($doctrine)
+   private function search()
    {
-      $ret = [];
-      $dirs = [
-         __DIR__."/../request",
-         APP_DIR."/src/request"
-      ];
-      foreach ($dirs as $dir) {
-         if (!file_exists($dir)) {
-            continue;
-         }
-
+      $tmp = [];
+      foreach ($this->opts["search-dir"] as $dir) {
+         Env::log("searching $dir...\n");
          $iterator = new RII(new RDI($dir, RDI::SKIP_DOTS), RII::SELF_FIRST);
          foreach ($iterator as $file) {
             if (($route = $this->getRouteFromFile($file))) {
@@ -106,11 +132,12 @@ class RouteTask extends \sndsgd\Task
                   // $doctrine->persist($route);
                   // $doctrine->flush();
                }
-               $ret[$combo] = $route;
+               $tmp[$combo] = $route;
             }
          }
       }
-      return $ret;
+
+      $this->routes = $tmp;
    }
 
    /**
@@ -127,7 +154,7 @@ class RouteTask extends \sndsgd\Task
          ($class = Classname::fromContents($contents))
       ) {
          $rc = new ReflectionClass($class);
-         if (!$rc->isAbstract() && $rc->isSubclassOf("genome\\Request")) {
+         if (!$rc->isAbstract() && $rc->isSubclassOf("sndsgd\\http\\inbound\\Request")) {
             return Route::createFromClassname($class);
          }
       }
@@ -136,7 +163,7 @@ class RouteTask extends \sndsgd\Task
 
    private function routeExists(Route $route)
    {
-      // $doctrine = Container::get("doctrine");
+      // $doctrine = Storage::getInstance()->get("doctrine");
       // $model = get_class($route);
       // $query = $doctrine->createQuery(
       //    "SELECT r FROM $model r 
@@ -149,25 +176,31 @@ class RouteTask extends \sndsgd\Task
 
    private function createRouteConfigContents()
    {
+      $date = (new DateTime)->format('Y-m-d \a\t H:i:s');
       $content = 
          "<?php\n\n".
-         "# generated by ".__CLASS__."\n\n".
-         "use \FastRoute\RouteCollector;\n\n".
-         "return \FastRoute\cachedDispatcher(function(RouteCollector \$r) {\n\n";
+         "namespace FastRoute;\n\n".
+         "# generated by ".__CLASS__." on $date\n\n".
+         "return cachedDispatcher(function(RouteCollector \$r) {\n\n";
 
       foreach ($this->routes as $route) {
          $method = var_export($route->getMethod(), true);
          $path = var_export($route->getPath(), true);
          $handler = var_export($route->getHandler(), true);
-         $content .= "   \$r->addRoute($method, $path, $handler);\n";
+         $content .= "    \$r->addRoute($method, $path, $handler);\n";
       }
 
+      $cacheFile = str_replace(
+         $this->opts["app-directory"], 
+         "", 
+         $this->opts["filename"]
+      );
+
       $content .= 
-         "\n".
-         "}, [\n".
-         '   "cacheFile" => APP_DIR."/data/route.cache",'.PHP_EOL.
-         '   "cacheDisabled" => $_SERVER["SERVER_ENVIRONMENT"] !== "prod"'.PHP_EOL.
-         "]);\n\n";
+         "\n}, [\n".
+         "    'cacheFile' => APP_DIR.'$cacheFile.cache',\n".
+         "    'cacheDisabled' => ENVIRONMENT !== 'prod',\n".
+         "]);\n";
       return $content;
    }
 }

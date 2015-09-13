@@ -3,7 +3,7 @@
 namespace sndsgd\http;
 
 use \RuntimeException;
-use \sndsgd\Container;
+use \sndsgd\Storage;
 
 
 /**
@@ -57,7 +57,7 @@ class RateLimiter
    public function __construct($uniqueId)
    {
       $this->cacheKey = __CLASS__."--$uniqueId";
-      $this->redis = Container::get("redis");
+      $this->redis = Storage::getInstance()->get("redis");
    }
 
    /**

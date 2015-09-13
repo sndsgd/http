@@ -13,11 +13,33 @@ use \sndsgd\Url;
 abstract class Request
 {
    /**
+    * Subclasses *MUST* specify an HTTP method
+    *
+    * @var string
+    */
+   const METHOD = "";
+
+   /**
+    * Subclasses *MUST* specify a uri path
+    *
+    * @var string
+    */
+   const PATH = "";
+
+   /**
     * Subclasses *MAY* force a request handler to ignore rate limiting
     *
     * @var string
     */
    const IGNORE_RATE_LIMIT = false;
+
+   /**
+    * Subclasses *MAY* set a higher priority so they can be matched sooner
+    * The higher the number, the higher the priority
+    *
+    * @var integer
+    */
+   const ROUTER_PRIORITY = 1;
 
    /**
     * Request body decoders
@@ -39,7 +61,7 @@ abstract class Request
 
    /**
     * Basic auth details are stashed here
-    * 
+    *
     * @var array<string|null>
     */
    protected $basicAuth;
@@ -74,7 +96,7 @@ abstract class Request
 
    /**
     * In some cases a response will be generated, and then stashed here
-    * 
+    *
     * @var \sndsgd\http\outbound\Response
     */
    protected $response;
@@ -96,10 +118,10 @@ abstract class Request
       if ($this->contentType === null) {
          $contentType = $this->getHeader("content-type") ?: "";
          $pos = strpos($contentType, ";");
-         $contentType = ($pos !== false) 
-            ? substr($contentType, 0, $pos) 
-            : $contentType;   
-         $this->contentType = $contentType;         
+         $contentType = ($pos !== false)
+            ? substr($contentType, 0, $pos)
+            : $contentType;
+         $this->contentType = $contentType;
       }
       return $this->contentType;
    }
@@ -113,9 +135,9 @@ abstract class Request
    {
       if ($this->basicAuth === null) {
          $this->basicAuth = [
-            array_key_exists("PHP_AUTH_USER", $_SERVER) 
+            array_key_exists("PHP_AUTH_USER", $_SERVER)
                ? $_SERVER["PHP_AUTH_USER"] : null,
-            array_key_exists("PHP_AUTH_PW", $_SERVER) 
+            array_key_exists("PHP_AUTH_PW", $_SERVER)
                ? $_SERVER["PHP_AUTH_PW"] : null,
          ];
       }
@@ -129,7 +151,7 @@ abstract class Request
    {
       $this->path = $path;
    }
-   
+
    /**
     * @return string
     */
@@ -193,7 +215,7 @@ abstract class Request
 
          $class = static::$dataTypes[$contentType];
          $decoder = new $class;
-         $this->bodyParameters = $decoder->getDecodedData();   
+         $this->bodyParameters = $decoder->getDecodedData();
       }
       return $this->bodyParameters;
    }
