@@ -27,6 +27,13 @@ abstract class Request
    const PATH = "";
 
    /**
+    * Subclasses *MAY* not require authentication
+    *
+    * @var string
+    */
+   const AUTHENTICATE = true;
+
+   /**
     * Subclasses *MAY* force a request handler to ignore rate limiting
     *
     * @var string
