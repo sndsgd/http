@@ -4,15 +4,16 @@ namespace sndsgd\http\outbound;
 
 use \InvalidArgumentException;
 use \sndsgd\http\Code;
+use \sndsgd\DataTrait;
 use \sndsgd\http\HeaderTrait;
 
 
 /**
  * Base class for outbound responses
  */
-abstract class Response
+class Response
 {
-   use HeaderTrait;
+   use DataTrait, HeaderTrait;
 
    /**
     * The name of the class that will be used to 'write' the response
@@ -37,13 +38,27 @@ abstract class Response
    protected $statusText = "OK";
 
    /**
-    * @param integer $code An http status code
-    * @see \sndsgd\http\Code.php
+    * Create a writer to 'write' the response
+    * 
+    * @return \sndsgd\http\response\Writer
     */
-   public function setStatusCode($code)
+   public function createWriter()
+   {
+      $classname = $this->writerClassname;
+      return new $classname($this);
+   }
+
+   /**
+    * @param integer $code An http status code
+    * @see \sndsgd\http\Code
+    */
+   public function setStatusCode($code, $statusText = null)
    {
       $this->statusCode = $code;
-      $this->statusText = Code::getStatusText($code);
+      $this->statusText = ($statusText === null)
+         ? Code::getStatusText($code)
+         : $statusText;
+
       if ($this->statusText === null) {
          throw new InvalidArgumentException("invalid HTTP status code '$code'");
       }
@@ -63,44 +78,5 @@ abstract class Response
    public function getStatusText()
    {
       return $this->statusText;
-   }
-
-   /**
-    * Create a writer to 'write' the response
-    * 
-    * @return \sndsgd\http\response\Writer
-    */
-   public function createWriter()
-   {
-      $classname = $this->writerClassname;
-      return new $classname($this);
-   }
-
-   /**
-    * Send the response to the client
-    *
-    * @return void
-    */
-   public function send()
-   {
-      header(
-         $_SERVER["SERVER_PROTOCOL"]." ". // HTTP 1.1
-         $this->statusCode." ". // 200
-         $this->statusText // OK
-      );
-      $this->writeHeaders();
-   }
-
-   /**
-    * Write the headers
-    */
-   protected function writeHeaders()
-   {
-      foreach ($this->headers as $header => $value) {
-         if (is_array($value)) {
-            $value = implode(", ", $value);
-         }
-         header("$header: $value");
-      }
    }
 }

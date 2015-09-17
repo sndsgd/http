@@ -13,42 +13,6 @@ use \sndsgd\Url;
 abstract class Request
 {
    /**
-    * Subclasses *MUST* specify an HTTP method
-    *
-    * @var string
-    */
-   const METHOD = "";
-
-   /**
-    * Subclasses *MUST* specify a uri path
-    *
-    * @var string
-    */
-   const PATH = "";
-
-   /**
-    * Subclasses *MAY* not require authentication
-    *
-    * @var string
-    */
-   const AUTHENTICATE = true;
-
-   /**
-    * Subclasses *MAY* force a request handler to ignore rate limiting
-    *
-    * @var string
-    */
-   const IGNORE_RATE_LIMIT = false;
-
-   /**
-    * Subclasses *MAY* set a higher priority so they can be matched sooner
-    * The higher the number, the higher the priority
-    *
-    * @var integer
-    */
-   const ROUTER_PRIORITY = 1;
-
-   /**
     * Request body decoders
     *
     * @var array<string,string>
@@ -58,6 +22,20 @@ abstract class Request
       "multipart/form-data" => "sndsgd\\http\\data\\decoder\\MultipartDataDecoder",
       "application/x-www-form-urlencoded" => "sndsgd\\http\\data\\decoder\\UrlDecoder",
    ];
+
+   /**
+    * The request method (GET, POST, PATCH, DELETE, ...)
+    *
+    * @var string
+    */
+   protected $method;
+
+   /**
+    * The uri path
+    *
+    * @var string
+    */
+   protected $path;
 
    /**
     * The request content type without a charset
@@ -72,13 +50,6 @@ abstract class Request
     * @var array<string|null>
     */
    protected $basicAuth;
-
-   /**
-    * The uri path
-    *
-    * @var string
-    */
-   protected $path;
 
    /**
     * Parameters included in the uri are stashed here after
@@ -108,7 +79,19 @@ abstract class Request
     */
    protected $response;
 
-   public function getHeader($name, $default = "")
+
+   public function __construct()
+   {
+      $this->method = $_SERVER["REQUEST_METHOD"];
+      $this->path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+   }
+
+   /**
+    * @param string $name The name of the header to get
+    * @param string $default A value to use if the header does not exist
+    * @return string
+    */
+   public function getHeader(/*string*/ $name, /*string*/ $default = "")/*: string*/
    {
       $name = strtoupper($name);
       $name = "HTTP_".preg_replace("~[^A-Z0-9]~", "_", $name);

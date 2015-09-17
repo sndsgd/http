@@ -6,7 +6,7 @@ use \CurlFile;
 use \Exception;
 use \InvalidArgumentException;
 use \sndsgd\Arr;
-use \sndsgd\data\Manager as DataTrait;
+use \sndsgd\DataTrait;
 use \sndsgd\http\inbound\response\CurlResponse;
 use \sndsgd\Mime;
 use \sndsgd\Url;
