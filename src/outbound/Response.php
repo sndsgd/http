@@ -4,7 +4,6 @@ namespace sndsgd\http\outbound;
 
 use \InvalidArgumentException;
 use \sndsgd\http\Code;
-use \sndsgd\DataTrait;
 use \sndsgd\http\HeaderTrait;
 
 
@@ -13,70 +12,51 @@ use \sndsgd\http\HeaderTrait;
  */
 class Response
 {
-   use DataTrait, HeaderTrait;
+    use HeaderTrait;
 
-   /**
-    * The name of the class that will be used to 'write' the response
-    * Note: 
-    *
-    * @var string
-    */
-   protected $writerClassname = "sndsgd\\http\\outbound\\response\\Writer";
+    /**
+     * The http status code
+     *
+     * @var integer
+     */
+    protected $statusCode = 200;
 
-   /**
-    * The http status code
-    *
-    * @var integer
-    */
-   protected $statusCode = 200;
+    /**
+     * The http status text
+     *
+     * @var string
+     */
+    protected $statusText = "OK";
 
-   /**
-    * The http status text
-    *
-    * @var string
-    */
-   protected $statusText = "OK";
+    /**
+     * @param integer $code An http status code
+     * @see \sndsgd\http\Code
+     */
+    public function setStatusCode($code, $statusText = null)
+    {
+        $this->statusCode = $code;
+        $this->statusText = ($statusText === null)
+            ? Code::getStatusText($code)
+            : $statusText;
 
-   /**
-    * Create a writer to 'write' the response
-    * 
-    * @return \sndsgd\http\response\Writer
-    */
-   public function createWriter()
-   {
-      $classname = $this->writerClassname;
-      return new $classname($this);
-   }
+        if ($this->statusText === null) {
+            throw new InvalidArgumentException("invalid HTTP status code '$code'");
+        }
+    }
 
-   /**
-    * @param integer $code An http status code
-    * @see \sndsgd\http\Code
-    */
-   public function setStatusCode($code, $statusText = null)
-   {
-      $this->statusCode = $code;
-      $this->statusText = ($statusText === null)
-         ? Code::getStatusText($code)
-         : $statusText;
+    /**
+     * @return integer
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
 
-      if ($this->statusText === null) {
-         throw new InvalidArgumentException("invalid HTTP status code '$code'");
-      }
-   }
-
-   /**
-    * @return integer
-    */
-   public function getStatusCode()
-   {
-      return $this->statusCode;
-   }
-
-   /**
-    * @return string
-    */
-   public function getStatusText()
-   {
-      return $this->statusText;
-   }
+    /**
+     * @return string
+     */
+    public function getStatusText()
+    {
+        return $this->statusText;
+    }
 }

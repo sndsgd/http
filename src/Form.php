@@ -8,30 +8,29 @@ namespace sndsgd\http;
  */
 abstract class Form extends \sndsgd\field\Collection
 {
-   /**
-    * @var \sndsgd\http\incoming\Request
-    */
-   protected $request;
+    /**
+     * @var \sndsgd\http\incoming\request\Controller
+     */
+    protected $controller;
 
-   /**
-    * @param \sndsgd\http\incoming\Request $request
-    */
-   public function setRequest($request)
-   {
-      $this->request = $request;
-   }
-   
-   /**
-    * @return \sndsgd\http\incoming\Request
-    */
-   public function getRequest()
-   {
-      return $this->request;
-   }
+    /**
+     * @param \sndsgd\http\incoming\request\Controller $controller
+     */
+    public function setController($controller)
+    {
+        $this->controller = $controller;
+    }
 
-   /**
-    * Function that adds the request specific fields to the field collection
-    */
-   abstract public function registerFields();
+    /**
+     * @return \sndsgd\http\incoming\request\Controller
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
+     * Function that adds the request specific fields to the field collection
+     */
+    abstract public function registerFields();
 }
-
