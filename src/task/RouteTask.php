@@ -99,21 +99,10 @@ class RouteTask extends \sndsgd\Task
         }
     }
 
-    private function loadUserRoles($doctrine)
-    {
-        // $query = $doctrine->createQuery(
-        //    "SELECT r FROM genome\\model\\user\\Role r"
-        // );
-        // $results = $query->getResult();
-        // foreach ($results as $role) {
-        //    $this->userRoles[$role->getDescription()] = $role;
-        // }
-    }
-
     /**
      * Find routes by examining the filesystem
      * 
-     * @return array<genome\model\Route>
+     * @return array<sndsgd\http\model\Route>
      */
     private function search()
     {
@@ -142,7 +131,7 @@ class RouteTask extends \sndsgd\Task
 
     /**
      * @param SplFileInfo $file The file to test
-     * @return \genome\model\Route|null
+     * @return \sndsgd\http\model\Route|null
      */
     private function getRouteFromFile(SplFileInfo $file)
     {
@@ -159,19 +148,6 @@ class RouteTask extends \sndsgd\Task
             }
         }
         return null;
-    }
-
-    private function routeExists(Route $route)
-    {
-        // $doctrine = Storage::getInstance()->get("doctrine");
-        // $model = get_class($route);
-        // $query = $doctrine->createQuery(
-        //    "SELECT r FROM $model r 
-        //    WHERE r.path = :path AND r.method = :method"
-        // );
-        // $query->setParameter("path", $route->getPath());
-        // $query->setParameter("method", $route->getMethod());
-        // return $query->getOneOrNullResult();
     }
 
     private function createRouteConfigContents()
