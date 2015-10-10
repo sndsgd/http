@@ -103,7 +103,7 @@ abstract class Request
      *
      * @return string|null
      */
-    public function getContentType()
+    public function getContentType()/*: string*/
     {
         if ($this->contentType === null) {
             $contentType = $this->getHeader("content-type") ?: "";
@@ -121,7 +121,7 @@ abstract class Request
      *
      * @return array<string|null>
      */
-    public function getBasicAuth()
+    public function getBasicAuth()/*: array*/
     {
         if ($this->basicAuth === null) {
             $this->basicAuth = [
@@ -137,7 +137,7 @@ abstract class Request
     /**
      * @param string $path
      */
-    public function setPath($path)
+    public function setPath(/*string*/ $path)
     {
         $this->path = $path;
     }
@@ -145,7 +145,7 @@ abstract class Request
     /**
      * @return string
      */
-    public function getPath()
+    public function getPath()/*: string*/
     {
         return $this->path;
     }
@@ -161,7 +161,7 @@ abstract class Request
     /**
      * @return array<string,mixed>
      */
-    public function getUriParameters()
+    public function getUriParameters()/*: array*/
     {
         return $this->uriParameters;
     }
@@ -169,7 +169,7 @@ abstract class Request
     /**
      * @return array<string,mixed>
      */
-    public function getQueryParameters()
+    public function getQueryParameters()/*: array*/
     {
         if ($this->queryParameters === null) {
             $result = [];
@@ -191,7 +191,7 @@ abstract class Request
      * @return array
      * @throws Exception If the provided content type is not acceptable
      */
-    protected function getBodyParameters()
+    protected function getBodyParameters()/*: array*/
     {
         if ($this->bodyParameters === null) {
             $contentType = $this->getContentType();
