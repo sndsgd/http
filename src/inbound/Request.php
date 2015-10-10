@@ -4,6 +4,8 @@ namespace sndsgd\http\inbound;
 
 use \Exception;
 use \sndsgd\http\data\decoder\UrlDecoder;
+use \sndsgd\http\inbound\request\exception\BadRequestException;
+use \sndsgd\Str;
 use \sndsgd\Url;
 
 
@@ -38,18 +40,11 @@ class Request
     protected $path;
 
     /**
-     * The request content type without a charset
+     * Once values are computed, they can be cached here
      *
-     * @var string
+     * @var array<string,mixed>
      */
-    protected $contentType;
-
-    /**
-     * Basic auth details are stashed here
-     *
-     * @var array<string|null>
-     */
-    protected $basicAuth;
+    protected $cache = [];
 
     /**
      * Parameters included in the uri are stashed here after
@@ -121,15 +116,28 @@ class Request
      */
     public function getContentType()/*: string*/
     {
-        if ($this->contentType === null) {
-            $contentType = $this->getHeader("content-type") ?: "";
-            $pos = strpos($contentType, ";");
-            $contentType = ($pos !== false)
-                ? substr($contentType, 0, $pos)
-                : $contentType;
-            $this->contentType = strtolower($contentType);
+        $cacheKey = "content-type";
+        if (!array_key_exists($cacheKey, $this->cache)) {
+            $value = Str::before($this->getHeader("content-type", ""), ";");
+            $this->cache[$cacheKey] = strtolower($value);
         }
-        return $this->contentType;
+        return $this->cache[$cacheKey];
+    }
+
+    /**
+     * Get the accept content type
+     *
+     * @return string
+     */
+    public function getAcceptContentType()/*: string*/
+    {
+        # accept: text/html,application/xhtml+xml;q=0.9,image/webp,*/*;q=0.8
+        $cacheKey = "accept-content-type";
+        if (!array_key_exists($cacheKey, $this->cache)) {
+            $value = Str::before($this->getHeader("accept", ""), ",");
+            $this->cache[$cacheKey] = strtolower($value);
+        }
+        return $this->cache[$cacheKey];
     }
 
     /**
@@ -139,15 +147,16 @@ class Request
      */
     public function getBasicAuth()/*: array*/
     {
-        if ($this->basicAuth === null) {
-            $this->basicAuth = [
+        $cacheKey = "basic-auth";
+        if (!array_key_exists("basic-auth", $this->cache)) {
+            $this->cache[$cacheKey] = [
                 array_key_exists("PHP_AUTH_USER", $_SERVER)
                     ? $_SERVER["PHP_AUTH_USER"] : null,
                 array_key_exists("PHP_AUTH_PW", $_SERVER)
                     ? $_SERVER["PHP_AUTH_PW"] : null,
             ];
         }
-        return $this->basicAuth;
+        return $this->cache[$cacheKey];
     }
 
     /**
@@ -194,11 +203,10 @@ class Request
     {
         if ($this->bodyParameters === null) {
             $contentType = $this->getContentType();
-            if (
-                $contentType === "" ||
-                !array_key_exists($contentType, static::$dataTypes)
-            ) {
-                throw new Exception("Unknown Content-Type '$contentType'", 400);
+            if (!array_key_exists($contentType, static::$dataTypes)) {
+                throw new BadRequestException(
+                    "Unknown Content-Type '$contentType'"
+                );
             }
 
             $class = static::$dataTypes[$contentType];
@@ -215,6 +223,6 @@ class Request
      */
     public function getRawBody()
     {
-        return file_get_contents('php://input');
+        return file_get_contents("php://input");
     }
 }

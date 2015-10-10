@@ -109,6 +109,27 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getAcceptContentType
+     * @dataProvider acceptContentTypeProvider
+     */
+    public function testGetAcceptContentType($input, $expect)
+    {
+        $_SERVER = $this->initServer(["HTTP_ACCEPT" => $input]);
+        $req = new Request();
+        $this->assertEquals($expect, $req->getAcceptContentType());
+    }
+
+    public function acceptContentTypeProvider()
+    {
+        return [
+            ["application/json,image/webp,*/*;q=0.8", "application/json"],
+            ["application/xml,*/*;asd=1.0", "application/xml"],
+            ["TEXT/html", "text/html"],
+            ["", ""],
+        ];
+    }
+
+    /**
      * @covers ::getBasicAuth
      * @dataProvider basicAuthProvider
      */

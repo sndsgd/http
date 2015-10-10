@@ -3,8 +3,10 @@
 namespace sndsgd\http\outbound;
 
 use \InvalidArgumentException;
+use \sndsgd\DataTrait;
 use \sndsgd\http\Code;
 use \sndsgd\http\HeaderTrait;
+use \sndsgd\http\inbound\Request;
 
 
 /**

@@ -2,26 +2,17 @@
 <?php
 
 # find and require the autoloader
-# 1. use the parent project bootstrap.php
-# 2. use the parent project autoload.php
-# ...
 call_user_func(function() {
-   $search = [
-      __DIR__."/../../../../bootstrap.php",
-      __DIR__."/../../../../autoload.php",
-      __DIR__."/../../../autoload.php",
-      __DIR__."/../../autoload.php",
-      __DIR__."/../bootstrap.php"
-   ];
-
-   foreach ($search as $path) {
-      if (file_exists($path) && is_file($path)) {
-         require $path;
-         return;
+   for ($i=4; $i>0; $i--) {
+      foreach (['bootstrap.php', 'autoload.php'] as $filename) {
+         $path = __DIR__."/".str_repeat("../", $i).$filename;
+         if (file_exists($path)) {
+            require_once $path;
+            return;
+         }
       }
    }
-
-   die("failed to locate autoload script\n");
+   die("failed to locate bootstrap/autoload script\n");
 });
 
 
