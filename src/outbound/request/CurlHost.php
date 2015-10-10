@@ -11,19 +11,19 @@ use \sndsgd\Url;
  */
 class CurlHost extends \sndsgd\http\Host
 {
-   public function initRequest($method, $path, $data = null)
-   {
-      $url = $this->getUrl($path, false);
-      $opts = $this->getOptions();
+    public function initRequest($method, $path, $data = null)
+    {
+        $url = $this->getUrl($path, false);
+        $opts = $this->getOptions();
 
-      $method = strtoupper($method);
-      if ($method === "GET" || $method === "DELETE") {
+        $method = strtoupper($method);
+        if ($method === "GET" || $method === "DELETE") {
 
-      }
+        }
 
-      $req = new CurlRequest;
-      $req->setUrl();
-      $req->setOptions($this->getOptions());
+        $req = new CurlRequest;
+        $req->setUrl();
+        $req->setOptions($this->getOptions());
 
-   }
+    }
 }

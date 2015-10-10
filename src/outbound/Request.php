@@ -11,36 +11,36 @@ use \sndsgd\http\MethodTrait;
  */
 abstract class Request
 {
-   use HeaderTrait, MethodTrait;
+    use HeaderTrait, MethodTrait;
 
-   /**
-    * The request url
-    *
-    * @var string
-    */
-   protected $url;
+    /**
+     * The request url
+     *
+     * @var string
+     */
+    protected $url;
 
-   /**
-    * @param string $url
-    */
-   public function setUrl($url)
-   {
-      $this->url = $url;
-   }
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
 
-   /**
-    * @return string
-    */
-   public function getUrl()
-   {
-      return $this->url;
-   }
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
 
-   /**
-    * Send the request and return an initialized response
-    *
-    * @param string $class A response classname as string
-    * @return \sndsgd\http\inbound\Response
-    */
-   abstract public function getResponse($class = null);
+    /**
+     * Send the request and return an initialized response
+     *
+     * @param string $class A response classname as string
+     * @return \sndsgd\http\inbound\Response
+     */
+    abstract public function getResponse($class = null);
 }

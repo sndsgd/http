@@ -8,82 +8,82 @@ use \sndsgd\fs\File;
 
 class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
 {
-   protected static $dir;
-   protected static $fileMd5;
+    protected static $dir;
+    protected static $fileMd5;
 
-   public static function setupBeforeClass()
-   {
-      self::$dir = __DIR__."/multipart-data";
-      self::$fileMd5 = md5_file(self::$dir."/test.png");
-   }
+    public static function setupBeforeClass()
+    {
+        self::$dir = __DIR__."/multipart-data";
+        self::$fileMd5 = md5_file(self::$dir."/test.png");
+    }
 
-   public function parseFile($name)
-   {
-      $file = new File(self::$dir."/$name.boundary");
-      if (
-         !$file->test(File::EXISTS | File::READABLE) ||
-         ($boundary = $file->read()) === false
-      ) {
-         throw new Exception("error in ".__CLASS__."\n".$file->getError()."\n");
-      }
-      
-      $_SERVER["CONTENT_TYPE"] = "multipart/form-data; boundary=$boundary";
+    public function parseFile($name)
+    {
+        $file = new File(self::$dir."/$name.boundary");
+        if (
+            !$file->test(File::EXISTS | File::READABLE) ||
+            ($boundary = $file->read()) === false
+        ) {
+            throw new Exception("error in ".__CLASS__."\n".$file->getError()."\n");
+        }
 
-      $parser = new MultipartDataDecoder;
-      $parser->setPath(self::$dir."/$name.raw");
-      return $parser->getDecodedData();
-   }
+        $_SERVER["CONTENT_TYPE"] = "multipart/form-data; boundary=$boundary";
 
-   private function examineResults($result, $isFile = false)
-   {
-      $this->assertTrue(is_array($result));
-      $this->assertArrayHasKey("name", $result);
-      $this->assertEquals("asd", $result["name"]);
-      $this->assertArrayHasKey("email", $result);
-      $this->assertEquals("asd@asd.com", $result["email"]);
-      $this->assertArrayHasKey("submit", $result);
-      $this->assertEquals("submit", $result["submit"]);
+        $parser = new MultipartDataDecoder;
+        $parser->setPath(self::$dir."/$name.raw");
+        return $parser->getDecodedData();
+    }
 
-      $this->assertArrayHasKey("file", $result);
-      if ($isFile === false) {
-         $this->assertNull($result["file"]);
-      }
-      else {
-         $file = $result["file"];
-         $this->assertEquals(self::$fileMd5, md5_file($file->getTempPath()));
-      }
-   }
+    private function examineResults($result, $isFile = false)
+    {
+        $this->assertTrue(is_array($result));
+        $this->assertArrayHasKey("name", $result);
+        $this->assertEquals("asd", $result["name"]);
+        $this->assertArrayHasKey("email", $result);
+        $this->assertEquals("asd@asd.com", $result["email"]);
+        $this->assertArrayHasKey("submit", $result);
+        $this->assertEquals("submit", $result["submit"]);
 
-   public function testChrome()
-   {
-      $this->examineResults($this->parseFile("chrome"));
-      $this->examineResults($this->parseFile("chrome-file"), true);
-   }
+        $this->assertArrayHasKey("file", $result);
+        if ($isFile === false) {
+            $this->assertNull($result["file"]);
+        }
+        else {
+            $file = $result["file"];
+            $this->assertEquals(self::$fileMd5, md5_file($file->getTempPath()));
+        }
+    }
 
-   public function testSafari()
-   {
-      $result = $this->parseFile("safari");
-      $this->examineResults($result);
+    public function testChrome()
+    {
+        $this->examineResults($this->parseFile("chrome"));
+        $this->examineResults($this->parseFile("chrome-file"), true);
+    }
 
-      $result = $this->parseFile("safari-file");
-      $this->examineResults($result, true);
-   }
+    public function testSafari()
+    {
+        $result = $this->parseFile("safari");
+        $this->examineResults($result);
 
-   public function testFirefox()
-   {
-      $result = $this->parseFile("firefox");
-      $this->examineResults($result);
+        $result = $this->parseFile("safari-file");
+        $this->examineResults($result, true);
+    }
 
-      $result = $this->parseFile("firefox-file");
-      $this->examineResults($result, true);
-   }
+    public function testFirefox()
+    {
+        $result = $this->parseFile("firefox");
+        $this->examineResults($result);
 
-   public function testInternetExplorer9()
-   {
-      $result = $this->parseFile("ie9");
-      $this->examineResults($result);
+        $result = $this->parseFile("firefox-file");
+        $this->examineResults($result, true);
+    }
 
-      $result = $this->parseFile("ie9-file");
-      $this->examineResults($result, true);
-   }
+    public function testInternetExplorer9()
+    {
+        $result = $this->parseFile("ie9");
+        $this->examineResults($result);
+
+        $result = $this->parseFile("ie9-file");
+        $this->examineResults($result, true);
+    }
 }

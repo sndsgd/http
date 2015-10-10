@@ -10,43 +10,43 @@ use \sndsgd\http\HeaderTrait;
  */
 abstract class Response
 {
-   use HeaderTrait;
+    use HeaderTrait;
 
-   /**
-    * The response body
-    *
-    * @var string
-    */
-   protected $body;
+    /**
+     * The response body
+     *
+     * @var string
+     */
+    protected $body;
 
-   /**
-    * @param string $body
-    */
-   public function setBody($body)
-   {
-      $this->body = $body;
-   }
+    /**
+     * @param string $body
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+    }
 
-   /**
-    * @return string
-    */
-   public function getBody()
-   {
-      return $this->body;
-   }
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 
-   /**
-    * Get the content type
-    *
-    * @return string|null
-    */
-   public function getContentType()
-   {
-      $ret = $this->getHeader("content-type");
-      if ($ret === null) {
-         return null;
-      }
-      $pos = strpos($ret, ";");
-      return ($pos !== false) ? substr($ret, 0, $pos) : $ret;
-   }
+    /**
+     * Get the content type
+     *
+     * @return string|null
+     */
+    public function getContentType()
+    {
+        $ret = $this->getHeader("content-type");
+        if ($ret === null) {
+            return null;
+        }
+        $pos = strpos($ret, ";");
+        return ($pos !== false) ? substr($ret, 0, $pos) : $ret;
+    }
 }

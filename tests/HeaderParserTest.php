@@ -8,14 +8,14 @@ namespace sndsgd\http;
  */
 class HeaderParserTest extends \PHPUnit_Framework_TestCase
 {
-   protected static $headers = [];
+    protected static $headers = [];
 
-   /**
-    * @coversNothing
-    */
-   public static function setUpBeforeClass()
-   {
-      self::addHeader("http://google.com", <<<HEADER
+    /**
+     * @coversNothing
+     */
+    public static function setUpBeforeClass()
+    {
+        self::addHeader("http://google.com", <<<HEADER
 HTTP/1.1 301 Moved Permanently
 Alternate-Protocol: 80:quic,p=0.01
 Cache-Control: public, max-age=2592000
@@ -30,7 +30,7 @@ X-XSS-Protection: 1; mode=block
 HEADER
 );
 
-      self::addHeader("https://www.google.com", <<<HEADER
+        self::addHeader("https://www.google.com", <<<HEADER
 HTTP/1.1 200 OK
 Alternate-Protocol: 443:quic,p=0.01
 Cache-Control: private, max-age=0
@@ -46,58 +46,57 @@ X-Frame-Options: SAMEORIGIN
 X-XSS-Protection: 1; mode=block
 HEADER
 );
-   }
+    }
 
-   /**
-    * @coversNothing
-    */
-   public static function addHeader($name, $content)
-   {
-      self::$headers[$name] = str_replace("\n", "\r\n", $content);
-   }
+    /**
+     * @coversNothing
+     */
+    public static function addHeader($name, $content)
+    {
+        self::$headers[$name] = str_replace("\n", "\r\n", $content);
+    }
 
-   /**
-    * @coversNothing
-    */
-   public static function tearDownAfterClass()
-   {
-      self::$headers = null;
-   }
+    /**
+     * @coversNothing
+     */
+    public static function tearDownAfterClass()
+    {
+        self::$headers = null;
+    }
 
 
-   public function testParseHttpGoogle()
-   {
-      $parser = new HeaderParser;
-      $parser->parse(self::$headers["http://google.com"]);
-      $this->assertEquals("HTTP/1.1", $parser->getProtocol());
-      $this->assertEquals(301, $parser->getStatusCode());
-      $this->assertEquals("Moved Permanently", $parser->getStatusText());
+    public function testParseHttpGoogle()
+    {
+        $parser = new HeaderParser;
+        $parser->parse(self::$headers["http://google.com"]);
+        $this->assertEquals("HTTP/1.1", $parser->getProtocol());
+        $this->assertEquals(301, $parser->getStatusCode());
+        $this->assertEquals("Moved Permanently", $parser->getStatusText());
 
-      $fields = $parser->getFields();
-      $this->assertTrue(is_array($fields));
-   }
+        $fields = $parser->getFields();
+        $this->assertTrue(is_array($fields));
+    }
 
-   public function testParseHttpsGoogle()
-   {
-      $parser = new HeaderParser;
-      $parser->parse(self::$headers["https://www.google.com"]);
-      $this->assertEquals("HTTP/1.1", $parser->getProtocol());
-      $this->assertEquals(200, $parser->getStatusCode());
-      $this->assertEquals("OK", $parser->getStatusText());
+    public function testParseHttpsGoogle()
+    {
+        $parser = new HeaderParser;
+        $parser->parse(self::$headers["https://www.google.com"]);
+        $this->assertEquals("HTTP/1.1", $parser->getProtocol());
+        $this->assertEquals(200, $parser->getStatusCode());
+        $this->assertEquals("OK", $parser->getStatusText());
 
-      $fields = $parser->getFields();
-      $this->assertTrue(is_array($fields));
-      $this->assertEquals("chunked", $fields["transfer-encoding"]);
-   }
+        $fields = $parser->getFields();
+        $this->assertTrue(is_array($fields));
+        $this->assertEquals("chunked", $fields["transfer-encoding"]);
+    }
 
-   /**
-    * @covers ::parse
-    * @expectedException InvalidArgumentException
-    */
-   public function testBadHeader()
-   {
-      $parser = new HeaderParser;
-      $parser->parse("HTTP/1.1 200 OK\nContent-Length: 219\n");
-   }
+    /**
+     * @covers ::parse
+     * @expectedException InvalidArgumentException
+     */
+    public function testBadHeader()
+    {
+        $parser = new HeaderParser;
+        $parser->parse("HTTP/1.1 200 OK\nContent-Length: 219\n");
+    }
 }
-

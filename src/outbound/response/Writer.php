@@ -2,45 +2,77 @@
 
 namespace sndsgd\http\outbound\response;
 
+use \sndsgd\ErrorTrait;
 use \sndsgd\http\outbound\Response;
 
 
 class Writer
 {
-   /**
-    * A response instance
-    * 
-    * @var \sndsgd\http\Response
-    */
-   protected $response;
+    use ErrorTrait;
 
-   /**
-    * @param \sndsgd\api\Response $response
-    */
-   public function __construct(Response $response)
-   {
-      $this->response = $response;
-   }
+    /**
+     * A response instance
+     * 
+     * @var \sndsgd\http\outbound\Response
+     */
+    protected $response;
 
-   protected function writeHeaders()
-   {
-      $protocol = array_key_exists("SERVER_PROTOCOL", $_SERVER)
-         ? $_SERVER["SERVER_PROTOCOL"]
-         : "HTTP 1.1";
+    /**
+     * @param \sndsgd\http\outbound\Response $response
+     */
+    public function __construct(Response $response)
+    {
+        $this->response = $response;
+    }
 
-      header(
-         $protocol." ". // HTTP 1.1
-         $this->response->getStatusCode()." ". // 200
-         $this->response->getStatusText() // OK
-      );
-      foreach ($this->response->getHeaders() as $key => $value) {
-         header("$key: $value");
-      }
-   }
+    /**
+     * Write the response headers
+     *
+     * @param array<string,string> $additionalHeaders
+     */
+    protected function writeHeaders(array $additionalHeaders = null)
+    {
+        $protocol = array_key_exists("SERVER_PROTOCOL", $_SERVER)
+            ? $_SERVER["SERVER_PROTOCOL"]
+            : "HTTP 1.1";
 
-   /**
-    * Write the response to the client
-    * 
-    */
-   abstract public function write();
+        header(
+            $protocol." ". // HTTP 1.1
+            $this->response->getStatusCode()." ". // 200
+            $this->response->getStatusText() // OK
+        );
+        foreach ($this->response->getHeaders() as $key => $value) {
+            header("$key: $value");
+        }
+        if ($additionalHeaders !== null) {
+            foreach ($additionalHeaders as $key => $value) {
+                header("$key: $value");
+            }
+        }
+    }
+
+    /**
+     * Generate the response body, and update the response accordingly
+     *
+     * @return boolean
+     */
+    abstract public function generate();
+
+    /**
+     * Write the response to the client
+     * 
+     */
+    public function write()
+    {
+        if ($this->response->getBody() === null) {
+            $this->generate();
+        }
+
+        $this->writeHeaders();
+
+        if ($this->response->getRequest()->getMethod() !== "HEAD") {
+            echo $this->response->getBody();
+        }
+        
+    }
 }
