@@ -5,6 +5,9 @@ namespace sndsgd\http\inbound\request;
 use \sndsgd\http\inbound\Request;
 
 
+/**
+ * Base request handler
+ */
 abstract class Controller
 {
     /**

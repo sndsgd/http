@@ -56,7 +56,7 @@ class Writer
      *
      * @return boolean
      */
-    abstract public function generate();
+    abstract public function generate()/*: bool*/;
 
     /**
      * Write the response to the client
@@ -73,6 +73,5 @@ class Writer
         if ($this->response->getRequest()->getMethod() !== "HEAD") {
             echo $this->response->getBody();
         }
-        
     }
 }

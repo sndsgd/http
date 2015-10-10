@@ -7,7 +7,7 @@ use \sndsgd\Storage;
 
 
 /**
- * A rate limited implemented using redis counters
+ * A rate limiter implemented using redis counters
  */
 class RateLimiter
 {
@@ -53,8 +53,10 @@ class RateLimiter
      */
     protected $expiration;
 
-
-    public function __construct($uniqueId)
+    /**
+     * @param string $uniqueId The unique cache key for the request
+     */
+    public function __construct(/*string*/ $uniqueId)
     {
         $this->cacheKey = __CLASS__."--$uniqueId";
         $this->redis = Storage::getInstance()->get("redis");
@@ -63,7 +65,7 @@ class RateLimiter
     /**
      * @param integer $count
      */
-    public function setCount($count)
+    public function setCount(/*int*/ $count)
     {
         $this->count = $count;
     }
@@ -71,7 +73,7 @@ class RateLimiter
     /**
      * @return integer
      */
-    public function getCount()
+    public function getCount()/*: int */
     {
         return $this->count;
     }
@@ -79,7 +81,7 @@ class RateLimiter
     /**
      * @param integer $duration
      */
-    public function setDuration($duration)
+    public function setDuration(/*int*/ $duration)
     {
         $this->duration = $duration;
     }
@@ -87,34 +89,70 @@ class RateLimiter
     /**
      * @return integer
      */
-    public function getDuration()
+    public function getDuration()/*: int */
     {
         return $this->duration;
     }
 
-    public function increment()
+    /**
+     * Create or increment a counter for the current unique id
+     * 
+     * @return boolean If the user has requests remaining
+     */
+    public function increment()/*: bool */
     {
         $count = $this->redis->incr($this->cacheKey);
         if ($count === 1) {
             $this->redis->setTimeout($this->cacheKey, $this->duration);
         }
         $this->remainingRequests = $this->count - $count;
-        $this->expiration = $this->redis->ttl($this->cacheKey);
+        return ($this->remainingRequests > 0);
     }
 
     /**
      * @return integer
      */
-    public function getRemainingRequests()
+    public function getRemainingRequests()/*: array */
     {
+        if ($this->remainingRequests === null) {
+            throw new RuntimeException(
+                "method prerequisite not called; ".
+                "call `increment()` before `getRemainingRequests()`"
+            );
+        }
         return $this->remainingRequests;
     }
 
     /**
      * @return integer
      */
-    public function getExpiration()
+    public function getExpiration()/*: integer */
     {
+        if ($this->expiration === null) {
+            $this->expiration = $this->redis->ttl($this->cacheKey);
+        }
         return $this->expiration;
+    }
+
+    /**
+     * Get rate limit headers
+     * 
+     * @return array<string,integer>
+     */
+    public function getHeaders()/*: array */
+    {
+        if ($this->remainingRequests === null) {
+            throw new RuntimeException(
+                "method prerequisite not called; ".
+                "call `increment()` before `getHeaders()`"
+            );
+        }
+
+        return [
+            'X-RateLimit-Expiration' => $this->getExpiration(),
+            'X-RateLimit-Requests-Remaining' => $this->remainingRequests,
+            'X-RateLimit-Duration' => $this->duration,
+            'X-RateLimit-Quota' => $this->count,
+        ];
     }
 }

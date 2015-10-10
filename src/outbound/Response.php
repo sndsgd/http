@@ -4,7 +4,6 @@ namespace sndsgd\http\outbound;
 
 use \InvalidArgumentException;
 use \sndsgd\http\Code;
-use \sndsgd\DataTrait;
 use \sndsgd\http\HeaderTrait;
 
 

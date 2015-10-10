@@ -9,24 +9,24 @@ namespace sndsgd\http;
 abstract class Form extends \sndsgd\field\Collection
 {
     /**
-     * @var \sndsgd\http\incoming\Request
+     * @var \sndsgd\http\inbound\request\Controller
      */
-    protected $request;
+    protected $controller;
 
     /**
-     * @param \sndsgd\http\incoming\Request $request
+     * @param \sndsgd\http\inbound\request\Controller $controller
      */
-    public function setRequest($request)
+    public function setController($controller)
     {
-        $this->request = $request;
+        $this->controller = $controller;
     }
 
     /**
-     * @return \sndsgd\http\incoming\Request
+     * @return \sndsgd\http\inbound\request\Controller
      */
-    public function getRequest()
+    public function getController()
     {
-        return $this->request;
+        return $this->controller;
     }
 
     /**

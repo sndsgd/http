@@ -161,7 +161,8 @@ class MultipartDataDecoder extends \sndsgd\http\data\Decoder
     }
 
     /**
-     * read the header values for the current field from the input stream
+     * Read the header values for the current field from the input stream
+     *
      * @return array
      */
     private function getFieldHeader()
@@ -219,7 +220,8 @@ class MultipartDataDecoder extends \sndsgd\http\data\Decoder
     }
 
     /**
-     * get the value of the current field in the input stream
+     * Get the value of the current field in the input stream
+     *
      * @return string
      */
     private function getValueFromField()

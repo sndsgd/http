@@ -42,7 +42,7 @@ trait HeaderTrait
      */
     public function addHeader($key, $value)
     {
-        Arr::addValue($this->headers, strtolower($key), $value);
+        Arr::addValue($this->headers, $key, $value);
     }
 
     /**
@@ -66,8 +66,9 @@ trait HeaderTrait
     public function getHeader($key)
     {
         $key = strtolower($key);
+        $headers = array_change_key_case($this->headers);
         return (array_key_exists($key, $this->headers))
-            ? $this->headers[$key]
+            ? $headers[$key]
             : null;
     }
 

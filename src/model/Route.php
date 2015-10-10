@@ -20,7 +20,7 @@ class Route extends \sndsgd\model\ModelAbstract
      * Create a route instance from a classname
      *
      * @param string $classname
-     * @return \genome\model\Route
+     * @return \sndsgd\http\model\Route
      * @throws ReflectionException
      */
     public static function createFromClassname($classname)

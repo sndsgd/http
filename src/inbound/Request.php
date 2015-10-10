@@ -8,9 +8,9 @@ use \sndsgd\Url;
 
 
 /**
- * Base class for inbound requests
+ * An inbound request
  */
-abstract class Request
+class Request
 {
     /**
      * Request body decoders
@@ -87,6 +87,22 @@ abstract class Request
     }
 
     /**
+     * @return string
+     */
+    public function getMethod()/*: string */
+    {
+        return $this->method;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()/*: string*/
+    {
+        return $this->path;
+    }
+
+    /**
      * @param string $name The name of the header to get
      * @param string $default A value to use if the header does not exist
      * @return string
@@ -103,7 +119,7 @@ abstract class Request
      *
      * @return string|null
      */
-    public function getContentType()
+    public function getContentType()/*: string*/
     {
         if ($this->contentType === null) {
             $contentType = $this->getHeader("content-type") ?: "";
@@ -111,7 +127,7 @@ abstract class Request
             $contentType = ($pos !== false)
                 ? substr($contentType, 0, $pos)
                 : $contentType;
-            $this->contentType = $contentType;
+            $this->contentType = strtolower($contentType);
         }
         return $this->contentType;
     }
@@ -121,7 +137,7 @@ abstract class Request
      *
      * @return array<string|null>
      */
-    public function getBasicAuth()
+    public function getBasicAuth()/*: array*/
     {
         if ($this->basicAuth === null) {
             $this->basicAuth = [
@@ -135,22 +151,6 @@ abstract class Request
     }
 
     /**
-     * @param string $path
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    /**
      * @param array<string,mixed> $params
      */
     public function setUriParameters(array $params)
@@ -161,7 +161,7 @@ abstract class Request
     /**
      * @return array<string,mixed>
      */
-    public function getUriParameters()
+    public function getUriParameters()/*: array*/
     {
         return $this->uriParameters;
     }
@@ -169,7 +169,7 @@ abstract class Request
     /**
      * @return array<string,mixed>
      */
-    public function getQueryParameters()
+    public function getQueryParameters()/*: array*/
     {
         if ($this->queryParameters === null) {
             $result = [];
@@ -186,20 +186,18 @@ abstract class Request
 
     /**
      * Get the request data using the content type
-     * Note: only used for requests that contain a body
      *
      * @return array
      * @throws Exception If the provided content type is not acceptable
      */
-    protected function getBodyParameters()
+    public function getBodyParameters()/*: array*/
     {
         if ($this->bodyParameters === null) {
             $contentType = $this->getContentType();
-            if ($contentType === "") {
-                return [];
-            }
-
-            if (!array_key_exists($contentType, static::$dataTypes)) {
+            if (
+                $contentType === "" ||
+                !array_key_exists($contentType, static::$dataTypes)
+            ) {
                 throw new Exception("Unknown Content-Type '$contentType'", 400);
             }
 
@@ -208,5 +206,15 @@ abstract class Request
             $this->bodyParameters = $decoder->getDecodedData();
         }
         return $this->bodyParameters;
+    }
+
+    /**
+     * Attempt to get the raw request body
+     *
+     * @return string
+     */
+    public function getRawBody()
+    {
+        return file_get_contents('php://input');
     }
 }
