@@ -79,7 +79,7 @@ class Code
      * @return string The status code
      * @return null The provided status code was not found
      */
-    public static function getStatusText($code)
+    public static function getStatusText(/*int*/ $code)
     {
         return array_key_exists($code, self::$codes)
             ? static::$codes[$code]
@@ -93,7 +93,7 @@ class Code
      * @param string|integer $match A combination of numbers and wildcards
      * @return boolean
      */
-    public static function matches($code, $match)
+    public static function matches(/*int*/ $code, /*string*/ $match)
     {
         if (is_string($match) && preg_match("/[0-9x]{3}/i", $match)) {
             $match = str_replace("x", "[0-9]", $match);

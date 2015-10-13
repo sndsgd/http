@@ -28,7 +28,7 @@ class Host
     /**
      * @param string $url A url to extract scheme, host, port, and path from
      */
-    public function setUrl($url)
+    public function setUrl(/*string*/ $url)
     {
         $url = Url::createFromString($url);
         if (!$url->getScheme() || !$url->getHost()) {
@@ -48,7 +48,7 @@ class Host
      * @param boolean $stringify
      * @return \sndsgd\Url|string
      */
-    public function getUrl($path = null, $stringify = false)
+    public function getUrl($path = null, /*bool*/ $stringify = false)
     {
         $ret = clone $this->url;
         if ($path !== null) {
@@ -68,7 +68,7 @@ class Host
     /**
      * @return array<mixed,mixed>
      */
-    public function getOptions()
+    public function getOptions()/*: array*/
     {
         return $this->options;
     }
