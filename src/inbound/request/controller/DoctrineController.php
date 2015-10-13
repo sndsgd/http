@@ -3,23 +3,8 @@
 namespace sndsgd\api\inbound\request\controller;
 
 
-class DoctrineController extends \sndsgd\http\inbound\request\Controller
+class DoctrineControllerTrait
 {
-    /**
-     * Verb to describe the endpoint action in a success message
-     * ex: created, updated, deleted, etc
-     *
-     * @var string
-     */
-    const SUCCESS_MESSAGE_VERB = "";
-
-    /**
-     * Whether or not to place the verb before the noun in response messages
-     *
-     * @var boolean
-     */
-    const SUCCESS_MESSAGE_VERB_FIRST = false;
-
     /**
      *
      * @var \Doctrine\ORM\EntityManager
@@ -27,33 +12,11 @@ class DoctrineController extends \sndsgd\http\inbound\request\Controller
     protected $em;
 
     /**
-     * The authenticator used to validate the user's credentials
-     *
-     * @var \sndsgd\http\Authenticator
-     */
-    protected $auth;
-
-    /**
-     * A form used to validate the request data
-     *
-     * @var \sndsgd\http\Form
-     */
-    protected $form;
-
-    /**
      * If an entity has been loaded/created, it will be referenced here
      *
      * @var \sndsgd\model\ModelAbstract
      */
     protected $entity;
-
-    /**
-     * If an error response is generated, it will be referenced here
-     *
-     * @var \sndsgd\http\outbound\Response
-     */
-    protected $response = null;
-
 
     /**
      * Localize doctrine to cut down on Storage::getInstance()->get() calls
@@ -123,30 +86,6 @@ class DoctrineController extends \sndsgd\http\inbound\request\Controller
     }
 
     /**
-     * Get the property to use when attempting to load the request entity
-     * 
-     * @return string
-     */
-    protected function getEntityLoadProperty()
-    {
-        return "uid";
-    }
-
-    /**
-     * Get the unique value to use when attempting to load the request entity
-     *
-     * @return integer|string
-     * @throws Exception
-     */
-    protected function getEntityLoadValue()
-    {
-        if (!array_key_exists("uid", $this->uriParameters)) {
-            throw new Exception("entity uid does not exist in uri parameters");
-        }
-        return $this->uriParameters["uid"];
-    }
-
-    /**
      * Load the entity that corresponds with the request
      * Note: if this method fails, it *MUST* create a response on this object
      *
@@ -188,51 +127,6 @@ class DoctrineController extends \sndsgd\http\inbound\request\Controller
     public function getEntity()
     {
         return $this->entity;
-    }
-
-    /**
-     * Create and validate a form
-     *
-     * @param array|null $parameters
-     * @return boolean
-     */
-    protected function validate(array $parameters)
-    {
-        $timer = Timer::create("validation");
-        if (static::FORM !== "") {
-            $this->createForm($parameters);
-            if (!$this->form->validate()) {
-                $this->response = $this->createValidationErrorResponse();
-                $timer->stop();
-                return false;
-            }   
-        }
-        $timer->stop();
-        return true;
-    }
-
-    /**
-     * Create a form to validate the user input and populate it with data
-     *
-     * @param array<string,mixed> $data
-     * @return void
-     */
-    protected function createForm(array $parameters)
-    {
-        $class = static::FORM;
-        $this->form = new $class;
-        $this->form->setRequest($this);
-        $this->form->registerFields();
-        $this->form->addValues($parameters);
-    }
-
-    /**
-     *
-     * @return array<string,mixed>
-     */
-    protected function getValidatedParameters()
-    {
-        return $this->form->exportValues();
     }
 
     /**
@@ -287,43 +181,5 @@ class DoctrineController extends \sndsgd\http\inbound\request\Controller
     public function getEntityUid($default = null)
     {
         return ($this->entity === null) ? $default : $this->entity->getUid();
-    }
-
-    /**
-     * Create a response
-     *
-     * @param integer $statusCode
-     * @param array|null $data
-     * @return \sndsgd\api\outgoing\Response
-     */
-    public function createResponse($code, array $data = null)
-    {
-        $res = new Response;
-        $res->setStatusCode($code);
-        if ($data !== null) {
-            $res->setData($data);
-        }
-        else if ($statusText = Code::getStatusText($code)) {
-            $res->setData([
-                "message" => $this->getEntityMessage(strtolower($statusText)),
-                "payload" => null,
-            ]);
-        }
-        return $res;
-    }
-
-    /**
-     * Create a validation error response
-     *
-     * @return \sndsgd\api\outgoing\Response
-     */
-    protected function createValidationErrorResponse(array $errors = null)
-    {
-        $errors = ($errors) ?: $this->form->exportErrors();
-        return $this->createResponse(400, [
-            "message" => "Validation error",
-            "errors" => $errors,
-            "payload" => null,
-        ]);
     }
 }
