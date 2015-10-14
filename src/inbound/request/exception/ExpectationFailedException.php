@@ -10,5 +10,5 @@ class ExpectationFailedException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 417;
+    const STATUS_CODE = 417;
 }

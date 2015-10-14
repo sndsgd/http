@@ -1,16 +1,23 @@
 #!/usr/bin/env php
 <?php
 
+namespace sndsgd\http;
+
+use \ReflectionClass;
+use \sndsgd\Classname;
+use \sndsgd\Str;
+
+
 # find and require the autoloader
 call_user_func(function() {
-   for ($i=4; $i>0; $i--) {
-      $path = __DIR__."/".str_repeat("../", $i)."vendor/autoload.php";
-      if (file_exists($path)) {
-         require_once $path;
-         return;
-      }
-   }
-   die("failed to locate bootstrap/autoload script\n");
+    for ($i=4; $i>0; $i--) {
+        $path = __DIR__."/".str_repeat("../", $i)."vendor/autoload.php";
+        if (file_exists($path)) {
+            require_once $path;
+            return;
+        }
+    }
+    die("failed to locate bootstrap/autoload script\n");
 });
 
 
@@ -27,27 +34,68 @@ class {{name}} extends request\\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected \$statusCode = {{code}};
+    const STATUS_CODE = {{code}};
 }
 
 TXT;
 
 
-$rc = new ReflectionClass("sndsgd\\http\\Code");
-$prop = $rc->getProperty("codes");
+$prop = (new ReflectionClass("sndsgd\\http\\Code"))->getProperty("codes");
 $prop->setAccessible(true);
-$codes = $prop->getValue();
-
-foreach ($codes as $code => $name) {
-   if ($code > 399) {
-      $name = preg_replace("~[^a-z]~i", " ", $name);
-      $name = \sndsgd\Str::toCamelCase($name)."Exception";
-      $content = str_replace("{{name}}", $name, $template);
-      $content = str_replace("{{code}}", $code, $content);
-      $path = __DIR__."/../src/inbound/request/exception/$name.php";
-      file_put_contents($path, $content);
-   }
+foreach ($prop->getValue() as $code => $name) {
+    if ($code > 399) {
+        $name = mkName($name);
+        $path = __DIR__."/../src/inbound/request/exception/$name.php";
+        echo "$name... ";
+        if (
+            file_exists($path) && 
+            ($contents = file_get_contents($path)) &&
+            ($classname = Classname::fromContents($contents)) &&
+            isCustomized($classname)
+        ) {
+            echo "SKIPPED\n";
+        }
+        else {
+            $content = str_replace("{{name}}", $name, $template);
+            $content = str_replace("{{code}}", $code, $content);      
+            file_put_contents($path, $content);
+            echo "updated\n";
+        }
+    }
 } 
 
+/**
+ * Create a title cased class name
+ * 
+ * @param string $status The HTTP status text
+ * @return string
+ */
+function mkName(/*string*/ $status)/*: string */ {
+    $words = preg_split("~[^a-z]~i", $status);
+    $words = array_map("strtolower", $words);
+    $words = array_map("ucfirst", $words);
+    return implode("", $words)."Exception";
+}
 
-
+/**
+ * Determine if an exception class has been modified from its generated state
+ * 
+ * @param string $classname The name of the exception class
+ * @return boolean
+ */
+function isCustomized(/*string*/ $classname)/*: bool*/ {
+    $rc = new ReflectionClass($classname);
+    $properties = 0;
+    foreach ($rc->getProperties() as $property) {
+        if ($property->class === $classname) {
+            $properties++;
+        }
+    }
+    $methods = 0;
+    foreach ($rc->getMethods() as $method) {
+        if ($method->class === $classname) {
+            $methods++;
+        }
+    }
+    return ($properties !== 0 || $methods !== 0);
+}

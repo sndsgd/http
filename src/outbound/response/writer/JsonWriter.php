@@ -40,7 +40,9 @@ class JsonWriter extends WriterAbstract
             return false;
         }
 
-        $this->response->addHeader("Content-Type" => "application/json; charset=UTF-8")
+        $this->response->addHeader(
+            "Content-Type" => "application/json; charset=UTF-8"
+        );
         $this->response->setBody($body);
         return true;
     }

@@ -10,5 +10,5 @@ class NetworkAuthenticationRequiredException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 511;
+    const STATUS_CODE = 511;
 }

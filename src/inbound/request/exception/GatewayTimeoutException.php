@@ -10,5 +10,5 @@ class GatewayTimeoutException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 504;
+    const STATUS_CODE = 504;
 }

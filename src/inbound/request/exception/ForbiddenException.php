@@ -10,5 +10,5 @@ class ForbiddenException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 403;
+    const STATUS_CODE = 403;
 }

@@ -10,5 +10,5 @@ class ServiceUnavailableException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 503;
+    const STATUS_CODE = 503;
 }

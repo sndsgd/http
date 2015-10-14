@@ -10,5 +10,5 @@ class RequestHeaderFieldsTooLargeException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 431;
+    const STATUS_CODE = 431;
 }

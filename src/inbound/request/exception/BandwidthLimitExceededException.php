@@ -10,5 +10,5 @@ class BandwidthLimitExceededException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 509;
+    const STATUS_CODE = 509;
 }

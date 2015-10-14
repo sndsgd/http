@@ -10,5 +10,5 @@ class MethodNotAllowedException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 405;
+    const STATUS_CODE = 405;
 }

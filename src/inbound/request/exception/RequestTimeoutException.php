@@ -10,5 +10,5 @@ class RequestTimeoutException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 408;
+    const STATUS_CODE = 408;
 }

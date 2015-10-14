@@ -10,5 +10,5 @@ class ProxyAuthenticationRequiredException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 407;
+    const STATUS_CODE = 407;
 }

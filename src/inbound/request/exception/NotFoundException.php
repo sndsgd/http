@@ -10,5 +10,5 @@ class NotFoundException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 404;
+    const STATUS_CODE = 404;
 }

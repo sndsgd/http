@@ -10,5 +10,5 @@ class RequestEntityTooLargeException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 413;
+    const STATUS_CODE = 413;
 }

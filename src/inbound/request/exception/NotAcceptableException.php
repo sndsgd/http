@@ -10,5 +10,5 @@ class NotAcceptableException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 406;
+    const STATUS_CODE = 406;
 }

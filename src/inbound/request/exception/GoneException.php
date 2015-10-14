@@ -10,5 +10,5 @@ class GoneException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 410;
+    const STATUS_CODE = 410;
 }

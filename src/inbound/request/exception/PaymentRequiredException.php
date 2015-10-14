@@ -10,5 +10,5 @@ class PaymentRequiredException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 402;
+    const STATUS_CODE = 402;
 }

@@ -5,10 +5,10 @@ namespace sndsgd\http\inbound\request\exception;
 use \sndsgd\http\inbound\request;
 
 
-class HTTPVersionNotSupportedException extends request\ExceptionAbstract
+class HttpVersionNotSupportedException extends request\ExceptionAbstract
 {
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 505;
+    const STATUS_CODE = 505;
 }

@@ -10,5 +10,5 @@ class UnsupportedMediaTypeException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 415;
+    const STATUS_CODE = 415;
 }

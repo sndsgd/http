@@ -37,9 +37,9 @@ class Writer
             : "HTTP 1.1";
 
         header(
-            $protocol." ". // HTTP 1.1
-            $this->response->getStatusCode()." ". // 200
-            $this->response->getStatusText() // OK
+            $protocol." ".
+            $this->response->getStatusCode()." ".
+            $this->response->getStatusText()
         );
         foreach ($this->response->getHeaders() as $key => $value) {
             header("$key: $value");

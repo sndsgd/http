@@ -10,7 +10,7 @@ abstract class ExceptionAbstract extends \Exception
      *
      * @var integer
      */
-    protected $statusCode = 500;
+    const STATUS_CODE = 500;
 
     /**
      * Get the status code
@@ -19,7 +19,7 @@ abstract class ExceptionAbstract extends \Exception
      */
     public function getStatusCode()/*: int */
     {
-        return $this->statusCode;
+        return static::STATUS_CODE;
     }
 
     /**

@@ -10,7 +10,7 @@ class BadRequestException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 400;
+    const STATUS_CODE = 400;
 
     /**
      * @var array<string,mixed>

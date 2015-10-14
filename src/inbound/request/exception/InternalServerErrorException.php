@@ -10,5 +10,5 @@ class InternalServerErrorException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 500;
+    const STATUS_CODE = 500;
 }

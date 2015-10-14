@@ -10,5 +10,5 @@ class ConflictException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 409;
+    const STATUS_CODE = 409;
 }

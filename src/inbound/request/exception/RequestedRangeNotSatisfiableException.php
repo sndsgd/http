@@ -10,5 +10,5 @@ class RequestedRangeNotSatisfiableException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 416;
+    const STATUS_CODE = 416;
 }

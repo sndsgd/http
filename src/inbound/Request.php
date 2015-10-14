@@ -19,7 +19,7 @@ class Request
      *
      * @var array<string,string>
      */
-    protected static $dataTypes = [
+    protected static $contentTypes = [
         "application/json" => "sndsgd\\http\\data\\decoder\\JsonDecoder",
         "multipart/form-data" => "sndsgd\\http\\data\\decoder\\MultipartDataDecoder",
         "application/x-www-form-urlencoded" => "sndsgd\\http\\data\\decoder\\UrlDecoder",
@@ -181,14 +181,16 @@ class Request
     public function getQueryParameters()/*: array*/
     {
         if ($this->queryParameters === null) {
-            $result = [];
+            $this->queryParameters = [];
             $pos = strpos($_SERVER["REQUEST_URI"], "?");
             if ($pos !== false) {
                 $queryString = substr($_SERVER["REQUEST_URI"], $pos + 1);
                 $rfc = UrlDecoder::getRfc();
-                $result = Url::decodeQueryString($queryString, $rfc);
+                $this->queryParameters = Url::decodeQueryString(
+                    $queryString,
+                    $rfc
+                );
             }
-            $this->queryParameters = $result;
         }
         return $this->queryParameters;
     }
@@ -203,13 +205,13 @@ class Request
     {
         if ($this->bodyParameters === null) {
             $contentType = $this->getContentType();
-            if (!array_key_exists($contentType, static::$dataTypes)) {
+            if (!array_key_exists($contentType, static::$contentTypes)) {
                 throw new BadRequestException(
                     "Unknown Content-Type '$contentType'"
                 );
             }
 
-            $class = static::$dataTypes[$contentType];
+            $class = static::$contentTypes[$contentType];
             $decoder = new $class;
             $this->bodyParameters = $decoder->getDecodedData();
         }
@@ -221,7 +223,7 @@ class Request
      *
      * @return string
      */
-    public function getRawBody()
+    public function getRawBody()/*: string*/
     {
         return file_get_contents("php://input");
     }

@@ -10,5 +10,5 @@ class NotImplementedException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 501;
+    const STATUS_CODE = 501;
 }

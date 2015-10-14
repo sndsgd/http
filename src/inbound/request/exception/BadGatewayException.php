@@ -10,5 +10,5 @@ class BadGatewayException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 502;
+    const STATUS_CODE = 502;
 }

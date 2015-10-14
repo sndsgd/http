@@ -10,5 +10,5 @@ class TooManyRequestsException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 429;
+    const STATUS_CODE = 429;
 }

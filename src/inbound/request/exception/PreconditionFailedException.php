@@ -10,5 +10,5 @@ class PreconditionFailedException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 412;
+    const STATUS_CODE = 412;
 }

@@ -10,5 +10,5 @@ class UnauthorizedException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 401;
+    const STATUS_CODE = 401;
 }

@@ -10,5 +10,5 @@ class LengthRequiredException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 411;
+    const STATUS_CODE = 411;
 }

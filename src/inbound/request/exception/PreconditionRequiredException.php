@@ -10,5 +10,5 @@ class PreconditionRequiredException extends request\ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    protected $statusCode = 428;
+    const STATUS_CODE = 428;
 }
