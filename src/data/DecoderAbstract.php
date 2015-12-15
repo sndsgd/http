@@ -6,7 +6,7 @@ namespace sndsgd\http\data;
 /**
  * The base class for request data encoders
  */
-abstract class Decoder
+abstract class DecoderAbstract
 {
     /**
      * The path to a file or stream to parse from

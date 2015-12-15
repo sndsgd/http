@@ -4,8 +4,7 @@ namespace sndsgd\http\data\decoder;
 
 use \Exception;
 
-
-class JsonDecoder extends \sndsgd\http\data\Decoder
+class JsonDecoder extends \sndsgd\http\data\DecoderAbstract
 {
     /**
      * {@inheritdoc}

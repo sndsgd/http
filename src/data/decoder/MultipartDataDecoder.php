@@ -7,8 +7,7 @@ use \sndsgd\Arr;
 use \sndsgd\http\UploadedFile;
 use \sndsgd\Mime;
 
-
-class MultipartDataDecoder extends \sndsgd\http\data\Decoder
+class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
 {
     const CONTENT_DISPOSITION_REGEX =
         '/content-disposition:[ +]?form-data;[ +](?:name="(.*?)")?(?:;[ +]?filename="(.*?)")?/i';
@@ -62,7 +61,6 @@ class MultipartDataDecoder extends \sndsgd\http\data\Decoder
      */
     private $files = [];
 
-
     /**
      * {@inheritdoc}
      */
@@ -78,9 +76,10 @@ class MultipartDataDecoder extends \sndsgd\http\data\Decoder
 
     private function detectBoundary()
     {
-        # get the boundary string from the content type header
-        $pos = strpos($_SERVER["CONTENT_TYPE"], "boundary=");
-        if ($pos === false) {
+        if (
+            !array_key_exists("CONTENT_TYPE", $_SERVER) ||
+            ($pos = strpos($_SERVER["CONTENT_TYPE"], "boundary=")) === false
+        ) {
             $err = "missing value for 'boundary' in content-type header";
             throw new Exception($err);
         }
@@ -98,14 +97,9 @@ class MultipartDataDecoder extends \sndsgd\http\data\Decoder
         while ($this->fieldsRemain() === true) {
             list($name, $filename, $contentType) = $this->getFieldHeader();
 
-            # if the current field is not a file process it as a normal value
             if ($filename === null) {
                 $value = $this->getValueFromField();
-            }
-
-            # otherwise, the current field is a file
-            # copy its contents to a temp file
-            else {
+            } else {
                 $value = $this->getFileFromField($name, $filename, $contentType);
             }
 

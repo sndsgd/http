@@ -6,8 +6,7 @@ use \Exception;
 use \sndsgd\Arr;
 use \sndsgd\Url;
 
-
-class UrlDecoder extends \sndsgd\http\data\Decoder
+class UrlDecoder extends \sndsgd\http\data\DecoderAbstract
 {
     /**
      * A header key to specify the RFC the url was encoded for
