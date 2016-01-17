@@ -2,9 +2,6 @@
 
 namespace sndsgd\http\data\encoder;
 
-use \InvalidArgumentException;
-
-
 class JsonEncoder extends \sndsgd\http\data\EncoderAbstract
 {
     /**
@@ -35,7 +32,7 @@ class JsonEncoder extends \sndsgd\http\data\EncoderAbstract
     public function setDepth($depth)
     {
         if (!is_int($depth) || $depth < 0) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 "invalid value provided for 'depth'; ".
                 "expecting an integer that is greater than 0"
             );

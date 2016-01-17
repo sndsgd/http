@@ -2,10 +2,6 @@
 
 namespace sndsgd\http;
 
-use \InvalidArgumentException;
-use \sndsgd\Arr;
-
-
 class HeaderParser
 {
     /**
@@ -46,9 +42,9 @@ class HeaderParser
     {
         $parts = explode("\r\n", $header, 2);
         if (count($parts) !== 2) {
-            throw new InvalidArgumentException(
-                "invalid value provided for 'header'; expecting a string that ".
-                "utilizes \\r\\n line breaks"
+            throw new \InvalidArgumentException(
+                "invalid value provided for 'header'; expecting a string ".
+                "that utilizes \\r\\n line breaks"
             );
         }
 
@@ -60,7 +56,7 @@ class HeaderParser
         $this->fields = [];
         foreach (explode("\r\n", trim($parts[1])) as $line) {
             list($key, $value) = explode(":", $line, 2);
-            Arr::addvalue($this->fields, strtolower($key), trim($value));
+            \sndsgd\Arr::addvalue($this->fields, strtolower($key), trim($value));
             $ret++;
         }
         return $ret;

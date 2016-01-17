@@ -34,7 +34,7 @@ class CurlRequest extends \sndsgd\http\outbound\Request
     protected $options = [];
 
     /**
-     * Close the curl object if it is still open
+     * Still open? nighty night.
      */
     public function __destruct()
     {

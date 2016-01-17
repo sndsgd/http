@@ -2,18 +2,33 @@
 
 namespace sndsgd\http\data\decoder;
 
-use \Exception;
-
+/**
+ * A JSON request body decoder
+ */
 class JsonDecoder extends \sndsgd\http\data\DecoderAbstract
 {
     /**
      * {@inheritdoc}
      */
-    public function getDecodedData()
+    public function decode(): array
     {
-        $data = json_decode(file_get_contents($this->path), true);
+        $json = @file_get_contents($this->path, true);
+        if ($json === false) {
+            $message = "failed to read input stream";
+            $err = error_get_last();
+            if ($err !== null) {
+                $message .= "; ".$err["message"];
+            }
+            throw new \RuntimeException($message);
+        }
+
+        $maxNestingLevels = $this->options->getMaxNestingLevels();
+        $data = json_decode($json, true, $maxNestingLevels);
         if ($data === null) {
-            throw new Exception("Failed to parse request data as JSON", 400);
+            $message = json_last_error_msg();
+            throw new \sndsgd\http\data\DecodeException(
+                "failed to decode JSON request data; $message"
+            );
         }
         return $data;
     }

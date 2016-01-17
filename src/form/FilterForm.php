@@ -35,7 +35,7 @@ class FilterForm extends \sndsgd\http\Form
      */
     public function registerFields()
     {
-        $request = $this->request;
+        $controller = $this->controller;
         $this->addFields([
             (new IntegerField("pagination-page"))
                 ->setDescription("The result page number")
@@ -60,7 +60,7 @@ class FilterForm extends \sndsgd\http\Form
                 ->setExportHandler(Field::EXPORT_SKIP)
                 ->addRules([
                     (new SortablePropertyRule)
-                        ->setModel($request::MODEL)
+                        ->setModel($controller::MODEL)
                         ->setAdditionalProperties($this->sortableProperties)
                 ]),
             (new StringField("sort-direction"))

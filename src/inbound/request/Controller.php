@@ -28,7 +28,7 @@ abstract class Controller
     const PATH = "";
 
     /**
-     * Subclasses *MAY* not require authentication
+     * Subclasses *SHALL* not require authentication
      *
      * @var string
      */

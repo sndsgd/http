@@ -15,7 +15,7 @@ class BadRequestException extends request\ExceptionAbstract
     /**
      * @var array<string,mixed>
      */
-    protected $validationErrors = [];
+    protected $validationErrors;
 
     /**
      * @param array<string,mixed>
@@ -31,5 +31,16 @@ class BadRequestException extends request\ExceptionAbstract
     public function getValidationErrors()
     {
         return $this->validationErrors;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResponseData()/*: array */
+    {
+        $ret = parent::getResponseData();
+        if ($this->validationErrors !== null) {
+            $ret["errors"] = $this->validationErrors;
+        }
     }
 }

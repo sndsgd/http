@@ -27,16 +27,16 @@ class JsonWriter extends WriterAbstract
     /**
      * {@inheritdoc}
      */
-    public function generate()
+    public function generateBody()
     {
-        $body = $this->response->getData();
-        $body = (empty($body))
+        $data = $this->response->getData();
+        $body = (empty($data))
             ? "{}"
-            : json_encode($body, $this->encodeOptions);
+            : json_encode($data, $this->encodeOptions);
 
         if ($body === false) {
-            $this->error = "failed to serialize response body";
-            $this->errorDetail = json_last_error_msg();
+            $this->error = "failed to serialize body as JSON";
+            $this->errorDetail = json_get_last_error_msg();
             return false;
         }
 

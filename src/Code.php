@@ -2,9 +2,6 @@
 
 namespace sndsgd\http;
 
-use \InvalidArgumentException;
-
-
 /**
  * A dictionary of http codes
  */
@@ -74,37 +71,35 @@ class Code
     /**
      * Get the relevant message for a status code
      *
-     * @param integer $code The status code
-     * @return string|null
-     * @return string The status code
-     * @return null The provided status code was not found
+     * @param int $statusCode The status code
+     * @return string
+     * @throws \InvalidArgumentException If the provided code is invalid
      */
-    public static function getStatusText(/*int*/ $code)
+    public static function getStatusText(int $statusCode): string
     {
-        return array_key_exists($code, self::$codes)
-            ? static::$codes[$code]
-            : null;
+        if (!array_key_exists($statusCode, static::$codes)) {
+            throw new \InvalidArgumentException(
+                "invalid value provided for 'statusCode'; ".
+                "expecting a valid status code as an integer"
+            );
+        }
+        return static::$codes[$statusCode];
     }
 
     /**
-     * Determine if a status code matches a pattern
+     * Get a status group for a given status code (2xx, 3xx, etc)
      *
-     * @param integer $code A status code to test
-     * @param string|integer $match A combination of numbers and wildcards
-     * @return boolean
+     * @param int $statusCode
+     * @return string
      */
-    public static function matches(/*int*/ $code, /*string*/ $match)
+    public static function getStatusGroup(int $statusCode): string
     {
-        if (is_string($match) && preg_match("/[0-9x]{3}/i", $match)) {
-            $match = str_replace("x", "[0-9]", $match);
-        }
-        else if (!is_int($match) || $match < 100 || $match > 599) {
-            throw new InvalidArgumentException(
-                "invalid value provided for 'match'; ".
-                "expecting a match target that contains only numbers and 'x'"
+        if ($statusCode < 100 || $statusCode > 599) {
+            throw new \InvalidArgumentException(
+                "invalid value provided for 'statusCode'; ".
+                "expecting a valid status code as an integer"
             );
         }
-
-        return (preg_match("/^{$match}\$/i", $code) === 1);
+        return floor($statusCode / 100)."xx";
     }
 }
