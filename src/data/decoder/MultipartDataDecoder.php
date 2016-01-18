@@ -231,16 +231,14 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
 
         # if a filename was in the content disposition
         # attempt to find its content type in the field header
-        $regex = "/content-type:[\t ]+?(.*)(?:;|$)/mi";
         if ($ret[1] !== null) {
+            $regex = "/content-type:[\t ]+?(.*)(?:;|$)/mi";
             if (preg_match($regex, $header, $matches) === 1) {
                 $ret[2] = strtolower($matches[1]);
             }
-
-            #
             else {
-                $ret[2] = "application/octet-stream";
-            }
+                $ret[2] = "";
+            }   
         }
         return $ret;
     }
@@ -285,7 +283,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
     private function getFileFromField(
         string $name,
         string $filename,
-        string $supposedContentType
+        string $unverifiedContentType
     )
     {
         # create and open a temp file to write the contents to
@@ -305,6 +303,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         # the total number of bytes written to the temp file
         $bytesWritten = 0;
 
+
         # if anything is left over from the previous field, add it to the file
         if ($this->buffer) {
             if (($bytesRead = fwrite($tempHandle, $this->buffer)) === false) {
@@ -315,6 +314,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
             $bytesWritten += $bytesRead;
         }
 
+        $timer = new \sndsgd\Timer("decode $name");
         while (($pos = strpos($this->buffer, $this->boundary)) === false) {
             $this->buffer = fread($this->fp, $this->bytesPerRead);
             if (($bytesRead = fwrite($tempHandle, $this->buffer)) === false) {
@@ -335,11 +335,11 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         if ($size < 1) {
             return $this->fileUploadError(
                 "file was not uploaded",
-                $tempHandle,
                 $tempPath,
+                $tempHandle,
                 $name,
                 $filename,
-                $supposedContentType,
+                $unverifiedContentType,
                 0
             );
         }
@@ -348,21 +348,25 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         elseif ($size > $this->maxFileSize) {
             return $this->fileUploadError(
                 "file exceeds maximum upload size",
-                $tempHandle,
                 $tempPath,
+                $tempHandle,
                 $name,
                 $filename,
-                $supposedContentType,
+                $unverifiedContentType,
                 0
             );
         }
 
         ftruncate($tempHandle, $size);
         fclose($tempHandle);
+        $timer->stop();
 
-        # attempt to read the real content type from the file contents
-        $contentType = Mime::getTypeFromFile($tempPath);
-        return new UploadedFile($filename, $contentType, $size, $tempPath);
+        return new UploadedFile(
+            $filename,
+            $unverifiedContentType,
+            $size,
+            $tempPath
+        );
     }
 
     /**

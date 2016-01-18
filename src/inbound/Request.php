@@ -3,10 +3,9 @@
 namespace sndsgd\http\inbound;
 
 use \Exception;
-use \sndsgd\http\data\decoder\UrlDecoder;
+use \sndsgd\http\data\decoder\QueryStringDecoder;
 use \sndsgd\http\inbound\request\exception\BadRequestException;
 use \sndsgd\Str;
-use \sndsgd\Url;
 
 /**
  * An inbound request
@@ -16,17 +15,6 @@ class Request
     const CACHE_KEY_CONTENT_TYPE = "header-content-type";
     const CACHE_KEY_ACCEPT = "header-accept";
     const CACHE_KEY_BASIC_AUTH = "basic-auth";
-
-    /**
-     * Request body decoders
-     *
-     * @var array<string,string>
-     */
-    protected static $contentTypes = [
-        "application/json" => "sndsgd\\http\\data\\decoder\\JsonDecoder",
-        "multipart/form-data" => "sndsgd\\http\\data\\decoder\\MultipartDataDecoder",
-        "application/x-www-form-urlencoded" => "sndsgd\\http\\data\\decoder\\UrlDecoder",
-    ];
 
     /**
      * A copy of the $_SERVER superglobal
@@ -55,6 +43,13 @@ class Request
      * @var array<string>
      */
     protected $headers;
+
+    /**
+     * The decoded querystring
+     *
+     * @var array<string,mixed>
+     */
+    protected $query;
 
     /**
      * Once values are computed, they can be cached here
@@ -107,6 +102,24 @@ class Request
     public function getHost(): string
     {
         return $this->server["HTTP_HOST"] ?? "";
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getQuery(): array
+    {
+        if ($this->query === null) {
+            if (isset($this->server["QUERY_STRING"])) {
+                $this->query = (new QueryStringDecoder(0))
+                    ->decode($this->server["QUERY_STRING"])
+                    ->getValues();    
+            }
+            else {
+                $this->query = [];
+            }
+        }
+        return $this->query;
     }
 
     /**
@@ -188,26 +201,6 @@ class Request
             ];
         }
         return $this->cache[static::CACHE_KEY_BASIC_AUTH];
-    }
-
-    /**
-     * @return array<string,mixed>
-     */
-    public function getQueryParameters(): array
-    {
-        if ($this->queryParameters === null) {
-            $this->queryParameters = [];
-            $pos = strpos($_SERVER["REQUEST_URI"], "?");
-            if ($pos !== false) {
-                $queryString = substr($_SERVER["REQUEST_URI"], $pos + 1);
-                $rfc = UrlDecoder::getRfc();
-                $this->queryParameters = Url::decodeQueryString(
-                    $queryString,
-                    $rfc
-                );
-            }
-        }
-        return $this->queryParameters;
     }
 
     /**
