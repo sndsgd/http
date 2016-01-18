@@ -138,27 +138,6 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
     }
 
     /**
-     * Read the input stream into the buffer until a string is encountered
-     *
-     * @param string $search The string to read until
-     * @return integer The position of the string in the buffer
-     */
-    private function readUntil($search)
-    {
-        while (($position = strpos($this->buffer, $search)) === false) {
-            if (feof($this->fp)) {
-                fclose($this->fp);
-                throw new DecodeException(
-                    "Invalid multipart data encountered; ".
-                    "end of content was reached before expected"
-                );
-            }
-            $this->buffer .= fread($this->fp, $this->bytesPerRead);
-        }
-        return $position;
-    }
-
-    /**
      * Determine if any more fields remain in the stream
      *
      * @return boolean
@@ -189,6 +168,27 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
 
         # if the buffer starts with the last boundary, there are no more fields
         return (strpos($this->buffer, $this->lastBoundary) !== 0);
+    }
+
+    /**
+     * Read the input stream into the buffer until a string is encountered
+     *
+     * @param string $search The string to read until
+     * @return integer The position of the string in the buffer
+     */
+    private function readUntil($search)
+    {
+        while (($position = strpos($this->buffer, $search)) === false) {
+            if (feof($this->fp)) {
+                fclose($this->fp);
+                throw new DecodeException(
+                    "Invalid multipart data encountered; ".
+                    "end of content was reached before expected"
+                );
+            }
+            $this->buffer .= fread($this->fp, $this->bytesPerRead);
+        }
+        return $position;
     }
 
     /**
