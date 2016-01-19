@@ -110,7 +110,10 @@ class Request
     public function getQuery(): array
     {
         if ($this->query === null) {
-            if (isset($this->server["QUERY_STRING"])) {
+            if (
+                isset($this->server["QUERY_STRING"]) &&
+                $this->server["QUERY_STRING"] !== ""
+            ) {
                 $this->query = (new QueryStringDecoder(0))
                     ->decode($this->server["QUERY_STRING"])
                     ->getValues();    
