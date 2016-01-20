@@ -87,9 +87,13 @@ class Request
     public function getPath(): string
     {
         if ($this->path === null) {
-            $this->path = isset($this->server["REQUEST_URI"])
-                ? parse_url($this->server["REQUEST_URI"], PHP_URL_PATH)
-                : "/";
+            if (isset($this->server["REQUEST_URI"])) {
+                $path = parse_url($this->server["REQUEST_URI"], PHP_URL_PATH);
+                $this->path = rawurldecode($path);
+            }
+            else {
+                $path = "/";
+            }
         }
         return $this->path;
     }
