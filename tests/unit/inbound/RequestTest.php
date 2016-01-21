@@ -153,26 +153,50 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     //     ];
     // }
 
-    // /**
-    //  * @covers ::getAcceptContentType
-    //  * @dataProvider acceptContentTypeProvider
-    //  */
-    // public function testGetAcceptContentType($input, $expect)
-    // {
-    //     $_SERVER = $this->initServer(["HTTP_ACCEPT" => $input]);
-    //     $req = new Request();
-    //     $this->assertEquals($expect, $req->getAcceptContentType());
-    // }
+    /**
+     * @covers ::getAcceptContentType
+     * @dataProvider acceptContentTypeProvider
+     */
+    public function testGetAcceptContentType($header, $all, $expect)
+    {
+        $req = new Request(["HTTP_ACCEPT" => $header]);
+        $this->assertEquals($expect, $req->getAcceptContentType($all));
+    }
 
-    // public function acceptContentTypeProvider()
-    // {
-    //     return [
-    //         ["application/json,image/webp,*/*;q=0.8", "application/json"],
-    //         ["application/xml,*/*;asd=1.0", "application/xml"],
-    //         ["TEXT/html", "text/html"],
-    //         ["", ""],
-    //     ];
-    // }
+    public function acceptContentTypeProvider()
+    {
+        return [
+            [
+                "application/json,image/webp,*/*;q=0.8",
+                false,
+                "application/json",
+            ],
+            [
+                "application/json,image/webp,*/*;q=0.8",
+                true,
+                [
+                    "application/json" => true,
+                    "image/webp" => true,
+                    "*/*" => true,
+                ],
+            ],
+            [
+                "application/xml,*/*;asd=1.0",
+                false,
+                "application/xml",
+            ],
+            [
+                "TEXT/html",
+                false,
+                "text/html",
+            ],
+            [
+                "",
+                false,
+                "",
+            ],
+        ];
+    }
 
     // /**
     //  * @covers ::getBasicAuth

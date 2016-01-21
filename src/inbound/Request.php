@@ -45,6 +45,12 @@ class Request
     protected $headers;
 
     /**
+     * [$acceptHeaders description]
+     * @var [type]
+     */
+    protected $acceptHeaders;
+
+    /**
      * The decoded querystring
      *
      * @var array<string,mixed>
@@ -92,7 +98,7 @@ class Request
                 $this->path = rawurldecode($path);
             }
             else {
-                $path = "/";
+                $this->path = "/";
             }
         }
         return $this->path;
@@ -182,16 +188,25 @@ class Request
     /**
      * Get the accept content type
      *
-     * @return string
+     * @param bool $all
+     * @return string|array
      */
-    public function getAcceptContentType(): string
+    public function getAcceptContentType(bool $all = false)
     {
         # accept: text/html,application/xhtml+xml;q=0.9,image/webp,*/*;q=0.8
-        if (!isset($this->cache[static::CACHE_KEY_ACCEPT])) {
-            $value = Str::before($this->getHeader("accept", ""), ",");
-            $this->cache[static::CACHE_KEY_ACCEPT] = strtolower($value);
+        if ($this->acceptHeaders === null) {
+            $this->acceptHeaders = [];
+            $header = $this->getHeader("accept", "");
+            $pos = strpos($header, ";");
+            if ($pos !== false) {
+                $header = substr($header, 0, $pos);
+            }
+            foreach (explode(",", $header) as $type) {
+                $type = strtolower($type);
+                $this->acceptHeaders[$type] = true;
+            }
         }
-        return $this->cache[static::CACHE_KEY_ACCEPT];
+        return ($all) ? $this->acceptHeaders : array_keys($this->acceptHeaders)[0];
     }
 
     /**
