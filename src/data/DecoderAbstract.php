@@ -57,7 +57,7 @@ abstract class DecoderAbstract
         $this->contentType = $contentType;
         $this->contentLength = $contentLength;
         $this->options = $options ?? new DecoderOptions();
-        $this->values = new \sndsgd\http\data\Collection(
+        $this->values = new Collection(
             $this->options->getMaxVars(),
             $this->options->getMaxNestingLevels()
         );

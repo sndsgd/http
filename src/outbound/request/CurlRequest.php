@@ -17,6 +17,8 @@ use \sndsgd\Url;
  */
 class CurlRequest extends \sndsgd\http\outbound\Request
 {
+    const RESPONSE_CLASS = "sndsgd\\http\\inbound\\response\\CurlResponse";
+
     use DataTrait;
 
     /**
@@ -32,6 +34,8 @@ class CurlRequest extends \sndsgd\http\outbound\Request
      * @var array<integer,boolean|integer|string>
      */
     protected $options = [];
+
+    protected $responseClass = self::RESPONSE_CLASS;
 
     /**
      * Still open? nighty night.
@@ -75,8 +79,18 @@ class CurlRequest extends \sndsgd\http\outbound\Request
         foreach ($this->options as $key => $value) {
             $opts[$key] = $value;
         }
-        $opts[CURLOPT_HTTPHEADER] = $this->stringifyHeaders();
+        $opts[CURLOPT_HTTPHEADER] = $this->headers->getStringifiedArray();
         return $opts;
+    }
+
+    public function setResponseClass(string $class)
+    {
+        if (!is_a($class, self::RESPONSE_CLASS, true)) {
+            throw new \InvalidArgumentException(
+                "invalid value provided for 'class'; ".
+                "expecting an subclass of '".self::RESPONSE_CLASS."'"
+            );
+        }
     }
 
     /**
@@ -149,25 +163,35 @@ class CurlRequest extends \sndsgd\http\outbound\Request
     }
 
     /**
+     * Create a response
+     * Used to create responses when using `curl_multi_*`
+     *
+     * @param string $body
+     * @param array $curlInfo
+     * @return \sndsgd\http\inbound\Response
+     */
+    public function createResponse(string $body, array $curlInfo)
+    {
+        $class = $this->responseClass;
+        $response = new $class($this);
+        $response->setBody($body);
+        $response->setCurlInfo($curlInfo);
+        return $response;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function getResponse($classname = null)
+    public function getResponse($class = self::RESPONSE_CLASS)
     {
-        $validClassname = "sndsgd\\http\\inbound\\response\\CurlResponse";
-        if ($classname === null) {
-            $classname = $validClassname;
-        }
-        else if (!is_a($classname, $validClassname, true)) {
-            throw new InvalidArgumentException(
-                "invalid value provided for 'classname'; ".
-                "expecting an subclass of '$validClassname'"
+        if (!is_a($class, self::RESPONSE_CLASS, true)) {
+            throw new \InvalidArgumentException(
+                "invalid value provided for 'class'; ".
+                "expecting an subclass of '".self::RESPONSE_CLASS."'"
             );
         }
 
         $ch = $this->getCurl();
-        $response = new $classname;
-        $response->setBody(curl_exec($ch));
-        $response->setCurlInfo(curl_getinfo($ch));
-        return $response;
+        return $this->createResponse(curl_exec($ch), curl_getinfo($ch));
     }
 }

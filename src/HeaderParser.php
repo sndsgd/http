@@ -56,7 +56,7 @@ class HeaderParser
         $this->fields = [];
         foreach (explode("\r\n", trim($parts[1])) as $line) {
             list($key, $value) = explode(":", $line, 2);
-            \sndsgd\Arr::addvalue($this->fields, strtolower($key), trim($value));
+            \sndsgd\Arr::addvalue($this->fields, $key, trim($value));
             $ret++;
         }
         return $ret;

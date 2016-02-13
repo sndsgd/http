@@ -5,7 +5,7 @@
     bootstrap="vendor/autoload.php"
     colors="true"
     convertErrorsToExceptions="true"
-    convertNoticesToExceptions="true"
+    convertNoticesToExceptions="false"
     convertWarningsToExceptions="false"
     processIsolation="false"
     stopOnFailure="false"

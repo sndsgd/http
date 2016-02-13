@@ -3,26 +3,26 @@
 namespace sndsgd\http;
 
 /**
- * @coversDefaultClass \sndsgd\http\Code
+ * @coversDefaultClass \sndsgd\http\Status
  */
 class CodeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers ::getStatusText
-     * @dataProvider providerGetStatusText
+     * @covers ::getText
+     * @dataProvider providerGetText
      */
-    public function testGetStatusText($code, $expect, $exception = null)
+    public function testGetText($code, $expect, $exception = null)
     {
         if ($exception === null) {
-            $this->assertSame($expect, Code::getStatusText($code));
+            $this->assertSame($expect, Status::getText($code));
         }
         else {
             $this->setExpectedException($exception);
-            Code::getStatusText($code);
+            Status::getText($code);
         }
     }
 
-    public function providerGetStatusText()
+    public function providerGetText()
     {
         return [
             [100, "Continue"],
@@ -80,21 +80,21 @@ class CodeTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::getStatusGroup
-     * @dataProvider providerGetStatusGroup
+     * @covers ::getGroup
+     * @dataProvider providerGetGroup
      */
-    public function testGetStatusGroup($code, $expect, $exception = null)
+    public function testGetGroup($code, $expect, $exception = null)
     {
         if ($exception === null) {
-            $this->assertSame($expect, Code::getStatusGroup($code));
+            $this->assertSame($expect, Status::getGroup($code));
         }
         else {
             $this->setExpectedException($exception);
-            Code::getStatusGroup($code);
+            Status::getGroup($code);
         }
     }
 
-    public function providerGetStatusGroup()
+    public function providerGetGroup()
     {
         return [
             [100, "1xx"],

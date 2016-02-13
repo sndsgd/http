@@ -126,4 +126,9 @@ class Response
     {
        return $this->body;
     }
+
+    public function send()
+    {
+        
+    }
 }

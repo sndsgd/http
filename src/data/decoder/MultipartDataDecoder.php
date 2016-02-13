@@ -303,7 +303,6 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         # the total number of bytes written to the temp file
         $bytesWritten = 0;
 
-
         # if anything is left over from the previous field, add it to the file
         if ($this->buffer) {
             if (($bytesRead = fwrite($tempHandle, $this->buffer)) === false) {

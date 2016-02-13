@@ -148,6 +148,14 @@ class Request
         return isset($this->headers[$name]) ? $this->headers[$name]: $default;
     }
 
+    public function getHeaders(): array
+    {
+        if ($this->headers === null) {
+            $this->headers = $this->readHeaders();
+        }
+        return $this->headers;
+    }
+
     /**
      * Create an array of all headers in the 
      *

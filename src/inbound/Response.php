@@ -2,15 +2,30 @@
 
 namespace sndsgd\http\inbound;
 
-use \sndsgd\http\HeaderTrait;
-
-
 /**
  * Base class for inbound responses
  */
 abstract class Response
 {
-    use HeaderTrait;
+    const DURATION_DNS_LOOKUP = 1;
+    const DURATION_CONNECT = 2;
+    const DURATION_WAIT = 4;
+    const DURATION_TRANSFER = 8;
+    const DURATION_TOTAL = 15;
+
+    /**
+     * The request this is a response for
+     *
+     * @var \sndsgd\http\outbound\Request
+     */
+    protected $request;
+
+    /**
+     * The response headers
+     *
+     * @var \sndsgd\http\HeaderCollection
+     */
+    protected $headers;
 
     /**
      * The response body
@@ -18,6 +33,31 @@ abstract class Response
      * @var string
      */
     protected $body;
+
+    public function __construct(\sndsgd\http\outbound\Request $request)
+    {
+        $this->request = $request;
+        $this->headers = new \sndsgd\http\HeaderCollection();
+    }
+
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        # respect multiple set-cookie headers
+        # manually add the headers as opposed to using `add|setMultiple`
+        foreach ($headers as $key => $value) {
+            $this->headers->add($key, $value);
+        }
+    }
+
+    public function getHeader(string $key): string
+    {
+        return $this->headers->get($key);
+    }
 
     /**
      * @param string $body

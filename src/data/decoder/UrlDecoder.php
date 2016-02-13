@@ -12,9 +12,14 @@ class UrlDecoder extends \sndsgd\http\data\DecoderAbstract
      */
     public function decode(): array
     {
-        $querystring = @file_get_contents($this->path, true);
+        $querystring = file_get_contents($this->path, true);
         if ($querystring === false) {
-            throw new \RuntimeException("Failed to read input stream");
+            $message = "failed to read input stream";
+            $err = error_get_last();
+            if ($err !== null) {
+                $message .= "; ".$err["message"];
+            }
+            throw new \RuntimeException($message);
         }
 
         $decoder = new QueryStringDecoder($this->contentLength, $this->values);

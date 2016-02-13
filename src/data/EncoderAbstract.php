@@ -2,10 +2,8 @@
 
 namespace sndsgd\http\data;
 
-use \Exception;
 use \sndsgd\DataTrait;
 use \sndsgd\ErrorTrait;
-
 
 /**
  * The base class for request data encoders
@@ -37,7 +35,7 @@ abstract class EncoderAbstract
             $this->encodedData === null &&
             !$this->encode()
         ) {
-            throw new Exception("failed to encode data; ".$this->getError());
+            throw new \Exception("failed to encode data; ".$this->getError());
         }
         return $this->encodedData;
     }

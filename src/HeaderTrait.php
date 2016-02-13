@@ -4,7 +4,6 @@ namespace sndsgd\http;
 
 use \sndsgd\Arr;
 
-
 trait HeaderTrait
 {
     /**
@@ -13,14 +12,36 @@ trait HeaderTrait
     protected $headers = [];
 
     /**
+     * A map of `lowercase key` => `key`
+     *
+     * @var array<string,string>
+     */
+    protected $headerKeyMap = [];
+
+    /**
      * Set a header
      *
      * @param string $key
-     * @param string|integer $value
+     * @param string $value
      */
-    public function setHeader($key, $value)
+    public function setHeader(string $key, string $value)
     {
-        $this->headers[strtolower($key)] = $value;
+        $key = $this->getHeaderKey($key, true);
+        $this->headers[$key] = $value;
+    }
+
+    private function getHeaderKey(string $key, bool $set = false): string
+    {
+        $lowercaseKey = strtolower($key);
+        if ($lowercaseKey !== $key) {
+            if (isset($this->headerKeyMap[$lowercaseKey])) {
+                return $this->headerKeyMap[$lowercaseKey];
+            }
+            elseif ($set) {
+                $this->headerKeyMap[$lowercaseKey] = $key;    
+            }
+        }
+        return $key;
     }
 
     /**
@@ -40,8 +61,9 @@ trait HeaderTrait
      * @param string $key
      * @param string|integer $value
      */
-    public function addHeader($key, $value)
+    public function addHeader(string $key, string $value)
     {
+        $key = $this->getHeaderKey($key, true);
         Arr::addValue($this->headers, $key, $value);
     }
 
@@ -61,15 +83,12 @@ trait HeaderTrait
      * Get a header value
      *
      * @param string|null $key A single header to fetch, or null to return all
-     * @return array|string|integer|float|null
+     * @return array<string>|string
      */
-    public function getHeader($key)
+    public function getHeader(string $key)
     {
-        $key = strtolower($key);
-        $headers = array_change_key_case($this->headers);
-        return (array_key_exists($key, $this->headers))
-            ? $headers[$key]
-            : null;
+        $key = $this->getHeaderKey($key);
+        return $this->headers[$key] ?? null;
     }
 
     /**

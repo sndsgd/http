@@ -2,7 +2,6 @@
 
 namespace sndsgd\http\outbound;
 
-use \sndsgd\http\HeaderTrait;
 use \sndsgd\http\MethodTrait;
 
 
@@ -11,7 +10,7 @@ use \sndsgd\http\MethodTrait;
  */
 abstract class Request
 {
-    use HeaderTrait, MethodTrait;
+    use MethodTrait;
 
     /**
      * The request url
@@ -21,11 +20,25 @@ abstract class Request
     protected $url;
 
     /**
+     * Request headers
+     *
+     * @var \sndsgd\http\HeaderCollection
+     */
+    protected $headers;
+
+
+    public function __construct()
+    {
+        $this->headers = new \sndsgd\http\HeaderCollection();
+    }
+
+    /**
      * @param string $url
      */
     public function setUrl($url)
     {
         $this->url = $url;
+        return $this;
     }
 
     /**
@@ -34,6 +47,30 @@ abstract class Request
     public function getUrl()
     {
         return $this->url;
+    }
+
+    public function setHeader(string $key, string $value): Request
+    {
+        $this->headers->setHeader($key, $value);
+        return $this;
+    }
+
+    public function setHeaders(array $headers): Request
+    {
+        $this->headers->setMultiple($headers);
+        return $this;
+    }
+
+    public function addHeader(string $key, string $value): Request
+    {
+        $this->headers->addHeader($key, $value);
+        return $this;
+    }
+
+    public function addHeaders(array $headers): Request
+    {
+        $this->headers->addMultiple($headers);
+        return $this;
     }
 
     /**

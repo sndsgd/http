@@ -2,17 +2,68 @@
 
 namespace sndsgd\http;
 
-/**
- * A dictionary of http codes
- */
-class Code
+class Status
 {
+    # informational
+    const CONTINUE = 100;
+    const SWITCHING_PROTOCOLS = 101;
+    const PROCESSING = 102;
+    # success
+    const OK = 200;
+    const CREATED = 201;
+    const ACCEPTED = 202;
+    const NON_AUTHORITATIVE_INFORMATION = 203;
+    const NO_CONTENT = 204;
+    const RESET_CONTENT = 205;
+    const PARTIAL_CONTENT = 206;
+    # redirection
+    const MULTIPLE_CHOICES = 300;
+    const MOVED_PERMANENTLY = 301;
+    const FOUND = 302;
+    const SEE_OTHER = 303;
+    const NOT_MODIFIED = 304;
+    const USE_PROXY = 305;
+    const TEMPORARY_REDIRECT = 307;
+    # client error
+    const BAD_REQUEST = 400;
+    const UNAUTHORIZED = 401;
+    const PAYMENT_REQUIRED = 402;
+    const FORBIDDEN = 403;
+    const NOT_FOUND = 404;
+    const METHOD_NOT_ALLOWED = 405;
+    const NOT_ACCEPTABLE = 406;
+    const PROXY_AUTHENTICATION_REQUIRED = 407;
+    const REQUEST_TIMEOUT = 408;
+    const CONFLICT = 409;
+    const GONE = 410;
+    const LENGTH_REQUIRED = 411;
+    const PRECONDITION_FAILED = 412;
+    const REQUEST_ENTITY_TOO_LARGE = 413;
+    const REQUEST_URI_TOO_LONG = 414;
+    const UNSUPPORTED_MEDIA_TYPE = 415;
+    const REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+    const EXPECTATION_FAILED = 417;
+    const PRECONDITION_REQUIRED = 428;
+    const TOO_MANY_REQUESTS = 429;
+    const REQUEST_HEADER_FIELDS_TOO_LARGE = 431;
+    # server error
+    const INTERNAL_SERVER_ERROR = 500;
+    const NOT_IMPLEMENTED = 501;
+    const BAD_GATEWAY = 502;
+    const SERVICE_UNAVAILABLE = 503;
+    const GATEWAY_TIMEOUT = 504;
+    const HTTP_VERSION_NOT_SUPPORTED = 505;
+    const INSUFFICIENT_STORAGE = 507;
+    const LOOP_DETECTED = 508;
+    const BANDWIDTH_LIMIT_EXCEEDED = 509;
+    const NETWORK_AUTHENTICATION_REQUIRED = 511;
+
     /**
-     * Status codes and their respective status texts
+     * Http status codes and their respective messages
      * 
      * @var array<integer,string>
      */
-    private static $codes = [
+    protected static $codes = [
         # informational
         100 => "Continue",
         101 => "Switching Protocols",
@@ -69,37 +120,37 @@ class Code
     ];
 
     /**
-     * Get the relevant message for a status code
+     * Get a message given a status code
      *
-     * @param int $statusCode The status code
+     * @param int $code The status code
      * @return string
      * @throws \InvalidArgumentException If the provided code is invalid
      */
-    public static function getStatusText(int $statusCode): string
+    public static function getText(int $code): string
     {
-        if (!array_key_exists($statusCode, static::$codes)) {
+        if (!isset(static::$codes[$code])) {
             throw new \InvalidArgumentException(
-                "invalid value provided for 'statusCode'; ".
+                "invalid value provided for 'code'; ".
                 "expecting a valid status code as an integer"
             );
         }
-        return static::$codes[$statusCode];
+        return static::$codes[$code];
     }
 
     /**
      * Get a status group for a given status code (2xx, 3xx, etc)
      *
-     * @param int $statusCode
+     * @param int $code
      * @return string
      */
-    public static function getStatusGroup(int $statusCode): string
+    public static function getGroup(int $code): string
     {
-        if ($statusCode < 100 || $statusCode > 599) {
+        if ($code < 100 || $code > 599) {
             throw new \InvalidArgumentException(
-                "invalid value provided for 'statusCode'; ".
+                "invalid value provided for 'code'; ".
                 "expecting a valid status code as an integer"
             );
         }
-        return floor($statusCode / 100)."xx";
+        return floor($code / 100)."xx";
     }
 }

@@ -40,7 +40,7 @@ class {{name}} extends request\\ExceptionAbstract
 TXT;
 
 
-$prop = (new ReflectionClass("sndsgd\\http\\Code"))->getProperty("codes");
+$prop = (new ReflectionClass("sndsgd\\http\\Status"))->getProperty("codes");
 $prop->setAccessible(true);
 foreach ($prop->getValue() as $code => $name) {
     if ($code > 399) {
@@ -70,7 +70,8 @@ foreach ($prop->getValue() as $code => $name) {
  * @param string $status The HTTP status text
  * @return string
  */
-function mkName(/*string*/ $status)/*: string */ {
+function mkName(string $status): string
+{
     $words = preg_split("~[^a-z]~i", $status);
     $words = array_map("strtolower", $words);
     $words = array_map("ucfirst", $words);
@@ -83,7 +84,8 @@ function mkName(/*string*/ $status)/*: string */ {
  * @param string $classname The name of the exception class
  * @return boolean
  */
-function isCustomized(/*string*/ $classname)/*: bool*/ {
+function isCustomized(string $classname): bool
+{
     $rc = new ReflectionClass($classname);
     $properties = 0;
     foreach ($rc->getProperties() as $property) {
