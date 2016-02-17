@@ -5,30 +5,18 @@ namespace sndsgd\http\inbound;
 use \Exception;
 use \sndsgd\http\data\decoder\QueryStringDecoder;
 use \sndsgd\http\inbound\request\exception\BadRequestException;
-use \sndsgd\Str;
 
 /**
  * An inbound request
  */
 class Request
 {
-    const CACHE_KEY_CONTENT_TYPE = "header-content-type";
-    const CACHE_KEY_ACCEPT = "header-accept";
-    const CACHE_KEY_BASIC_AUTH = "basic-auth";
-
     /**
      * A copy of the $_SERVER superglobal
      *
      * @var array<string,string|integer|float>
      */
     protected $server;
-
-    /**
-     * The request method (GET, POST, PATCH, DELETE, ...)
-     *
-     * @var string
-     */
-    protected $method;
 
     /**
      * The uri path
@@ -43,6 +31,11 @@ class Request
      * @var array<string>
      */
     protected $headers;
+
+    /**
+     * @var string
+     */
+    protected $contentType;
 
     /**
      * [$acceptHeaders description]
@@ -79,12 +72,7 @@ class Request
      */
     public function getMethod(): string
     {
-        if ($this->method === null) {
-            $this->method = isset($this->server["REQUEST_METHOD"]) 
-                ? $this->server["REQUEST_METHOD"]
-                : "GET";
-        }
-        return $this->method;
+        return $this->server["REQUEST_METHOD"] ?? "GET";
     }
 
     /**
@@ -102,6 +90,16 @@ class Request
             }
         }
         return $this->path;
+    }
+
+    public function getIp(): string
+    {
+        foreach (["HTTP_X_FORWARDED_FOR", "X_FORWARDED_FOR"] as $key) {
+            if (isset($this->server[$key])) {
+                return $this->server[$key];
+            }
+        }
+        return $this->server["REMOTE_ADDR"] ?? "";
     }
 
     /**
@@ -125,10 +123,7 @@ class Request
             $this->headers = $this->readHeaders();
         }
         $name = strtolower($name);
-        if (isset($this->headers[$name])) {
-            return $this->headers[$name];
-        }
-        return $default;
+        return $this->headers[$name] ?? $default;
     }
 
     /**
@@ -145,7 +140,7 @@ class Request
     /**
      * Create an array of all headers in the 
      *
-     * @return array<string,string|integer>
+     * @return array<string,string>
      */
     private function readHeaders()
     {
@@ -166,17 +161,23 @@ class Request
     }
 
     /**
-     * Get the content type
-     *
      * @return string
      */
     public function getContentType(): string
     {
-        if (!isset($this->cache[static::CACHE_KEY_CONTENT_TYPE])) {
-            $value = Str::before($this->getHeader("content-type", ""), ";");
-            $this->cache[static::CACHE_KEY_CONTENT_TYPE] = strtolower($value);
+        if ($this->contentType === null) {
+            $header = strtolower($this->getHeader("content-type", ""));
+            $this->contentType = \sndsgd\Str::before($header, ";");
         }
-        return $this->cache[static::CACHE_KEY_CONTENT_TYPE];
+        return $this->contentType;
+    }
+
+    /**
+     * @return int
+     */
+    public function getContentLength(): int
+    {
+        return (int) $this->getHeader("content-length", "0");
     }
 
     /**
@@ -210,13 +211,10 @@ class Request
      */
     public function getBasicAuth(): array
     {
-        if (!isset($this->cache[static::CACHE_KEY_BASIC_AUTH])) {
-            $this->cache[static::CACHE_KEY_BASIC_AUTH] = [
-                ($this->server["PHP_AUTH_USER"] ?? ""),
-                ($this->server["PHP_AUTH_PW"] ?? ""),
-            ];
-        }
-        return $this->cache[static::CACHE_KEY_BASIC_AUTH];
+        return [
+            ($this->server["PHP_AUTH_USER"] ?? ""),
+            ($this->server["PHP_AUTH_PW"] ?? ""),
+        ];
     }
 
     /**
@@ -249,20 +247,49 @@ class Request
     public function getBodyParameters(): array
     {
         if ($this->bodyParameters === null) {
-            $this->decodeBody();
+            $this->bodyParameters = $this->decodeBody();
         }
         return $this->bodyParameters;
     }
 
     private function decodeBody()
     {
+        if ($this->getMethod() === "POST") {
+            return $this->parsePost();
+        }
+        
         $contentType = $this->getContentType();
-        if (!array_key_exists($contentType, static::$contentTypes)) {
+        if (!isset(static::$contentTypes[$contentType])) {
             throw new BadRequestException("unknown content-type '$contentType'");
         }
 
+        $contentLength = (int) $this->getHeader("content-length");
         $class = static::$contentTypes[$contentType];
-        $decoder = new $class;
-        $this->bodyParameters = $decoder->getDecodedData();
+        $decoder = new $class("php://input", $contentType,  $contentLength);
+        $this->bodyParameters = $decoder->decode();
+    }
+
+    private function parsePost()
+    {
+        $ret = $_POST ?: [];
+        if (isset($_FILES)) {
+            foreach ($_FILES as $name => $info) {
+                $extension = pathinfo($info['name'], PATHINFO_EXTENSION);
+                $type = \sndsgd\Mime::getTypeFromExtension($extension);
+                $file = new \sndsgd\http\UploadedFile(
+                    $info['name'],
+                    $type,
+                    $info['size'],
+                    $info['tmp_name']
+                );
+
+                if ($info['error'] !== UPLOAD_ERR_OK) {
+                    $file->setError($info['error']);
+                }
+
+                \sndsgd\Arr::addValue($ret, $name, $file);
+            }
+        }
+        return $ret;
     }
 }
