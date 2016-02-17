@@ -91,26 +91,6 @@ class Collection implements \Countable
     }
 
     /**
-     * 
-     * @param  array  &$values [description]
-     * @param  string $key     [description]
-     * @param  string $value   [description]
-     * @return [type]          [description]
-     */
-    private function appendValue(array &$values, string $key, string $value)
-    {
-        if (array_key_exists($key, $values)) {
-            if (!is_array($values[$key])) {
-                $values[$key] = [$values[$key]];
-            }
-            $values[$key][] = $value;
-        }
-        else {
-            $values[$key] = $value;
-        }
-    }
-
-    /**
      * Add a value that has a nested key
      *
      * @param string $key

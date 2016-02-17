@@ -115,27 +115,6 @@ class Request
     }
 
     /**
-     * @return array<string,mixed>
-     */
-    public function getQuery(): array
-    {
-        if ($this->query === null) {
-            if (
-                isset($this->server["QUERY_STRING"]) &&
-                $this->server["QUERY_STRING"] !== ""
-            ) {
-                $this->query = (new QueryStringDecoder(0))
-                    ->decode($this->server["QUERY_STRING"])
-                    ->getValues();    
-            }
-            else {
-                $this->query = [];
-            }
-        }
-        return $this->query;
-    }
-
-    /**
      * @param string $name The name of the header to get
      * @param string $default A value to use if the header does not exist
      * @return string
@@ -145,9 +124,16 @@ class Request
         if ($this->headers === null) {
             $this->headers = $this->readHeaders();
         }
-        return isset($this->headers[$name]) ? $this->headers[$name]: $default;
+        $name = strtolower($name);
+        if (isset($this->headers[$name])) {
+            return $this->headers[$name];
+        }
+        return $default;
     }
 
+    /**
+     * @return array<string,string>
+     */
     public function getHeaders(): array
     {
         if ($this->headers === null) {
@@ -182,7 +168,7 @@ class Request
     /**
      * Get the content type
      *
-     * @return string|null
+     * @return string
      */
     public function getContentType(): string
     {
@@ -234,6 +220,27 @@ class Request
     }
 
     /**
+     * @return array<string,mixed>
+     */
+    public function getQueryParameters(): array
+    {
+        if ($this->query === null) {
+            if (
+                isset($this->server["QUERY_STRING"]) &&
+                $this->server["QUERY_STRING"] !== ""
+            ) {
+                $this->query = (new QueryStringDecoder(0))
+                    ->decode($this->server["QUERY_STRING"])
+                    ->getValues();    
+            }
+            else {
+                $this->query = [];
+            }
+        }
+        return $this->query;
+    }
+
+    /**
      * Get the request data using the content type
      *
      * @return array
@@ -245,16 +252,6 @@ class Request
             $this->decodeBody();
         }
         return $this->bodyParameters;
-    }
-
-    public function getBodyParameter(string $name, $default = null)
-    {
-        if ($this->bodyParameters === null) {
-            $this->decodeBody();
-        }
-        return (array_key_exists($name, $this->bodyParameters))
-            ? $this->bodyParameters[$name]
-            : $default;
     }
 
     private function decodeBody()

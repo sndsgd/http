@@ -4,13 +4,18 @@ namespace sndsgd\http\data;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
-    private function createCollection($maxVars = 10, $maxNesting = 10, array $values = null)
+    private function createCollection($maxVars = 10, $maxNesting = 10, array $values = [])
     {
         $collection = new Collection($maxVars, $maxNesting, $values);
-        $rc = new \ReflectionClass($collection);
-        $property = $rc->getProperty("values");
-        $property->setAccessible(true);
-        $property->setValue($collection, $values);
+        foreach ($values as $key => $value) {
+            foreach ((array) $value as $val) {
+                $collection->addValue($key, $val);    
+            }
+        }
+        // $rc = new \ReflectionClass($collection);
+        // $property = $rc->getProperty("values");
+        // $property->setAccessible(true);
+        // $property->setValue($collection, $values);
         return $collection;
     }
 
@@ -90,19 +95,21 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider providerToArray
+     * @dataProvider providerGetValues
      */
-    public function testGetValues($test)
+    public function testGetValues($test, $expect)
     {
         $collection = $this->createCollection(100, 100, $test);
-        $this->assertSame($test, $collection->getValues());
+        $this->assertSame($expect, $collection->getValues());
     }
 
-    public function providerToArray()
+    public function providerGetValues()
     {
         return [
-            [["one" => "1", "two" => "2"]],
-            [["one" => ["1", "2", "3"], "two" => "2", "three" => ["a" => "a", "b" => "b"]]],
+            [
+                ["one" => "1", "two" => "2"],
+                ["one" => "1", "two" => "2"],
+            ],
         ];
     }
 

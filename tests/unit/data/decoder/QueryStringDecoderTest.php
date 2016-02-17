@@ -8,7 +8,28 @@ namespace sndsgd\http\data\decoder;
 class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @covers ::decodePair
+     * @dataProvider provideConstructor
+     */
+    public function testConstructor($contentLength, $values)
+    {
+        $decoder = new QueryStringDecoder($contentLength, $values);
+    }
+
+    public function provideConstructor()
+    {
+        $options = new \sndsgd\http\data\DecoderOptions();
+        $collection = new \sndsgd\http\data\Collection(
+            $options->getMaxVars(),
+            $options->getMaxNestingLevels()
+        );
+
+        return [
+            [42, null],
+            [42, $collection],
+        ];
+    }
+
+    /**
      * @dataProvider provideDecodePair
      */
     public function testDecodePair($pair, $expectKey, $expectValue)
@@ -53,6 +74,26 @@ class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
                 "%F0%9F%92%A9%5B%F0%9F%92%A9%5D=emoji",
                 "💩[💩]",
                 "emoji",
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideDecode
+     */
+    public function testDecode($query, $expect)
+    {
+        $decoder = new QueryStringDecoder(strlen($query));
+        $collection = $decoder->decode($query);
+        $this->assertSame($expect, $collection->getValues());
+    }
+
+    public function provideDecode()
+    {
+        return [
+            [
+                "one=1&two=two",
+                ["one" => "1", "two" => "two"],
             ],
         ];
     }

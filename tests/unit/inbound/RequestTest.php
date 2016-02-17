@@ -116,43 +116,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
-
-    // /**
-    //  * @covers ::getHeader
-    //  */
-    // public function testGetHeader()
-    // {
-    //     $_SERVER = $this->initServer([
-    //         "HTTP_X_APP_TEST" => "test",
-    //     ]);
-
-    //     $req = new Request();
-    //     $this->assertEquals("test", $req->getHeader("x-app-test"));
-    //     $this->assertEquals("test", $req->getHeader("X-App-Test"));
-    //     $this->assertEquals("test", $req->getHeader("X-APP-TEST"));
-    // }
-
-    // /**
-    //  * @covers ::getContentType
-    //  * @dataProvider contentTypeProvider
-    //  */
-    // public function testGetContentType($input, $expect)
-    // {
-    //     $_SERVER = $this->initServer(["HTTP_CONTENT_TYPE" => $input]);
-    //     $req = new Request();
-    //     $this->assertEquals($expect, $req->getContentType());
-    // }
-
-    // public function contentTypeProvider()
-    // {
-    //     return [
-    //         ["application/json", "application/json"],
-    //         ["application/json; charset=UTF-8", "application/json"],
-    //         ["TEXT/html", "text/html"],
-    //     ];
-    // }
-
     /**
      * @covers ::getAcceptContentType
      * @dataProvider acceptContentTypeProvider
@@ -198,112 +161,128 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    // /**
-    //  * @covers ::getBasicAuth
-    //  * @dataProvider basicAuthProvider
-    //  */
-    // public function testGetBasicAuth($server, $expect)
-    // {
-    //     $_SERVER = $this->initServer($server);
-    //     $req = new Request();
-    //     $this->assertEquals($expect, $req->getBasicAuth());
-    // }
+    /**
+     * @dataProvider providerGetQueryParameters
+     */
+    public function testGetQueryParameters($server, $expect)
+    {
+        $request = new Request($server);
+        $this->assertSame($expect, $request->getQueryParameters());
+    }
 
-    // public function basicAuthProvider()
-    // {
-    //     return [
-    //         [
-    //             [],
-    //             [null, null]
-    //         ],
-    //         [
-    //             [
-    //                 "PHP_AUTH_USER" => "user"
-    //             ],
-    //             ["user", null]
-    //         ],
-    //         [
-    //             [
-    //                 "PHP_AUTH_PW" => "password"
-    //             ],
-    //             [null, "password"]
-    //         ],
-    //         [
-    //             [
-    //                 "PHP_AUTH_USER" => "user",
-    //                 "PHP_AUTH_PW" => "password"
-    //             ],
-    //             ["user", "password"]
-    //         ]
-    //     ];
-    // }
+    public function providerGetQueryParameters()
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                ["QUERY_STRING" => "one=1&two=two"],
+                ["one" => "1", "two" => "two"],
+            ],
+        ];
+    }
 
-    // /**
-    //  * @covers ::setUriParameters
-    //  * @covers ::getUriParameters
-    //  */
-    // public function testSetGetUriParameters()
-    // {
-    //     $params = ["one" => "1", "two" => "two"];
-    //     $_SERVER = $this->initServer();
-    //     $req = new Request();
-    //     $req->setUriParameters($params);
-    //     $this->assertEquals($params, $req->getUriParameters());
-    // }
+    /**
+     * @dataProvider providerGetHeader
+     */
+    public function testGetHeader($server, $header, $default, $expect)
+    {
+        $request = new Request($server);
+        $this->assertSame($expect, $request->getHeader($header, $default));
+    }
 
-    // /**
-    //  * @covers ::getQueryParameters
-    //  */
-    // public function testGetQueryParameters()
-    // {
-    //     $_SERVER = $this->initServer(["REQUEST_URI" => "/?one=1&two=two"]);
-    //     $expect = ["one" => 1, "two" => "two"];
-    //     $req = new Request();
-    //     $result = $req->getQueryParameters();
-    //     $this->assertEquals($expect, $result);
-    // }
+    public function providerGetHeader()
+    {
+        return [
+            [
+                ["HTTP_SOME_VALUE" => "test"],
+                "some-value",
+                "",
+                "test",
+            ],
+            [
+                ["HTTP_SOME_VALUE" => "test"],
+                "SOME-VALUE",
+                "",
+                "test",
+            ],
+            [
+                ["HTTP_SOME_VALUE" => "test"],
+                "a-value",
+                "default",
+                "default",
+            ],
+        ];
+    }
 
-    // /**
-    //  * @covers ::getBodyParameters
-    //  */
-    // public function testGetBodyParameters()
-    // {
-    //     $_SERVER = $this->initServer(["HTTP_CONTENT_TYPE" => "test/test"]);
-    //     $req = new ExtendedRequest();
-    //     $params = $req->getBodyParameters();
-    //     $this->assertEquals(["one" => "1", "two" => "two"], $params);
-    // }
+    /**
+     * @dataProvider providerGetHeaders
+     */
+    public function testGetHeaders($server, $expect)
+    {
+        $request = new Request($server);
+        $this->assertSame($expect, $request->getHeaders());
+    }
 
-    // /**
-    //  * @covers ::getBodyParameters
-    //  * @expectedException Exception
-    //  */
-    // public function testGetBodyParametersNoContentType()
-    // {
-    //     # no content type is provided
-    //     $_SERVER = $this->initServer();
-    //     $req = new ExtendedRequest();
-    //     $params = $req->getBodyParameters();
-    // }
+    public function providerGetHeaders()
+    {
+        return [
+            [
+                ["HTTP_ONE" => "1", "HTTP_OTHER_VALUE" => "asd"],
+                ["one" => "1", "other-value" => "asd"],
+            ],
+        ];
+    }
 
-    // /**
-    //  * @covers ::getBodyParameters
-    //  * @expectedException Exception
-    //  */
-    // public function testGetBodyParametersUnknownContentType()
-    // {
-    //     $_SERVER = $this->initServer(["HTTP_CONTENT_TYPE" => "no/decoder"]);
-    //     $req = new ExtendedRequest();
-    //     $params = $req->getBodyParameters();
-    // }
+    /**
+     * @dataProvider providerGetContentType
+     */
+    public function testGetContentType($server, $expect)
+    {
+        $request = new Request($server);
+        $this->assertSame($expect, $request->getContentType());
+    }
 
-    // /**
-    //  * @covers ::getRawBody
-    //  */
-    // public function testGetRawBody()
-    // {
-    //     $_SERVER = $this->initServer();
-    //     $req = new ExtendedRequest();
-    //     $this->assertEquals("", $req->getRawBody());
-    // }
+    public function providerGetContentType()
+    {
+        return [
+            [
+                ["HTTP_CONTENT_TYPE" => "application/json"],
+                "application/json",
+            ],
+            [
+                ["HTTP_CONTENT_TYPE" => "application/json; charset=UTF-8"],
+                "application/json",
+            ],
+            [
+                ["HTTP_CONTENT_TYPE" => "TEXT/html"],
+                "text/html",
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providerGetBasicAuth
+     */
+    public function testGetBasicAuth($server, $expect)
+    {
+        $request = new Request($server);
+        $this->assertSame($expect, $request->getBasicAuth());
+    }
+
+    public function providerGetBasicAuth()
+    {
+        return [
+            [
+                [],
+                ["", ""],
+            ],
+            [
+                ["PHP_AUTH_USER" => "user", "PHP_AUTH_PW" => "pass"],
+                ["user", "pass"],
+            ]
+        ];
+    }
 }

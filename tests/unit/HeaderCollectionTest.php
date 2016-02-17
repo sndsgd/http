@@ -2,8 +2,7 @@
 
 namespace sndsgd\http;
 
-/**
- * @coversDefaultClass \sndsgd\http\HeaderCollection
+/*
  */
 class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,8 +16,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerSetGet
-     * @covers ::set
-     * @covers ::get
      */
     public function testSetGet($hc, $key, $value, $getKey, $expect)
     {
@@ -57,7 +54,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerSetMultiple
-     * @covers ::setMultiple
      */
     public function testSetMutiple($hc, array $headers, array $expect)
     {
@@ -94,7 +90,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerAdd
-     * @covers ::add
      */
     public function testAdd($hc, $key, $value, $expect)
     {
@@ -122,7 +117,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerAddMultiple
-     * @covers ::addMultiple
      */
     public function testAddMultiple($hc, array $values, array $expect)
     {
@@ -143,7 +137,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerGet
-     * @covers ::get
      */
     public function testGet($hc, $key, $expect)
     {
@@ -171,7 +164,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerGetMultiple
-     * @covers ::getMultiple
      */
     public function testGetMultiple($hc, array $keys, array $expect)
     {
@@ -195,7 +187,6 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider providerGetStringifiedArray
-     * @covers ::getStringifiedArray
      */
     public function testGetStringifiedArray($hc, array $expect)
     {
@@ -224,19 +215,23 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider provider__toString
+     */
     public function test__toString($hc, $expect)
     {
-
+        $this->assertSame($expect, (string) $hc);
     }
 
-    // public function testStringifyHeaders()
-    // {
-    //     $this->test->addHeaders(static::$testHeaders);
-    //     $res = $this->test->stringifyHeaders();
-    //     $this->assertEquals([
-    //         "one: 1",
-    //         "two: two",
-    //         "three: 1, 2, 3"
-    //     ], $res);
-    // }
+    public function provider__toString()
+    {
+        return [
+            [
+                (new HeaderCollection())
+                    ->add("one", "1")
+                    ->add("two", "2"),
+                "one: 1\r\ntwo: 2",
+            ]
+        ];
+    }
 }
