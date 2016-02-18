@@ -38,10 +38,9 @@ class Request
     protected $contentType;
 
     /**
-     * [$acceptHeaders description]
-     * @var [type]
+     * @var array<string,string>
      */
-    protected $acceptHeaders;
+    protected $acceptContentTypes;
 
     /**
      * The decoded querystring
@@ -181,16 +180,15 @@ class Request
     }
 
     /**
-     * Get the accept content type
+     * Get client specified acceptable content types
      *
-     * @param bool $all
-     * @return string|array
+     * @return array<string,string>
      */
-    public function getAcceptContentType(bool $all = false)
+    public function getAcceptContentTypes(): array
     {
         # accept: text/html,application/xhtml+xml;q=0.9,image/webp,*/*;q=0.8
-        if ($this->acceptHeaders === null) {
-            $this->acceptHeaders = [];
+        if ($this->acceptContentTypes === null) {
+            $this->acceptContentTypes = [];
             $header = $this->getHeader("accept", "");
             $pos = strpos($header, ";");
             if ($pos !== false) {
@@ -198,10 +196,10 @@ class Request
             }
             foreach (explode(",", $header) as $type) {
                 $type = strtolower($type);
-                $this->acceptHeaders[$type] = true;
+                $this->acceptContentTypes[$type] = $type;
             }
         }
-        return ($all) ? $this->acceptHeaders : array_keys($this->acceptHeaders)[0];
+        return $this->acceptContentTypes;
     }
 
     /**
