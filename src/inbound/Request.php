@@ -111,6 +111,11 @@ class Request
         return $this->server["HTTP_HOST"] ?? "";
     }
 
+    public function getProtocol(): string
+    {
+        return $this->server["SERVER_PROTOCOL"] ?? "HTTP 1.1";
+    }
+
     /**
      * @param string $name The name of the header to get
      * @param string $default A value to use if the header does not exist

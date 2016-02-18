@@ -50,6 +50,7 @@ class Response
     public function __construct(Request $request)
     {
         $this->request = $request;
+        $this->headers = new \sndsgd\http\HeaderCollection();
     }
 
     /**
@@ -60,15 +61,34 @@ class Response
         return $this->request;
     }
 
+    public function setHeader(string $key, string $value)
+    {
+        $this->headers->set($key, $value);
+    }
+
+    public function setHeaders(array $headers)
+    {
+        # respect multiple set-cookie headers
+        # manually add the headers as opposed to using `add|setMultiple`
+        foreach ($headers as $key => $value) {
+            $this->headers->add($key, $value);
+        }
+    }
+
+    public function getHeader(string $key): string
+    {
+        return $this->headers->get($key);
+    }
+
     /**
      * Set the status code and text
      *
      * @param integer $code The http status code
      * @see \sndsgd\http\Code
      */
-    public function setStatus(/*integer*/ $code)
+    public function setStatus(int $code)
     {
-        $this->statusText = Code::getStatusText($code);
+        $this->statusText = Status::getText($code);
         if ($this->statusText === null) {
             throw new InvalidArgumentException(
                 "invalid value provided for 'code'; ".
@@ -81,7 +101,7 @@ class Response
     /**
      * @param integer $statusCode
      */
-    public function setStatusCode(/*integer*/ $statusCode)
+    public function setStatusCode(int $statusCode)
     {
         $this->statusCode = $statusCode;
     }
@@ -129,6 +149,12 @@ class Response
 
     public function send()
     {
-        
+        $protocol = $this->request->getProtocol();
+        header("$protocol {$this->statusCode} {$this->statusText}");
+        foreach ($this->headers->getStringifiedArray() as $header) {
+            header("$header");
+        }
+
+        echo $this->body;
     }
 }
