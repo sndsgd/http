@@ -3,9 +3,7 @@
 namespace sndsgd\http\outbound;
 
 use \InvalidArgumentException;
-use \sndsgd\DataTrait;
-use \sndsgd\http\Code;
-use \sndsgd\http\HeaderTrait;
+use \sndsgd\http\Status;
 use \sndsgd\http\inbound\Request;
 
 
@@ -14,8 +12,6 @@ use \sndsgd\http\inbound\Request;
  */
 class Response
 {
-    use DataTrait, HeaderTrait;
-
     /**
      * A reference to the request this instance is a response to
      *
@@ -135,7 +131,7 @@ class Response
      */
     public function setBody($body)
     {
-        $this->addHeader("Content-Length", mb_strlen($body));
+        $this->setHeader("Content-Length", mb_strlen($body));
         $this->body = $body;
     }
     
