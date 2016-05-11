@@ -41,9 +41,7 @@ class HeaderCollection
      */
     public function set(string $key, string $value): HeaderCollection
     {
-        $key = $this->getKey($key, true);
-        $this->headers[$key] = $value;
-        return $this;
+        return $this->setMultiple([$key => $value]);
     }
 
     /**
@@ -54,7 +52,8 @@ class HeaderCollection
     public function setMultiple(array $headers): HeaderCollection
     {
         foreach ($headers as $key => $value) {
-            $this->set($key, $value);
+            $key = $this->getKey($key, true);
+            $this->headers[$key] = $value;
         }
         return $this;
     }
@@ -67,9 +66,7 @@ class HeaderCollection
      */
     public function add(string $key, string $value): HeaderCollection
     {
-        $key = $this->getKey($key, true);
-        \sndsgd\Arr::addValue($this->headers, $key, $value);
-        return $this;
+        return $this->addMultiple([$key => $value]);
     }
 
     /**
@@ -80,7 +77,8 @@ class HeaderCollection
     public function addMultiple(array $headers): HeaderCollection
     {
         foreach ($headers as $key => $value) {
-            $this->add($key, $value);
+            $key = $this->getKey($key, true);
+            \sndsgd\Arr::addValue($this->headers, $key, $value);
         }
         return $this;
     }

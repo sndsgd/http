@@ -3,7 +3,6 @@
 namespace sndsgd\http\data\decoder;
 
 use \sndsgd\http\data\Collection;
-use \sndsgd\http\data\DecoderOptions;
 
 class QueryStringDecoder
 {
@@ -29,7 +28,7 @@ class QueryStringDecoder
      * parameters will be added to a new collection
      *
      * @param string $contentType
-     * @param \sndsgd\http\data\Collection|null $params
+     * @param \sndsgd\http\data\Collection|null $values
      */
     public function __construct(
         int $contentLength,
@@ -74,14 +73,14 @@ class QueryStringDecoder
      * Decode a query string
      *
      * @param string $query
-     * @return \sndsgd\http\data\Collection
+     * @return array
      */
-    public function decode($query)
+    public function decode($query): array
     {
         foreach (explode("&", $query) as $pair) {
             list($key, $value) = $this->decodePair($pair);
             $this->values->addValue($key, $value);
         }
-        return $this->values;
+        return $this->values->getValues();
     }
 }

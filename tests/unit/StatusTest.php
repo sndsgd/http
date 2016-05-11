@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\Status
  */
-class CodeTest extends \PHPUnit_Framework_TestCase
+class StatusTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::getText

@@ -63,7 +63,7 @@ class Status
      * 
      * @var array<integer,string>
      */
-    protected static $codes = [
+    protected static $statuses = [
         # informational
         100 => "Continue",
         101 => "Switching Protocols",
@@ -128,13 +128,13 @@ class Status
      */
     public static function getText(int $code): string
     {
-        if (!isset(static::$codes[$code])) {
+        if (!isset(static::$statuses[$code])) {
             throw new \InvalidArgumentException(
                 "invalid value provided for 'code'; ".
                 "expecting a valid status code as an integer"
             );
         }
-        return static::$codes[$code];
+        return static::$statuses[$code];
     }
 
     /**

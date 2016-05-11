@@ -8,7 +8,7 @@ use \sndsgd\Arr;
 use \sndsgd\http\UploadedFile;
 use \sndsgd\Mime;
 
-class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
+class MultipartDataDecoder extends DecoderAbstract
 {
     /**
      * The number of bytes to read when using `fread()`
@@ -43,28 +43,28 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
      *
      * @var resource
      */
-    private $fp;
+    protected $fp;
 
     /**
      * The multipart field boundary
      *
      * @var string
      */
-    private $boundary;
+    protected $boundary;
 
     /**
      * The final field boundary, with the end dashes
      *
      * @var string
      */
-    private $lastBoundary;
+    protected $lastBoundary;
 
     /**
      * The contents of the input stream that have been read, but not processed
      *
      * @var string
      */
-    private $buffer = "";
+    protected $buffer = "";
 
     /**
      * @param \sndsgd\http\inbound\Request $request
@@ -94,7 +94,9 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
 
         $this->fp = fopen($this->path, "r");
         if ($this->fp === false) {
-            throw new \Exception("failed to open '{$this->path}' for reading");
+            throw new \RuntimeException(
+                "failed to open '{$this->path}' for reading"
+            );
         }
 
         while ($this->fieldsRemain() === true) {
@@ -126,7 +128,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
      *
      * @return string
      */
-    private function getBoundary()
+    protected function getBoundary()
     {
         $pos = strpos($this->contentType, "boundary=");
         if ($pos === false) {
@@ -142,7 +144,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
      *
      * @return boolean
      */
-    private function fieldsRemain()
+    protected function fieldsRemain()
     {
         $bufferlen = strlen($this->buffer);
         $minlen = strlen($this->lastBoundary);
@@ -150,16 +152,16 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         # if the buffer is too short to contain the last boundary
         # read enough bytes into the buffer to allow for a strpos test
         if ($bufferlen < $minlen) {
-            if (feof($this->fp)) {
+            if ($this->feof()) {
                 fclose($this->fp);
                 throw new DecodeException(
                     "Invalid multipart data encountered; ".
                     "end of content was reached before expected"
                 );
             }
-            elseif (($bytes = fread($this->fp, $this->bytesPerRead)) === false) {
+            elseif (($bytes = $this->fread()) === false) {
                 fclose($this->fp);
-                throw new \Exception(
+                throw new \RuntimeException(
                     "failed to read $minlen bytes from input stream"
                 );
             }
@@ -176,17 +178,17 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
      * @param string $search The string to read until
      * @return integer The position of the string in the buffer
      */
-    private function readUntil($search)
+    protected function readUntil($search)
     {
         while (($position = strpos($this->buffer, $search)) === false) {
-            if (feof($this->fp)) {
+            if ($this->feof()) {
                 fclose($this->fp);
                 throw new DecodeException(
                     "Invalid multipart data encountered; ".
                     "end of content was reached before expected"
                 );
             }
-            $this->buffer .= fread($this->fp, $this->bytesPerRead);
+            $this->buffer .= $this->fread();
         }
         return $position;
     }
@@ -267,7 +269,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
      *
      * @return bool
      */
-    private function getTempFilePath()
+    protected function getTempFilePath()
     {
         return tempnam(sys_get_temp_dir(), "uploaded-file-");
     }
@@ -280,7 +282,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
      * @param string $contentType The mime content type of the file
      * @return \sndsgd\http\UploadedFile
      */
-    private function getFileFromField(
+    protected function getFileFromField(
         string $name,
         string $filename,
         string $unverifiedContentType
@@ -288,7 +290,7 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
     {
         # create and open a temp file to write the contents to
         $tempPath = $this->getTempFilePath();
-        $tempHandle = @fopen($tempPath, "w");
+        $tempHandle = fopen($tempPath, "w");
         if ($tempHandle === false) {
             fclose($this->fp);
             $message = "failed to open '$tempPath' for writing";
@@ -304,22 +306,25 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         $bytesWritten = 0;
 
         # if anything is left over from the previous field, add it to the file
-        if ($this->buffer) {
-            if (($bytesRead = fwrite($tempHandle, $this->buffer)) === false) {
+        if ($this->buffer !== "") {
+            if (($bytesRead = $this->fwrite($tempHandle, $this->buffer)) === false) {
                 fclose($this->fp);
                 fclose($tempHandle);
-                throw new \Exception("fwrite() failed to write to '$tempPath'");
+                throw new \RuntimeException(
+                    "fwrite() failed to write to '$tempPath'"
+                );
             }
             $bytesWritten += $bytesRead;
         }
 
-        $timer = new \sndsgd\Timer("decode $name");
         while (($pos = strpos($this->buffer, $this->boundary)) === false) {
-            $this->buffer = fread($this->fp, $this->bytesPerRead);
-            if (($bytesRead = fwrite($tempHandle, $this->buffer)) === false) {
+            $this->buffer = $this->fread();
+            if (($bytesRead = $this->fwrite($tempHandle, $this->buffer)) === false) {
                 fclose($this->fp);
                 fclose($tempHandle);
-                throw new \Exception("fwrite() failed to write to '$tempPath'");
+                throw new \RuntimeException(
+                    "fwrite() failed to write to '$tempPath'"
+                );
             }
             $bytesWritten += $bytesRead;
         }
@@ -333,10 +338,9 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         # if the uploaded file was empty
         if ($size < 1) {
             return $this->fileUploadError(
-                "file was not uploaded",
+                UPLOAD_ERR_NO_FILE,
                 $tempPath,
                 $tempHandle,
-                $name,
                 $filename,
                 $unverifiedContentType,
                 0
@@ -346,10 +350,9 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
         # if the file exceeded the max upload size
         elseif ($size > $this->maxFileSize) {
             return $this->fileUploadError(
-                "file exceeds maximum upload size",
+                UPLOAD_ERR_INI_SIZE,
                 $tempPath,
                 $tempHandle,
-                $name,
                 $filename,
                 $unverifiedContentType,
                 0
@@ -358,7 +361,6 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
 
         ftruncate($tempHandle, $size);
         fclose($tempHandle);
-        $timer->stop();
 
         return new UploadedFile(
             $filename,
@@ -371,19 +373,17 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
     /**
      * Handle an invalid file upload
      *
-     * @param  string $message A message describing what went wrong
-     * @param  resource $fp The pointer to the temp file
-     * @param  string $name The parameter name
-     * @param  string $filename The file name as provided by the client
-     * @param  string $contentType The mime type of the uploaded file
-     * @param  int $size The bytesize of the uploaded file
+     * @param int $code The relevant PHP file upload error
+     * @param resource $fp The pointer to the temp file
+     * @param string $filename The file name as provided by the client
+     * @param string $contentType The mime type of the uploaded file
+     * @param int $size The bytesize of the uploaded file
      * @return \sndsgd\http\UploadedFile
      */
-    private function fileUploadError(
-        string $message,
+    protected function fileUploadError(
+        int $code,
         string $tempPath,
         $tempHandle,
-        string $name,
         string $filename,
         string $contentType,
         int $size
@@ -394,8 +394,39 @@ class MultipartDataDecoder extends \sndsgd\http\data\DecoderAbstract
             unlink($tempPath);
         }
 
-        $ret = new UploadedFile($filename, $contentType, $size, "");
-        $ret->setError($message);
-        return $ret;
+        $error = new \sndsgd\http\UploadedFileError($code);
+        $file = new UploadedFile($filename, $contentType, $size, "");
+        $file->setError($error);
+        return $file;
+    }
+
+    /**
+     * Stubbable method for mocking calls to feof
+     *
+     * @return bool
+     */
+    protected function feof()
+    {
+        return feof($this->fp);
+    }
+
+    /**
+     * Stubbable method for mocking calls to feof
+     *
+     * @return string
+     */
+    protected function fread()
+    {
+        return fread($this->fp, $this->bytesPerRead);
+    }
+
+    /**
+     * Stubbable method for mocking calls to feof
+     *
+     * @return int
+     */
+    protected function fwrite($pointer, string $content)
+    {
+        return fwrite($pointer, $content);
     }
 }

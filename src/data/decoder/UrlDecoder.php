@@ -3,16 +3,16 @@
 namespace sndsgd\http\data\decoder;
 
 /**
- * A urlendocde content decoder
+ * A urlencoded content decoder
  */
-class UrlDecoder extends \sndsgd\http\data\DecoderAbstract
+class UrlDecoder extends DecoderAbstract
 {
     /**
      * {@inheritdoc}
      */
     public function decode(): array
     {
-        $querystring = file_get_contents($this->path, true);
+        $querystring = @file_get_contents($this->path, true);
         if ($querystring === false) {
             $message = "failed to read input stream";
             $err = error_get_last();
@@ -23,6 +23,6 @@ class UrlDecoder extends \sndsgd\http\data\DecoderAbstract
         }
 
         $decoder = new QueryStringDecoder($this->contentLength, $this->values);
-        return $decoder->decode($querystring)->getValues();
+        return $decoder->decode($querystring);
     }
 }

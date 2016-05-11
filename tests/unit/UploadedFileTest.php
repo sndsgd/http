@@ -25,7 +25,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $property->setAccessible(true);
         $this->assertSame($clientFilename, $property->getValue($file));
 
-        $property = $rc->getProperty("contentType");
+        $property = $rc->getProperty("unverifiedContentType");
         $property->setAccessible(true);
         $this->assertSame($contentType, $property->getValue($file));
 
@@ -80,39 +80,92 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
      * @covers ::getContentType
      * @dataProvider providerGetContentType
      */
-    public function testGetContentType($contentType, $expect)
+    public function testGetContentType(
+        $unverifiedContentType,
+        $fileContentType,
+        $allowUnverified,
+        $expect
+    )
     {
-        $file = new UploadedFile("test.txt", $contentType, 123, "");
-        $this->assertSame($expect, $file->getContentType());
+        $mock = $this->getMockBuilder(UploadedFile::class)
+            ->setConstructorArgs(["test.txt", $unverifiedContentType, 123])
+            ->setMethods(['getContentTypeFromFile'])
+            ->getMock();
+
+        $mock->method('getContentTypeFromFile')->willReturn($fileContentType);
+
+        $this->assertSame($expect, $mock->getContentType($allowUnverified));
     }
 
     public function providerGetContentType()
     {
         return [
-            ["", ""],
-            ["text/plain", "text/plain"],
-            ["TEXT/PLAIN", "text/plain"],
+            ["unverified", "verified", true, "unverified"],
+            ["unverified", "verified", false, "verified"],
         ];
+    }
+
+    public function testGetContentTypeFromFile()
+    {
+        $filename = basename(__FILE__);
+        $file = new UploadedFile($filename, "text/plain");
+        $rc = new \ReflectionClass($file);
+        $method = $rc->getMethod("getContentTypeFromFile");
+        $method->setAccessible(true);
+        $contentType = $method->invoke($file, __FILE__);
+        $this->assertSame("text/x-php", $contentType);
     }
 
     /**
      * @covers ::isType
      * @dataProvider providerIsType
      */
-    public function testIsType($contentType, $types, $expect)
+    public function testIsType(
+        $filename,
+        $unverifiedContentType,
+        $realContentType,
+        $types,
+        $allowUnverified,
+        $expect
+    )
     {
-        $file = new UploadedFile("test.txt", $contentType, 123, "");
-        $this->assertSame($expect, $file->isType($types));
+        $mock = $this->getMockBuilder(UploadedFile::class)
+            ->setConstructorArgs([$filename, $unverifiedContentType, 123])
+            ->setMethods(["getContentTypeFromFile"])
+            ->getMock();
+
+        $mock->method("getContentTypeFromFile")->willReturn($realContentType);
+
+        $this->assertSame($expect, $mock->isType($types, $allowUnverified));
     }
 
     public function providerIsType()
     {
         return [
-            ["image/jpeg", ["image/jpeg"], true],
-            ["IMAGE/JPEG", ["image/jpeg"], true],
-            ["image/jpeg", ["jpg"], true],
-            ["image/jpeg", ["png", "gif", "jpg"], true],
-            ["app/evil", ["image/png", "image/gif", "image/jpeg"], false],
+            [
+                "image.jpg",
+                "image/jpeg",
+                "text/javascript",
+                ["image/jpeg"],
+                true,
+                true,
+            ],
+            [
+                "image.jpg",
+                "image/jpeg",
+                "text/javascript",
+                ["image/jpeg"],
+                false,
+                false,
+            ],
+            [
+                "image.jpg",
+                "image/jpeg",
+                "app/evil", 
+                ["image/png", "image/gif", "image/jpeg"],
+                false,
+                false,
+            ],
         ];
     }
 
@@ -155,5 +208,13 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             ["/test/path", "/test/path"],
             ["", null, "RuntimeException"],
         ];
+    }
+
+    public function testSetGetError()
+    {
+        $error = new UploadedFileError(UPLOAD_ERR_INI_SIZE);
+        $file = new UploadedFile("test.txt", "text/plain");
+        $file->setError($error);
+        $this->assertSame($error, $file->getError());
     }
 }

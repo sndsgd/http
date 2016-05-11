@@ -2,19 +2,56 @@
 
 namespace sndsgd\http;
 
-class UploadedFile implements \JsonSerializable
+class UploadedFile
 {
+    /**
+     * The name of the file as provided by the client's device
+     * 
+     * @var string
+     */
     protected $clientFilename;
+
+    /**
+     * The content type as provided by the client's device
+     *
+     * @var string
+     */
     protected $unverifiedContentType;
+
+    /**
+     * The content type as determined by a call to `finfo()`
+     *
+     * @var string
+     */
     protected $contentType;
+
+    /**
+     * The size of the file in bytes
+     *
+     * @var int
+     */
     protected $size;
+
+    /**
+     * The absolute path to the temp file
+     * Note: this may be empty if the upload failed
+     *
+     * @var string
+     */
     protected $tempPath;
+
+    /**
+     * If an error is encountered, it will be accessible here
+     *
+     * @var \sndsgd\ErrorInterface
+     */
     protected $error;
+
 
     public function __construct(
         string $clientFilename,
         string $unverifiedContentType,
-        int $size,
+        int $size = 0,
         string $tempPath = ""
     )
     {
@@ -36,6 +73,12 @@ class UploadedFile implements \JsonSerializable
         return $this->clientFilename;
     }
 
+    /**
+     * Get the content type
+     * 
+     * @param bool $allowUnverified
+     * @return string
+     */
     public function getContentType(bool $allowUnverified = false): string
     {
         # always use the verified content type if it exists
@@ -43,9 +86,20 @@ class UploadedFile implements \JsonSerializable
             if ($allowUnverified) {
                 return $this->unverifiedContentType;
             }
-            $this->contentType = \sndsgd\Mime::getTypeFromFile($this->tempPath);
+            $this->contentType = $this->getContentTypeFromFile($this->tempPath);
         }
         return $this->contentType;
+    }
+
+    /**
+     * Stubbable method to read the content type from a file
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function getContentTypeFromFile(string $path)
+    {
+        return \sndsgd\Mime::getTypeFromFile($path);
     }
 
     public function isType(
@@ -55,18 +109,14 @@ class UploadedFile implements \JsonSerializable
     {
         $contentType = $this->getContentType($allowUnverified);
         foreach ($types as $type) {
-            $type = strtolower($type);
-            if (
-                $type === $contentType ||
-                \sndsgd\Mime::getTypeFromExtension($type) === $contentType
-            ) {
+            if (strtolower($type) === $contentType) {
                 return true;
             }
         }
         return false;
     }
 
-    public function getSize()
+    public function getSize(): int
     {
         return $this->size;
     }
@@ -79,20 +129,10 @@ class UploadedFile implements \JsonSerializable
         return $this->tempPath;
     }
 
-    public function jsonSerialize()
-    {
-        return [
-            "error" => $this->error,
-            "clientFilename" => $this->clientFilename,
-            "contentType" => $this->getContentType(true),
-            "size" => $this->size,
-            "tempPath" => $this->tempPath,
-        ];
-    }
-
-    public function setError(string $error)
+    public function setError(\sndsgd\ErrorInterface $error): UploadedFile
     {
         $this->error = $error;
+        return $this;
     }
 
     public function getError()

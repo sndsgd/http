@@ -8,7 +8,7 @@
 
 ## Requirements
 
-You need **PHP >= 5.4.0** to use this library, however, the latest stable version of PHP is recommended.
+You need **PHP >= 7.0** to use this library, however, the latest stable version of PHP is recommended.
 
 
 ## Install
@@ -17,21 +17,4 @@ Install `sndsgd/http` using [Composer](https://getcomposer.org/).
 
 ```
 composer require sndsgd/http
-```
-
-## Testing
-
-Use [PHPUnit](https://phpunit.de/) to run unit tests.
-
-```
-vendor/bin/phpunit
-```
-
-
-## Documentation
-
-Use [ApiGen](http://apigen.org/) to create docs.
-
-```
-apigen generate
 ```

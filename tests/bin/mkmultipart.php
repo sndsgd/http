@@ -43,23 +43,11 @@ if (php_sapi_name() === "cli") {
 }
 
 elseif ($_SERVER["REQUEST_METHOD"] === "PUT") {
-    $name = $_SERVER["HTTP_USER_AGENT"];
-    if (preg_match("/[^a-z-]/i", $name)) {
-        $name = substr(md5($name), 0, 8);
-    }
-    $path = "$dataDir/multipart/various/$name";
+    $name = $_GET["name"];
+    $path = "$dataDir/multipart/$name";
     file_put_contents("$path.type", $_SERVER["HTTP_CONTENT_TYPE"]);
-    $contents = file_get_contents("php://input");
-    //file_put_contents("$path.content", $contents);
+    file_put_contents("$path.content", file_get_contents("php://input"));
 
-    # update the file input names
-    if ($name === "php-curl") {
-        $regex = '/name="[0-9]"; file/';
-        $contents = preg_replace($regex, 'name="file"; file', $contents);
-    }
-    file_put_contents("$path.content", $contents);
-
-    
     echo "request written";
     exit(0);
 }

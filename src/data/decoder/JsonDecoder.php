@@ -5,7 +5,7 @@ namespace sndsgd\http\data\decoder;
 /**
  * A JSON request body decoder
  */
-class JsonDecoder extends \sndsgd\http\data\DecoderAbstract
+class JsonDecoder extends DecoderAbstract
 {
     /**
      * {@inheritdoc}

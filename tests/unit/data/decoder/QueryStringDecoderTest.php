@@ -17,7 +17,7 @@ class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
 
     public function provideConstructor()
     {
-        $options = new \sndsgd\http\data\DecoderOptions();
+        $options = new DecoderOptions();
         $collection = new \sndsgd\http\data\Collection(
             $options->getMaxVars(),
             $options->getMaxNestingLevels()
@@ -84,8 +84,7 @@ class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
     public function testDecode($query, $expect)
     {
         $decoder = new QueryStringDecoder(strlen($query));
-        $collection = $decoder->decode($query);
-        $this->assertSame($expect, $collection->getValues());
+        $this->assertSame($expect, $decoder->decode($query));
     }
 
     public function provideDecode()

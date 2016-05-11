@@ -69,9 +69,9 @@ class Collection implements \Countable
      */
     public function addValue(string $key, $value)
     {
-        # ensure the total input variables doesn't exceed 'max_input_variables'
+        # ensure the total input variables doesn't exceed `max_input_variables`
         if ($this->count === $this->maxVars) {
-            throw new \Exception("max_input_variables exceeded");
+            throw new DecodeException("max_input_variables exceeded");
         }
 
         # if the key has both open and close brackets
@@ -97,7 +97,7 @@ class Collection implements \Countable
      * @param mixed $value
      * @param integer $pos The position of the first open bracket
      */
-    protected function addNestedValue(string $key, string $value, int $pos)
+    protected function addNestedValue(string $key, $value, int $pos)
     {
         # convert the levels into an array of strings
         $levels = (strpos($key, "][") !== false)
@@ -106,10 +106,10 @@ class Collection implements \Countable
         
         array_unshift($levels, substr($key, 0, $pos));
 
-        # ensure the nesting doesn't exceed 'max_nesting_levels'
+        # ensure the nesting doesn't exceed `max_nesting_levels`
         $levelLen = count($levels);
         if ($levelLen > $this->maxNestingLevels) {
-            throw new \Exception("max_input_nesting_level exceeded");
+            throw new DecodeException("max_input_nesting_level exceeded");
         }
 
         $lastKey = array_pop($levels);

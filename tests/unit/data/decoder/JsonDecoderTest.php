@@ -4,7 +4,7 @@ namespace sndsgd\http\data\decoder;
 
 use \org\bovigo\vfs\vfsStream;
 
-class JsonDataDecoderTest extends \PHPUnit_Framework_TestCase
+class JsonDecoderTest extends \PHPUnit_Framework_TestCase
 {
     public function setup()
     {
@@ -88,7 +88,7 @@ class JsonDataDecoderTest extends \PHPUnit_Framework_TestCase
         ];
 
         # max depth exceeded
-        $options = $this->getMockBuilder("sndsgd\\http\\data\\DecoderOptions")
+        $options = $this->getMockBuilder(DecoderOptions::class)
             ->setMethods(["getMaxNestingLevels"])
             ->getMock();
         $options->method("getMaxNestingLevels")->willReturn(3);
