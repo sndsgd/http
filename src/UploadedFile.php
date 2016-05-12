@@ -2,7 +2,7 @@
 
 namespace sndsgd\http;
 
-class UploadedFile
+class UploadedFile implements \JsonSerializable
 {
     /**
      * The name of the file as provided by the client's device
@@ -68,6 +68,11 @@ class UploadedFile
         }
     }
 
+    /**
+     * Retrieve the filename provided by the client
+     *
+     * @return string
+     */
     public function getClientFilename(): string
     {
         return $this->clientFilename;
@@ -102,13 +107,20 @@ class UploadedFile
         return \sndsgd\Mime::getTypeFromFile($path);
     }
 
+    /**
+     * Determine whether the file type matches any that are provided
+     *
+     * @param array<string> $mimeTypes Acceptable mime types
+     * @param bool $allowUnverified Whether to trust the client provided type 
+     * @return bool
+     */
     public function isType(
-        array $types,
+        array $mimeTypes,
         bool $allowUnverified = false
     ): bool
     {
         $contentType = $this->getContentType($allowUnverified);
-        foreach ($types as $type) {
+        foreach ($mimeTypes as $type) {
             if (strtolower($type) === $contentType) {
                 return true;
             }
@@ -116,11 +128,22 @@ class UploadedFile
         return false;
     }
 
+    /**
+     * Retrieve the byte size of the file
+     *
+     * @return int
+     */
     public function getSize(): int
     {
         return $this->size;
     }
 
+    /**
+     * Retrieve the absolute path to the temp file
+     *
+     * @return string
+     * @throws \RuntimeException If the temp path was not set
+     */
     public function getTempPath(): string
     {
         if ($this->tempPath === "") {
@@ -129,14 +152,46 @@ class UploadedFile
         return $this->tempPath;
     }
 
+    /**
+     * @param \sndsgd\ErrorInterface $error
+     * @return \sndsgd\http\UploadedFile
+     */
     public function setError(\sndsgd\ErrorInterface $error): UploadedFile
     {
         $this->error = $error;
         return $this;
     }
 
+    /**
+     * @return \sndsgd\ErrorInterface|null
+     */
     public function getError()
     {
         return $this->error;
+    }
+
+    /**
+     * Get an array representation of this object
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            "clientFilename" => $this->getClientFilename(),
+            "unverifiedContentType" => $this->getContentType(true),
+            "verifiedContentType" => $this->getContentType(),
+            "size" => $this->getSize(),
+            "tempPath" => $this->getTempPath(),
+        ];
+    }
+
+    /**
+     * @see http://php.net/manual/jsonserializable.jsonserialize.php
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

@@ -12,14 +12,14 @@ class BadRequestException extends ExceptionAbstract
     /**
      * @var array<\sndsgd\ErrorInterface>
      */
-    protected $validationErrors;
+    protected $errors;
 
     /**
      * @param array<\sndsgd\ErrorInterface>
      */
-    public function setValidationErrors(array $errors)
+    public function setErrors(array $errors)
     {
-        $this->validationErrors = \sndsgd\TypeTest::typedArray(
+        $this->errors = \sndsgd\TypeTest::typedArray(
             $errors,
             \sndsgd\ErrorInterface::class
         );
@@ -28,8 +28,8 @@ class BadRequestException extends ExceptionAbstract
     /**
      * @return array<\sndsgd\ErrorInterface>
      */
-    public function getValidationErrors()
+    public function getErrors()
     {
-        return $this->validationErrors;
+        return $this->errors;
     }
 }

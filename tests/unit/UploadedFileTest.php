@@ -7,6 +7,14 @@ namespace sndsgd\http;
  */
 class UploadedFileTest extends \PHPUnit_Framework_TestCase
 {
+    protected $tempPath;
+
+    public function setup()
+    {
+        $this->tempPath = tempnam(sys_get_temp_dir(), "UploadedFile-");
+        file_put_contents($this->tempPath, "testing...");
+    }
+
     /**
      * @covers ::__construct
      * @dataProvider providerConstructor
@@ -51,11 +59,10 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
      */
     public function testDestruct()
     {
-        $tempPath = tempnam(sys_get_temp_dir(), "UploadedFile-");
-        file_put_contents($tempPath, "testing...");
-
-        $file = new UploadedFile("", "", filesize($tempPath), $tempPath);
+        $size = filesize($this->tempPath);
+        $file = new UploadedFile("", "", $size, $this->tempPath);
         unset($file);
+        $this->assertFalse(file_exists($this->tempPath));
     }
 
     /**
@@ -216,5 +223,48 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
         $file = new UploadedFile("test.txt", "text/plain");
         $file->setError($error);
         $this->assertSame($error, $file->getError());
+    }
+
+    /**
+     * @covers ::toArray
+     * @dataProvider providerToArray
+     */
+    public function testToArray($filename, $type, $size)
+    {
+        $mock = $this->getMockBuilder(UploadedFile::class)
+            ->setConstructorArgs([$filename, $type, $size, $this->tempPath])
+            ->setMethods(['getContentType'])
+            ->getMock();
+
+        $mock->method('getContentType')
+            ->willReturn($type);
+
+        $expect = [
+            "clientFilename" => $filename,
+            "unverifiedContentType" => $type,
+            "verifiedContentType" => $type,
+            "size" => $size,
+            "tempPath" => $this->tempPath,
+        ];
+
+        $this->assertSame($expect, $mock->toArray());
+    }
+
+    public function providerToArray()
+    {
+        return [
+            ["test.txt", "text/plain", 123],
+        ];
+    }
+
+    /**
+     * @covers ::jsonSerialize
+     * @dataProvider providerToArray
+     */
+    public function testJsonSerialize($filename, $type, $size)
+    {
+        $test = new UploadedFile($filename, $type, $size, $this->tempPath);
+        $json = json_encode($test);
+        $this->assertSame($test->toArray(), json_decode($json, true));
     }
 }
