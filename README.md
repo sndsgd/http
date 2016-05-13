@@ -25,10 +25,10 @@ This library aims to improve how PHP handles HTTP requests, and streamline the t
 
 ## Improved Request Parameter Decoders
 
-To experiment with the decoders, you can PHP's built in webserver with the script located in `bin/demo.php`.
+To experiment with the decoders, you can use PHP's built in webserver with the script located in `bin/request-demo.php`.
 
 ```sh
-php -S localhost:8080 bin/demo.php
+php -S localhost:8080 bin/request-demo.php
 ```
 
 Now you will be able to make requests to [http://localhost:8080](http://localhost:8080/) using any HTTP client. In the examples below, we'll be using [httpie](https://github.com/jkbrzt/httpie). To dump information about the request that is being made, simply append `-v` to any of the commands below.

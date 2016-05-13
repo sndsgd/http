@@ -1,4 +1,5 @@
 <?php
+
 require __DIR__."/../vendor/autoload.php";
 
 $request = new \sndsgd\http\Request($_SERVER);
