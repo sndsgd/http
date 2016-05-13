@@ -1,0 +1,33 @@
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="string"
+
+abc
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="integer"
+
+42
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="float"
+
+4.2
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="array"
+
+1
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="array"
+
+2
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="array"
+
+3
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="a[nested][value]"
+
+thing
+--04602bf3872d4cb6bc18cef191469770
+Content-Disposition: form-data; name="file"; filename="empty"
+
+
+--04602bf3872d4cb6bc18cef191469770--
