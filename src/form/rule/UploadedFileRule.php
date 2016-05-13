@@ -10,12 +10,18 @@ class UploadedFileRule extends RuleAbstract
     /**
      * {@inheritdoc}
      */
-    protected $description = "type:file";
+    public function getDescription(): string
+    {
+        return _("type:file");
+    }
 
     /**
      * {@inheritdoc}
      */
-    protected $errorMessage = "must be a file";
+    public function getErrorMessage(): string
+    {
+        return _("must be a file");
+    }
 
     /**
      * {@inheritdoc}

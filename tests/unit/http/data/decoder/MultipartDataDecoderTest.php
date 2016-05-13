@@ -21,13 +21,13 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
 
     private function getDir($name = null)
     {
-        $dir = realpath(__DIR__."/../../../data");
+        $dir = realpath(__DIR__."/../../../../data");
         return ($name === null) ? $dir : "$dir/$name";
     }
 
     private function getParameterDetails()
     {
-        $path = $this->getDir()."/parameters.json";
+        $path = Fs::getFile($this->getDir()."/parameters.json");
         $json = file_get_contents($path);
         $data = json_decode($data, true);
         exit;

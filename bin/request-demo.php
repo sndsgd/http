@@ -28,4 +28,3 @@ switch ($request->getPath()) {
 }
 
 echo json_encode($data, \sndsgd\Json::HUMAN);
-

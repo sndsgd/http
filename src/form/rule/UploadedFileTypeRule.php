@@ -32,8 +32,9 @@ class UploadedFileTypeRule extends RuleAbstract
      */
     public function getDescription(): string
     {
+        $template = _("file-type:%s");
         $types = implode(",", $this->mimeTypes);
-        return "file-type:$types";
+        return sprintf($template, $types);
     }
 
     /**
@@ -55,11 +56,16 @@ class UploadedFileTypeRule extends RuleAbstract
      */
     public function getErrorMessage(): string
     {
-        $types = \sndsgd\Arr::implode(", ", $this->getWrappedOptions(), "or ");
         if ($this->errorMessage === null) {
-            return "must be a file of the following types: $types";
+            $template = (count($this->mimeTypes) === 1)
+                ? _("must be a file of the following type: %s")
+                : _("must be a file of the following types: %s");
+        } else {
+            $template = $this->errorMessage;
         }
-        return sprintf($this->errorMessage, $types);
+
+        $types = implode(", ", $this->getWrappedOptions());
+        return sprintf($template, $types);
     }
 
     /**

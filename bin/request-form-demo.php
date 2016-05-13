@@ -22,14 +22,9 @@ $form = (new \sndsgd\Form())
 $request = new \sndsgd\http\Request($_SERVER);
 $validator = new \sndsgd\form\Validator($form);
 try {
-    $data = [
-        "payload" => $validator->validate($request->getBodyParameters()),
-    ];
+    $data = ["payload" => $validator->validate($request->getBodyParameters())];
 } catch (\sndsgd\form\ValidationException $ex) {
-    $data = [
-        "errors" => $ex->getErrors(),
-    ];
+    $data = ["errors" => $ex->getErrors()];
 }
 
 echo json_encode($data, \sndsgd\Json::HUMAN);
-

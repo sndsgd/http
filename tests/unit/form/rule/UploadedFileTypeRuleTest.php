@@ -11,12 +11,37 @@ class UploadedFileTypeRuleTest extends \PHPUnit_Framework_TestCase
         $this->assertSame("file-type:image/jpeg,image/png", $result);
     }
 
-    public function testGetErrorMessage()
+    /**
+     * @dataProvider providerGetErrorMessage
+     */
+    public function testGetErrorMessage($types, $errorMessage, $expect)
     {
-        $rule = new UploadedFileTypeRule("image/jpeg", "image/png");
-        $expect = "must be a 'image/jpeg', or 'image/png' file";
-        $result = $rule->getErrorMessage();
-        $this->assertSame($expect, $result);
+        $rule = new UploadedFileTypeRule(...$types);
+        if ($errorMessage) {
+            $rule->setErrorMessage($errorMessage);
+        }
+        $this->assertSame($expect, $rule->getErrorMessage());
+    }
+
+    public function providerGetErrorMessage()
+    {
+        return [
+            [
+                ["image/jpeg"],
+                "",
+                "must be a file of the following type: 'image/jpeg'",
+            ],
+            [
+                ["image/gif", "image/png"],
+                "",
+                "must be a file of the following types: 'image/gif', 'image/png'",
+            ],
+            [
+                ["text/plain"],
+                "custom message %s",
+                "custom message 'text/plain'",
+            ],
+        ];
     }
 
     /**
@@ -24,16 +49,27 @@ class UploadedFileTypeRuleTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidate($value, $expect)
     {
-        $rule = new \sndsgd\form\rule\UploadedFileRule();
+        $rule = new UploadedFileTypeRule();
         $this->assertSame($expect, $rule->validate($value));
+    }
+
+    private function getUploadedFileMock($isType)
+    {
+        $mock = $this->getMockBuilder(\sndsgd\http\UploadedFile::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['isType'])
+            ->getMock();
+
+        $mock->method('isType')->willReturn($isType);
+        return $mock;
     }
 
     public function providerValidate()
     {
         return [
-            [new \sndsgd\http\UploadedFile("test.txt", "text/plain"), true],
-            [new \stdClass(), false],
-            [[], false],
+            [123, false],
+            [$this->getUploadedFileMock(false), false],
+            [$this->getUploadedFileMock(true), true],
         ];
     }
 }
