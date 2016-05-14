@@ -92,6 +92,20 @@ class Response
     }
 
     /**
+     * Add a header
+     * Allows for adding multiple headers with the same key
+     *
+     * @param string $key
+     * @param string $value
+     * @return \sndsgd\http\Response
+     */
+    public function addHeader(string $key, string $value): Response
+    {
+        $this->headers->add($key, $value);
+        return $this;
+    }
+
+    /**
      * @param string $key
      * @return \sndsgd\http\Response
      */
