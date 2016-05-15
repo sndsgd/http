@@ -19,7 +19,7 @@
         "php": ">=7.0.0",
         "sndsgd/util": "~1.0.3",
         "sndsgd/error": "~0.0.1",
-        "sndsgd/form": "~0.0.3",
+        "sndsgd/form": "dev-master",
         "sndsgd/fs": "~0.2.2"
     },
     "require-dev": {
