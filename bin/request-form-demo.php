@@ -7,12 +7,12 @@ require __DIR__."/../vendor/autoload.php";
 
 $form = (new \sndsgd\Form())
     ->addFields(
-        (new field\ScalarField("caption"))
+        (new field\ValueField("caption"))
             ->addRules(
                 new rule\IntegerRule(),
                 new rule\MaxLengthRule(255)
             ),
-        (new field\ScalarField("image"))
+        (new field\ValueField("image"))
             ->addRules(
                 new rule\RequiredRule(),
                 new rule\UploadedFileTypeRule("image/jpeg", "image/png")
