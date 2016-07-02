@@ -2,9 +2,6 @@
 
 namespace sndsgd\form\rule;
 
-/**
- * Ensure a value is an integer
- */
 class UploadedFileRule extends RuleAbstract
 {
     /**

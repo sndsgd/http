@@ -7,24 +7,35 @@ require __DIR__."/../vendor/autoload.php";
 
 $form = (new \sndsgd\Form())
     ->addFields(
-        (new field\ValueField("caption"))
+        (new field\StringField("caption"))
             ->addRules(
-                new rule\IntegerRule(),
+                new rule\RequiredRule(),
                 new rule\MaxLengthRule(255)
             ),
-        (new field\ValueField("image"))
+        (new field\UploadedFileField("image"))
             ->addRules(
                 new rule\RequiredRule(),
                 new rule\UploadedFileTypeRule("image/jpeg", "image/png")
             )
     );
 
+$detail = $form->getDetail();
+echo json_encode($detail, 448);
+exit;
+
+
 $request = new \sndsgd\http\Request($_SERVER);
 $validator = new \sndsgd\form\Validator($form);
 try {
-    $data = ["payload" => $validator->validate($request->getBodyParameters())];
+    $parameters = $validator->validate($request->getBodyParameters());
+    $message = "Success";
 } catch (\sndsgd\form\ValidationException $ex) {
-    $data = ["errors" => $ex->getErrors()];
+    $message = "Validation Error";
+    $errors = $ex->getErrors();
 }
 
-echo json_encode($data, \sndsgd\Json::HUMAN);
+echo json_encode([
+    "message" => $message,
+    "parameters" => $parameters ?? null,
+    "errors" => $errors ?? [],
+], \sndsgd\Json::HUMAN);

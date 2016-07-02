@@ -1,6 +1,6 @@
 {
     "name": "sndsgd/http",
-    "description": "A collection of tools for working with HTTP",
+    "description": "Improved HTTP for PHP",
     "type": "library",
     "homepage": "https://github.com/sndsgd/http",
     "license": "MIT",
@@ -29,8 +29,5 @@
         "psr-4": {
             "sndsgd\\": "src"
         }
-    },
-    "bin": [
-        "bin/routes"
-    ]
+    }
 }
