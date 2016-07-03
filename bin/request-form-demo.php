@@ -19,11 +19,6 @@ $form = (new \sndsgd\Form())
             )
     );
 
-$detail = $form->getDetail();
-echo json_encode($detail, 448);
-exit;
-
-
 $request = new \sndsgd\http\Request($_SERVER);
 $validator = new \sndsgd\form\Validator($form);
 try {

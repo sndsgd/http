@@ -3,9 +3,8 @@
 namespace sndsgd\http;
 
 use \sndsgd\http\data\decoder;
-use \sndsgd\http\exception;
 
-class Request
+class Request implements RequestParameterDecoderInterface
 {
     /**
      * A copy of the $_SERVER superglobal
@@ -235,7 +234,7 @@ class Request
     }
 
     /**
-     * @return array<string,mixed>
+     * {@inheritdoc}
      */
     public function getQueryParameters(): array
     {
@@ -254,20 +253,7 @@ class Request
     }
 
     /**
-     * Stubbable method for creating a body decoder
-     *
-     * @return \sndsgd\http\request\BodyDecoder
-     */
-    protected function getBodyDecoder()
-    {
-        return new request\BodyDecoder();
-    }
-
-    /**
-     * Get the request data using the content type
-     *
-     * @return array
-     * @throws Exception If the provided content type is not acceptable
+     * {@inheritdoc}
      */
     public function getBodyParameters(): array
     {
@@ -287,4 +273,14 @@ class Request
         }
         return $this->bodyParameters;
     }    
+
+    /**
+     * Stubbable method for creating a body decoder
+     *
+     * @return \sndsgd\http\request\BodyDecoder
+     */
+    protected function getBodyDecoder()
+    {
+        return new request\BodyDecoder();
+    }
 }
