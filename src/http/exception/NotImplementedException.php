@@ -7,5 +7,8 @@ class NotImplementedException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 501;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::NOT_IMPLEMENTED;
+    }
 }

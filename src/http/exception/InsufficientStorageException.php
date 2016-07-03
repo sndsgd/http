@@ -7,5 +7,8 @@ class InsufficientStorageException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 507;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::INSUFFICIENT_STORAGE;
+    }
 }

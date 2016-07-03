@@ -7,5 +7,8 @@ class PreconditionFailedException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 412;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::PRECONDITION_FAILED;
+    }
 }

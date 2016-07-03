@@ -7,5 +7,8 @@ class MethodNotAllowedException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 405;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::METHOD_NOT_ALLOWED;
+    }
 }

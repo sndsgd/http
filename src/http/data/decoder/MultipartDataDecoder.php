@@ -2,12 +2,6 @@
 
 namespace sndsgd\http\data\decoder;
 
-use \sndsgd\http\data\DecodeException;
-use \Exception;
-use \sndsgd\Arr;
-use \sndsgd\http\UploadedFile;
-use \sndsgd\Mime;
-
 class MultipartDataDecoder extends DecoderAbstract
 {
     /**
@@ -154,7 +148,7 @@ class MultipartDataDecoder extends DecoderAbstract
         if ($bufferlen < $minlen) {
             if ($this->feof()) {
                 fclose($this->fp);
-                throw new DecodeException(
+                throw new \sndsgd\http\data\DecodeException(
                     "Invalid multipart data encountered; ".
                     "end of content was reached before expected"
                 );
@@ -183,7 +177,7 @@ class MultipartDataDecoder extends DecoderAbstract
         while (($position = strpos($this->buffer, $search)) === false) {
             if ($this->feof()) {
                 fclose($this->fp);
-                throw new DecodeException(
+                throw new \sndsgd\http\data\DecodeException(
                     "Invalid multipart data encountered; ".
                     "end of content was reached before expected"
                 );
@@ -215,7 +209,7 @@ class MultipartDataDecoder extends DecoderAbstract
 
         if (preg_match($regex, $header, $matches) !== 1) {
             fclose($this->fp);
-            throw new DecodeException(
+            throw new \sndsgd\http\data\DecodeException(
                 "Invalid multipart data; 'Content-Disposition' ".
                 "malformed or missing in file field header"
             );
@@ -362,7 +356,7 @@ class MultipartDataDecoder extends DecoderAbstract
         ftruncate($tempHandle, $size);
         fclose($tempHandle);
 
-        return new UploadedFile(
+        return new \sndsgd\http\UploadedFile(
             $filename,
             $unverifiedContentType,
             $size,
@@ -395,7 +389,7 @@ class MultipartDataDecoder extends DecoderAbstract
         }
 
         $error = new \sndsgd\http\UploadedFileError($code);
-        $file = new UploadedFile($filename, $contentType, $size, "");
+        $file = new \sndsgd\http\UploadedFile($filename, $contentType, $size, "");
         $file->setError($error);
         return $file;
     }

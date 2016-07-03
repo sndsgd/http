@@ -7,5 +7,8 @@ class ExpectationFailedException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 417;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::EXPECTATION_FAILED;
+    }
 }

@@ -5,14 +5,17 @@ namespace sndsgd\http\exception;
 class BadRequestException extends ExceptionAbstract
 {
     /**
-     * {@inheritdoc}
-     */
-    const STATUS_CODE = 400;
-
-    /**
      * @var array<\sndsgd\ErrorInterface>
      */
     protected $errors;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::BAD_REQUEST;
+    }
 
     /**
      * @param array<\sndsgd\ErrorInterface>

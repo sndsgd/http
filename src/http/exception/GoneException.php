@@ -7,5 +7,8 @@ class GoneException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 410;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::GONE;
+    }
 }

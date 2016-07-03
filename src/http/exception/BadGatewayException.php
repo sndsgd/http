@@ -7,5 +7,8 @@ class BadGatewayException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 502;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::BAD_GATEWAY;
+    }
 }

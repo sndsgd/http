@@ -7,5 +7,8 @@ class RequestHeaderFieldsTooLargeException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 431;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::REQUEST_HEADER_FIELDS_TOO_LARGE;
+    }
 }

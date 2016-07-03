@@ -7,5 +7,8 @@ class RequestEntityTooLargeException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 413;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::REQUEST_ENTITY_TOO_LARGE;
+    }
 }

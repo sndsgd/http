@@ -7,5 +7,8 @@ class PaymentRequiredException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 402;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::PAYMENT_REQUIRED;
+    }
 }

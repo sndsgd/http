@@ -7,5 +7,8 @@ class RequestTimeoutException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 408;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::REQUEST_TIMEOUT;
+    }
 }

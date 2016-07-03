@@ -7,5 +7,8 @@ class LengthRequiredException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 411;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::LENGTH_REQUIRED;
+    }
 }

@@ -7,5 +7,8 @@ class GatewayTimeoutException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 504;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::GATEWAY_TIMEOUT;
+    }
 }

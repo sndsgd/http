@@ -7,5 +7,8 @@ class BandwidthLimitExceededException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 509;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::BANDWIDTH_LIMIT_EXCEEDED;
+    }
 }

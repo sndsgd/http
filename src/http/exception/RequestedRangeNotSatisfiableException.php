@@ -7,5 +7,8 @@ class RequestedRangeNotSatisfiableException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 416;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::REQUESTED_RANGE_NOT_SATISFIABLE;
+    }
 }

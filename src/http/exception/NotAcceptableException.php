@@ -7,5 +7,8 @@ class NotAcceptableException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 406;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::NOT_ACCEPTABLE;
+    }
 }

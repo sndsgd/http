@@ -7,5 +7,8 @@ class LoopDetectedException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 508;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::LOOP_DETECTED;
+    }
 }

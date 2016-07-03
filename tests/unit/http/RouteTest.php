@@ -19,8 +19,11 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function providerGetMethod()
     {
         return [
-            ["GET", "/", 1, "GET"],
-            ["get", "/", 1, "GET"],
+            ["post", "/", 1, "POST"],
+            ["POST", "/", 1, "POST"],
+            ["PATCH", "/", 1, "PATCH"],
+            ["PUT", "/", 1, "PUT"],
+            ["DELETE", "/", 1, "DELETE"],
         ];
     }
 
@@ -38,6 +41,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         return [
             ["GET", "/", 1, "/"],
             ["GET", "/test/path", 1, "/test/path"],
+            ["GET", "/test/💩/💩", 1, "/test/💩/💩"],
         ];
     }
 

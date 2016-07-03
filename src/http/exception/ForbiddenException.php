@@ -7,5 +7,8 @@ class ForbiddenException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 403;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::FORBIDDEN;
+    }
 }

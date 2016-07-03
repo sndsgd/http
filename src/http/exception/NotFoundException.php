@@ -7,5 +7,8 @@ class NotFoundException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 404;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::NOT_FOUND;
+    }
 }

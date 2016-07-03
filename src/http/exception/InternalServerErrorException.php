@@ -7,5 +7,8 @@ class InternalServerErrorException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 500;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::INTERNAL_SERVER_ERROR;
+    }
 }

@@ -7,5 +7,8 @@ class ServiceUnavailableException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 503;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::SERVICE_UNAVAILABLE;
+    }
 }

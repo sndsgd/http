@@ -114,6 +114,37 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::addHeader
+     * @dataProvider providerAddHeader
+     */
+    public function testAddHeader(array $headers, $expect)
+    {
+        foreach ($headers as list($key, $value)) {
+            $this->response->addHeader($key, $value);
+        }
+
+        $this->assertSame($expect, $this->response->getHeader($key));
+    }
+
+    public function providerAddHeader()
+    {
+        return [
+            [
+                [["test", "one"]],
+                "one",
+            ],
+            [
+                [["test", "one"], ["test", "two"]],
+                "one, two",
+            ],
+            [
+                [["test", "one"], ["test", "two"], ["test", "💩"]],
+                "one, two, 💩",
+            ],
+        ];
+    }
+
+    /**
      * @covers ::setBody
      * @covers ::getBody
      * @dataProvider providerSetGetBody

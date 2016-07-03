@@ -224,7 +224,7 @@ class Request
     /**
      * Get the basic auth credentials
      *
-     * @return array<string|null>
+     * @return array<string>
      */
     public function getBasicAuth(): array
     {
@@ -244,10 +244,9 @@ class Request
                 isset($this->server["QUERY_STRING"]) &&
                 $this->server["QUERY_STRING"] !== ""
             ) {
-                $this->query = (new decoder\QueryStringDecoder(0))
-                    ->decode($this->server["QUERY_STRING"]);
-            }
-            else {
+                $decoder = new decoder\QueryStringDecoder(0);
+                $this->query = $decoder->decode($this->server["QUERY_STRING"]);
+            } else {
                 $this->query = [];
             }
         }
@@ -276,8 +275,7 @@ class Request
             $contentType = $this->getHeader("content-type", "");
             if ($contentType === "") {
                 $this->bodyParameters = [];
-            }
-            else {
+            } else {
                 $decoder = $this->getBodyDecoder();
                 $this->bodyParameters = $decoder->decode(
                     $this->getMethod(),

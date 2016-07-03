@@ -7,5 +7,8 @@ class ConflictException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 409;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::CONFLICT;
+    }
 }

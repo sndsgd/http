@@ -7,5 +7,8 @@ class ProxyAuthenticationRequiredException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 407;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::PROXY_AUTHENTICATION_REQUIRED;
+    }
 }

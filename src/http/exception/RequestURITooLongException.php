@@ -7,5 +7,8 @@ class RequestUriTooLongException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 414;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::REQUEST_URI_TOO_LONG;
+    }
 }

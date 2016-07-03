@@ -7,5 +7,8 @@ class NetworkAuthenticationRequiredException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 511;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::NETWORK_AUTHENTICATION_REQUIRED;
+    }
 }

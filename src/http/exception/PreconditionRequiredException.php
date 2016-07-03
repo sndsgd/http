@@ -7,5 +7,8 @@ class PreconditionRequiredException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 428;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::PRECONDITION_REQUIRED;
+    }
 }

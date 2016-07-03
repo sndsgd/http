@@ -5,19 +5,12 @@ namespace sndsgd\http\exception;
 abstract class ExceptionAbstract extends \Exception
 {
     /**
-     * The relevant http status code
-     *
-     * @var integer
-     */
-    const STATUS_CODE = 500;
-
-    /**
      * Get the status code
      *
-     * @return integer
+     * @return int
      */
     public function getStatusCode(): int
     {
-        return static::STATUS_CODE;
+        return \sndsgd\http\Status::INTERNAL_SERVER_ERROR;
     }
 }

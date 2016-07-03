@@ -7,5 +7,8 @@ class HttpVersionNotSupportedException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 505;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::HTTP_VERSION_NOT_SUPPORTED;
+    }
 }

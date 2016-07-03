@@ -2,8 +2,6 @@
 
 namespace sndsgd\http\data\decoder;
 
-use \sndsgd\http\data\Collection;
-
 class QueryStringDecoder
 {
     /**
@@ -32,13 +30,13 @@ class QueryStringDecoder
      */
     public function __construct(
         int $contentLength,
-        Collection $values = null
+        \sndsgd\http\data\Collection $values = null
     )
     {
         $this->contentLength = $contentLength;
         if ($values === null) {
             $options = new DecoderOptions();
-            $this->values = $values ?: new Collection(
+            $this->values = $values ?: new \sndsgd\http\data\Collection(
                 $options->getMaxVars(),
                 $options->getMaxNestingLevels()
             );

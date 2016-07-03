@@ -7,5 +7,8 @@ class TooManyRequestsException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 429;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::TOO_MANY_REQUESTS;
+    }
 }

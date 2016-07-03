@@ -7,5 +7,8 @@ class UnsupportedMediaTypeException extends ExceptionAbstract
     /**
      * {@inheritdoc}
      */
-    const STATUS_CODE = 415;
+    public function getStatusCode(): int
+    {
+        return \sndsgd\http\Status::UNSUPPORTED_MEDIA_TYPE;
+    }
 }
