@@ -120,6 +120,17 @@ class Status
     ];
 
     /**
+     * Determine whether a status code has a valid status message
+     *
+     * @param int $code The code to verify
+     * @return bool
+     */
+    public static function isValid(int $code): bool
+    {
+        return isset(static::$statuses[$code]);
+    }
+
+    /**
      * Get a message given a status code
      *
      * @param int $code The status code
@@ -145,7 +156,7 @@ class Status
      */
     public static function getGroup(int $code): string
     {
-        if ($code < 100 || $code > 599) {
+        if (!static::isValid($code)) {
             throw new \InvalidArgumentException(
                 "invalid value provided for 'code'; ".
                 "expecting a valid status code as an integer"
