@@ -8,6 +8,25 @@ namespace sndsgd\http;
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @covers ::__toString
+     * @dataProvider providerToString
+     */
+    public function testToString($method, $path, $expect)
+    {
+        $route = new Route($method, $path);
+        $this->assertSame($expect, (string) $route);
+        $this->assertSame($expect, $route->__toString());
+    }
+
+    public function providerToString()
+    {
+        return [
+            ["post", "/", "POST:/"],
+            ["GeT", "/some/path", "GET:/some/path"],
+        ];
+    }
+
+    /**
      * @dataProvider providerGetMethod
      */
     public function testGetMethod($method, $path, $priority, $expect)

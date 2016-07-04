@@ -33,6 +33,11 @@ class Route
         $this->priority = $priority;
     }
 
+    public function __toString()
+    {
+        return "{$this->method}:{$this->path}";
+    }
+
     public function getMethod(): string
     {
         return $this->method;
