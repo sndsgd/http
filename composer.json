@@ -1,8 +1,8 @@
 {
     "name": "sndsgd/http",
-    "description": "A collection of tools for working with HTTP",
+    "description": "Improved HTTP for PHP",
     "type": "library",
-    "homepage": "https://github.com/sndsgd/sndsgd-http",
+    "homepage": "https://github.com/sndsgd/http",
     "license": "MIT",
     "authors": [
         {
@@ -11,25 +11,23 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/sndsgd/sndsgd-http/issues",
-        "source": "https://github.com/sndsgd/sndsgd-http/tree/master"
+        "issues": "https://github.com/sndsgd/http/issues",
+        "source": "https://github.com/sndsgd/http/tree/master"
     },
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.0.0",
-        "sndsgd/util": "~1.0.3",
-        "sndsgd/error": "~0.0.1",
-        "sndsgd/fs": "~0.2.2"
+        "sndsgd/util": "~1.0.5",
+        "sndsgd/error": "~0.0.3",
+        "sndsgd/form": "~0.1.0",
+        "sndsgd/fs": "~0.2.4"
     },
     "require-dev": {
         "mikey179/vfsStream": "1.6.2"
     },
     "autoload": {
         "psr-4": {
-            "sndsgd\\http\\": "src/"
+            "sndsgd\\": "src"
         }
-    },
-    "bin": [
-        "bin/routes"
-    ]
+    }
 }
