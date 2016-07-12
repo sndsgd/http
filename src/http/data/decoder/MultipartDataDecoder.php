@@ -61,8 +61,11 @@ class MultipartDataDecoder extends DecoderAbstract
     protected $buffer = "";
 
     /**
-     * @param \sndsgd\http\inbound\Request $request
-     * @param string $path
+     * @param string $path The path to the stream to read from
+     * @param string $contentType The content type of the request body
+     * @param int $contentLength The size of the request body
+     * @param \sndsgd\http\data\decoder\Options
+     * @param int $bytesPerRead The number of bytes to read at a time
      */
     public function __construct(
         string $path,
@@ -234,7 +237,7 @@ class MultipartDataDecoder extends DecoderAbstract
             }
             else {
                 $ret[2] = "";
-            }   
+            }
         }
         return $ret;
     }
@@ -273,7 +276,7 @@ class MultipartDataDecoder extends DecoderAbstract
      *
      * @param string $name The field name
      * @param string $filename The name of the uploaded file
-     * @param string $contentType The mime content type of the file
+     * @param string $unverifiedContentType The user provided content type
      * @return \sndsgd\http\UploadedFile
      */
     protected function getFileFromField(
@@ -368,7 +371,8 @@ class MultipartDataDecoder extends DecoderAbstract
      * Handle an invalid file upload
      *
      * @param int $code The relevant PHP file upload error
-     * @param resource $fp The pointer to the temp file
+     * @param string $tempPath The absolute path to the temp file
+     * @param resource $tempHandle The handle for the temp file
      * @param string $filename The file name as provided by the client
      * @param string $contentType The mime type of the uploaded file
      * @param int $size The bytesize of the uploaded file
