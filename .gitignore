@@ -1,6 +1,3 @@
-docs
-vendor
-composer.lock
-bin/dev.php
-tests/coverage-clover.xml
-tests/coverage-coveralls.json
+/build
+/vendor
+/composer.lock
