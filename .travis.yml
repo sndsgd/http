@@ -3,6 +3,9 @@ language: php
 php:
   - 7.0
 
+install:
+  - composer install --no-interaction --prefer-source --dev
+
 script:
   - phpunit --coverage-clover tests/coverage/clover.xml
 
