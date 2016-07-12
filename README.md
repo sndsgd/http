@@ -18,7 +18,7 @@ You need **PHP >= 7.0** to use this library, however, the latest stable version 
 
 ## Install
 
-Install `sndsgd/rate` using [Composer](https://getcomposer.org/).
+Install `sndsgd/http` using [Composer](https://getcomposer.org/).
 
 
 ## Usage
