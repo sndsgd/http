@@ -36,7 +36,7 @@ class QueryStringDecoder
         $this->contentLength = $contentLength;
         if ($values === null) {
             $options = new DecoderOptions();
-            $this->values = $values ?: new \sndsgd\http\data\Collection(
+            $this->values = new \sndsgd\http\data\Collection(
                 $options->getMaxVars(),
                 $options->getMaxNestingLevels()
             );
@@ -49,8 +49,9 @@ class QueryStringDecoder
      * Decode a urlencoded parameter pair
      *
      * @param string $pair
+     * @return array<string> The decoded key and value
      */
-    public function decodePair(string $pair)
+    public function decodePair(string $pair): array
     {
         # more than a handful of clients like to use '+' characters
         # when encoding data that is (almost) compliant with rfc 3986

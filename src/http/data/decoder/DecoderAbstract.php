@@ -43,8 +43,10 @@ abstract class DecoderAbstract implements DecoderInterface
     protected $values;
 
     /**
-     * @param \sndsgd\http\inbound\Request $request
      * @param string $path
+     * @param string $contentType
+     * @param int $contentLength
+     * @param \sndsgd\http\data\decoder\DecoderOptions|null $options
      */
     public function __construct(
         string $path,
