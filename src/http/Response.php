@@ -26,6 +26,11 @@ class Response
     protected $statusText = "OK";
 
     /**
+     * @var \sndsgd\http\HeaderCollection
+     */
+    protected $headers;
+
+    /**
      * Once the body has been generated it is stored here
      *
      * @var string
@@ -140,7 +145,7 @@ class Response
      */
     public function getBody()
     {
-       return $this->body;
+        return $this->body;
     }
 
     public function send()

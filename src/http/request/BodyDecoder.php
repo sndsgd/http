@@ -119,8 +119,7 @@ class BodyDecoder
                         ]);
                         \sndsgd\Arr::addValue($ret, $name, $file);    
                     }
-                }
-                else {
+                } else {
                     $file = $this->createUploadedFile($info);
                     \sndsgd\Arr::addValue($ret, $name, $file);
                 }

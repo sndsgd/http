@@ -109,8 +109,7 @@ class MultipartDataDecoder extends DecoderAbstract
                 if ($this->fileCount < $this->maxFileCount) {
                     $value = $this->getFileFromField($name, $filename, $contentType);
                     $this->values->addValue($name, $value);
-                }
-                else {
+                } else {
 
                 }
 
@@ -224,7 +223,8 @@ class MultipartDataDecoder extends DecoderAbstract
             );
         }
 
-        list($match, $name, $filename) = array_pad($matches, 3, "");
+        # we have no need for the entire match, so we drop it here
+        list( , $name, $filename) = array_pad($matches, 3, "");
 
         # if a filename was in the content disposition
         # attempt to find its content type in the field header
@@ -264,7 +264,7 @@ class MultipartDataDecoder extends DecoderAbstract
     /**
      * Allow for stubbing the result of tempnam using reflection
      *
-     * @return bool
+     * @return string
      */
     protected function getTempFilePath()
     {
