@@ -23,7 +23,7 @@ class Request implements RequestParameterDecoderInterface
     /**
      * Headers are parsed and cached here
      *
-     * @var array<string>
+     * @var array<string,string>
      */
     protected $headers;
 
@@ -85,8 +85,7 @@ class Request implements RequestParameterDecoderInterface
             if (isset($this->server["REQUEST_URI"])) {
                 $path = parse_url($this->server["REQUEST_URI"], PHP_URL_PATH);
                 $this->path = rawurldecode($path);
-            }
-            else {
+            } else {
                 $this->path = "/";
             }
         }
@@ -135,11 +134,9 @@ class Request implements RequestParameterDecoderInterface
      */
     public function getHeader(string $name, string $default = ""): string
     {
-        if (!$this->headers) {
-            $this->headers = $this->readHeaders();
-        }
-        $name = strtolower($name);
-        return $this->headers[$name] ?? $default;
+        $lowercaseName = strtolower($name);
+        $headers = $this->getHeaders();
+        return $headers[$lowercaseName] ?? $default;
     }
 
     /**

@@ -33,7 +33,7 @@ class UploadedFileError extends \sndsgd\Error
                 break;
             default:
                 throw new \InvalidArgumentException(
-                    "invalid value provided for 'code'; " . 
+                    "invalid value provided for 'code'; ".
                     "expecting one of the php `UPLOAD_ERR_*` constants"
                 );
         }

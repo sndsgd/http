@@ -17,6 +17,8 @@ class HeaderCollection
     protected $keyMap = [];
 
     /**
+     * Retrieve a key that can be used in a hashmap to prevent duplicate keys
+     *
      * @param string $key
      * @param bool $register Whether to register a new key
      * @return string
@@ -26,8 +28,7 @@ class HeaderCollection
         $lowercaseKey = strtolower($key);
         if (isset($this->keyMap[$lowercaseKey])) {
             $key = $this->keyMap[$lowercaseKey];
-        }
-        elseif ($register) {
+        } elseif ($register) {
             $this->keyMap[$lowercaseKey] = $key;
         }
         return $key;
@@ -62,7 +63,7 @@ class HeaderCollection
      * Add a request header
      *
      * @param string $key
-     * @param string|integer $value
+     * @param string $value
      */
     public function add(string $key, string $value): HeaderCollection
     {
@@ -99,7 +100,7 @@ class HeaderCollection
     /**
      * Get multiple header values
      *
-     * @param string $key
+     * @param string ...$keys
      * @return array<string>
      */
     public function getMultiple(string ...$keys): array

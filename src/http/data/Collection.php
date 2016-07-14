@@ -64,7 +64,7 @@ class Collection implements \Countable
     /**
      * Add a value to the collection
      *
-     * @param string|number $name The index/key to add the value under
+     * @param string|number $key The index/key to add the value under
      * @param string|\sndsgd\http\UploadedFile $value The value to add
      */
     public function addValue(string $key, $value)
@@ -82,8 +82,7 @@ class Collection implements \Countable
             $openPos < $closePos
         ) {
             $this->addNestedValue($key, $value, $openPos);
-        }
-        else {
+        } else {
             \sndsgd\Arr::addValue($this->values, $key, $value);
         }
 

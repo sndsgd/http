@@ -4,13 +4,46 @@ namespace sndsgd\http\data\decoder;
 
 use \org\bovigo\vfs\vfsStream;
 
+/**
+ * @coversDefaultClass \sndsgd\http\data\decoder\MultipartDataDecoder
+ */
 class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
 {
+    use \phpmock\phpunit\PHPMock;
+
     const VFS_ROOT = "root";
+
+    protected static $tempFiles = [];
+
+    public static function tearDownAfterClass()
+    {
+        foreach (self::$tempFiles as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+    }
 
     public function setup()
     {
         $this->root = vfsStream::setup(self::VFS_ROOT);
+    }
+
+    private function createMultipartTempFile(array $params)
+    {
+        $boundary = \sndsgd\Str::random(100);
+        $multipart = new \GuzzleHttp\Psr7\MultipartStream($params, $boundary);
+
+        $tempPath = tempnam(sys_get_temp_dir(), "uploaded-file-");
+        file_put_contents($tempPath, $multipart);
+
+        self::$tempFiles[] = $tempPath;
+
+        return [
+            $tempPath,
+            "multipart/form-data; boundary=$boundary",
+            filesize($tempPath),
+        ];
     }
 
     private function getVfsTempPath($name = "test", $perms = 0777)
@@ -19,47 +52,9 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
         return vfsStream::url(self::VFS_ROOT."/".$name);
     }
 
-    private function getDir($name = null)
-    {
-        $dir = realpath(__DIR__."/../../../../data");
-        return ($name === null) ? $dir : "$dir/$name";
-    }
-
-    private function getParameterDetails()
-    {
-        $path = Fs::getFile($this->getDir()."/parameters.json");
-        $json = file_get_contents($path);
-        $data = json_decode($data, true);
-        exit;
-    }
-
-    private function getTestUploadInfo($name)
-    {
-        $dir = $this->getDir("multipart");
-        $contentFile = "$dir/$name.content";
-        $typeFile =  "$dir/$name.type";
-        return [
-            $contentFile,
-            file_get_contents($typeFile),
-            filesize($contentFile),
-        ];  
-    }
-
-    private function getTestFileInfo($name)
-    {
-        $dir = $this->getDir("multipart/various");
-        $contentFile = "$dir/$name.content";
-        $typeFile =  "$dir/$name.type";
-        return [
-            $contentFile,
-            file_get_contents($typeFile),
-            filesize($contentFile),
-        ];
-    }
-
-
     /**
-     * @expectedException Exception
+     * @covers ::decode
+     * @expectedException \RuntimeException
      */
     public function testDecodeReadException()
     {
@@ -70,6 +65,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getBoundary
      * @expectedException \sndsgd\http\data\DecodeException
      */
     public function testGetBoundaryException()
@@ -81,21 +77,63 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getFieldHeader
      * @expectedException \sndsgd\http\data\DecodeException
      */
     public function testMalformedContentDispositionException()
     {
-        $path = $this->getDir("multipart")."/malformed-content-disposition.content";
-        $type = "multipart/form-data; boundary=3ce079ead76547fa9261ae19db4febb3";
-        $decoder = new MultipartDataDecoder($path, $type, 100);
+        list($path, $contentType, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "test",
+                "contents" => "value",
+                "headers" => [
+                    "Content-Disposition" => ";;;"
+                ]
+            ],
+        ]);
+
+        $decoder = new MultipartDataDecoder($path, $contentType, $length);
         @$decoder->decode();
+    }
+
+    /**
+     * @covers ::getFieldHeader
+     */
+    public function testFileEmptyContentType()
+    {
+        list($path, $contentType, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => "file contents...",
+            ],
+        ]);
+
+        # remove the content type from the file header
+        $remove = "Content-Type: text/plain\r\n";
+        $contents = file_get_contents($path);
+        $contents = str_replace($remove, "", $contents);
+        file_put_contents($path, $contents);
+        $length -= strlen($remove);
+
+        $decoder = new MultipartDataDecoder($path, $contentType, $length);
+        $result = $decoder->decode();
     }
 
     public function testEmptyFileError()
     {
-        list($path, $type, $size) = $this->getTestUploadInfo("empty-file");
+        list($path, $contentType, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => "",
+                "headers" => [
+                    "Content-Type" => \sndsgd\Mime::getTypeFromExtension("txt"),
+                ],
+            ],
+        ]);
 
-        $decoder = new MultipartDataDecoder($path, $type, $size);
+        $decoder = new MultipartDataDecoder($path, $contentType, $length);
         $data = $decoder->decode();
 
         $this->assertArrayHasKey("file", $data);
@@ -106,32 +144,48 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(UPLOAD_ERR_NO_FILE, $error->getCode());
     }
 
-    public function testMaxFilesizeError()
+    /**
+     * @dataProvider providerMaxFilesizeError
+     */
+    public function testMaxFilesizeError($maxSize, $size, $expectError)
     {
-        list($path, $type, $size) = $this->getTestUploadInfo("two-images");
+        list($path, $type, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => \sndsgd\Str::random($size),
+            ],
+        ]);
 
         # replace options so the max filesize is less than 1024
         $options = $this->getMockBuilder(DecoderOptions::class)
             ->setMethods(["getMaxFileSize"])
             ->getMock();
-        $options->method("getMaxFileSize")->willReturn(1024);
+        $options->method("getMaxFileSize")->willReturn($maxSize);
 
-        $decoder = new MultipartDataDecoder($path, $type, $size, $options);
+        $decoder = new MultipartDataDecoder($path, $type, $length, $options);
         $data = $decoder->decode();
 
-        # `random` exceeds the max file size
-        $this->assertArrayHasKey("random", $data);
-        $file = $data["random"];
+        $this->assertArrayHasKey("file", $data);
+        $file = $data["file"];
         $this->assertInstanceOf(\sndsgd\http\UploadedFile::class, $file);
-        $error = $file->getError();
-        $this->assertInstanceOf(\sndsgd\http\UploadedFileError::class, $error);
-        $this->assertSame(UPLOAD_ERR_INI_SIZE, $error->getCode());
 
-        # `qr` doess not exceed the max file size
-        $this->assertArrayHasKey("qr", $data);
-        $file = $data["qr"];
-        $this->assertInstanceOf(\sndsgd\http\UploadedFile::class, $file);
-        $this->assertNull($file->getError());
+        $error = $file->getError();
+        if ($expectError) {
+            $this->assertInstanceOf(\sndsgd\http\UploadedFileError::class, $error);
+            $this->assertSame(UPLOAD_ERR_INI_SIZE, $error->getCode());
+        } else {
+            $this->assertNull($file->getError());
+        }
+    }
+
+    public function providerMaxFilesizeError()
+    {
+        return [
+            [100, 101, true],
+            [100, 100, false],
+            [100, 99, false],
+        ];
     }
 
     /**
@@ -141,30 +195,36 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException($exception);
 
-        list($path, $type, $size) = $this->getTestUploadInfo("empty-file");
+        list($path, $type, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => "file contents",
+            ],
+        ]);
 
-        $mock = $this->getMockBuilder(MultipartDataDecoder::class)
-            ->setConstructorArgs([$path, $type, $size])
-            ->setMethods(["feof", "fread"])
-            ->getMock();
+        $decoder = new MultipartDataDecoder($path, $type, $length);
 
-        $mock->method("feof")->willReturn($feof);
-        $mock->method("fread")->willReturn($fread);
+        $feofMock = $this->getFunctionMock(__NAMESPACE__, "feof");
+        $feofMock->expects($this->any())->willReturn($feof);
 
-        $rc = new \ReflectionClass($mock);
+        $freadMock = $this->getFunctionMock(__NAMESPACE__, "fread");
+        $freadMock->expects($this->any())->willReturn($fread);
+
+        $rc = new \ReflectionClass($decoder);
         $fp = $rc->getProperty("fp");
         $fp->setAccessible(true);
-        $fp->setValue($mock, fopen($path, "r"));
+        $fp->setValue($decoder, fopen($path, "r"));
         $buffer = $rc->getProperty("buffer");
         $buffer->setAccessible(true);
-        $buffer->setValue($mock, "");
+        $buffer->setValue($decoder, "");
         $lastBoundary = $rc->getProperty("lastBoundary");
         $lastBoundary->setAccessible(true);
-        $lastBoundary->setValue($mock, "a");
+        $lastBoundary->setValue($decoder, "a");
 
         $method = $rc->getMethod("fieldsRemain");
         $method->setAccessible(true);
-        $method->invoke($mock);
+        $method->invoke($decoder);
     }
 
     public function providerFieldsRemainExceptions()
@@ -175,23 +235,30 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
     /**
      * @expectedException \sndsgd\http\data\DecodeException
      */
     public function testReadUntilException()
     {
-        list($path, $type, $length) = $this->getTestUploadInfo("empty-file");
+        list($path, $type, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => "file contents",
+            ],
+        ]);
 
         $tempfile = $this->getVfsTempPath();
 
         $mock = $this->getMockBuilder(MultipartDataDecoder::class)
             ->setConstructorArgs([$path, $type, $length])
-            ->setMethods(["getTempFilePath", "feof"])
+            ->setMethods(["getTempFilePath"])
             ->getMock();
 
         $mock->method("getTempFilePath")->willReturn($tempfile);
-        $mock->method("feof")->willReturn(true);
+        
+        $feofMock = $this->getFunctionMock(__NAMESPACE__, "feof");
+        $feofMock->expects($this->any())->willReturn(true);
 
         # set the buffer to NOT contain the boundary
         $rc = new \ReflectionClass($mock);
@@ -202,12 +269,32 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
         $mock->decode();
     }
 
+    public function testReadUntil()
+    {
+        $bytesPerRead = 2048;
+        list($path, $type, $length) = $this->createMultipartTempFile([
+            [
+                'name' => 'one',
+                'contents' => \sndsgd\Str::random($bytesPerRead * 3),
+            ],
+        ]);
+
+        $decoder = new MultipartDataDecoder($path, $type, $length, null, $bytesPerRead);
+        $decoder->decode();
+    }
+
     /**
      * @expectedException \RuntimeException
      */
     public function testGetFileFromFieldOpenTempFileException()
     {
-        list($path, $type, $length) = $this->getTestUploadInfo("empty-file");
+        list($path, $type, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => "file contents",
+            ],
+        ]);
 
         $tempfile = $this->getVfsTempPath("test", 0000);
 
@@ -223,57 +310,66 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider providerGetFileFromFieldWriteException
      * @expectedException \RuntimeException
      */
-    public function testGetFileFromFieldWriteException()
+    public function testGetFileFromFieldWriteException(
+        $firstWriteResult,
+        $secondWriteResult
+    )
     {
-        list($path, $type, $length) = $this->getTestUploadInfo("empty-file");
+        list($path, $type, $length) = $this->createMultipartTempFile([
+            [
+                "name" => "file1",
+                "filename" => "test.txt",
+                "contents" => \sndsgd\Str::random(8192),
+            ],
+            [
+                "name" => "file2",
+                "filename" => "test.txt",
+                "contents" => \sndsgd\Str::random(8192),
+            ],
+            [
+                "name" => "file3",
+                "filename" => "test.txt",
+                "contents" => \sndsgd\Str::random(8192),
+            ],
+        ]);
 
-        $tempfile = $this->getVfsTempPath();
+        # replace options so the max filesize is less than 1024
+        $options = $this->getMockBuilder(DecoderOptions::class)
+            ->setMethods(["getMaxFileSize"])
+            ->getMock();
+        $options->method("getMaxFileSize")->willReturn(1024);
 
         $mock = $this->getMockBuilder(MultipartDataDecoder::class)
-            ->setConstructorArgs([$path, $type, $length])
-            ->setMethods(["getTempFilePath", "fwrite"])
+            ->setConstructorArgs([$path, $type, $length, $options])
+            ->setMethods(["getTempFilePath"])
             ->getMock();
 
+        $tempfile = $this->getVfsTempPath();
         $mock->method("getTempFilePath")->willReturn($tempfile);
-        $mock->method("fwrite")->willReturn(false);
+        
+        $fwriteMock = $this->getFunctionMock(__NAMESPACE__, "fwrite");
+        $fwriteMock
+            ->expects($this->any())
+            ->will($this->onConsecutiveCalls($firstWriteResult, $secondWriteResult));
 
-        # set the buffer to NOT contain the boundary
-        $rc = new \ReflectionClass($mock);
-        $property = $rc->getProperty("buffer");
-        $property->setAccessible(true);
-        $property->setValue($mock, \sndsgd\Str::random(1000));
+        $mock->decode();
+    }
 
-        @$mock->decode();
+    public function providerGetFileFromFieldWriteException()
+    {
+        return [
+            [false, true],
+            [true, false],
+        ];
     }
 
     /**
-     * @expectedException \RuntimeException
+     * 
+     *
      */
-    public function testGetFileFromFieldWriteException2()
-    {
-        list($path, $type, $length) = $this->getTestUploadInfo("empty-file");
-
-        $tempfile = $this->getVfsTempPath();
-
-        $mock = $this->getMockBuilder(MultipartDataDecoder::class)
-            ->setConstructorArgs([$path, $type, $length])
-            ->setMethods(["getTempFilePath", "fwrite"])
-            ->getMock();
-
-        $mock->method("getTempFilePath")->willReturn($tempfile);
-        $mock->method("fwrite")->willReturn(false);
-
-        # set the buffer to NOT contain the boundary
-        $rc = new \ReflectionClass($mock);
-        $property = $rc->getProperty("buffer");
-        $property->setAccessible(true);
-        $property->setValue($mock, "");
-
-        @$mock->decode();
-    }
-
     public function testFileUploadError()
     {
         $stream = $this->getVfsTempPath("stream");

@@ -14,12 +14,9 @@ class UrlDecoder extends DecoderAbstract
     {
         $querystring = @file_get_contents($this->path, true);
         if ($querystring === false) {
-            $message = "failed to read input stream";
-            $err = error_get_last();
-            if ($err !== null) {
-                $message .= "; ".$err["message"];
-            }
-            throw new \RuntimeException($message);
+            throw new \RuntimeException(
+                \sndsgd\Error::createMessage("failed to read input stream")
+            );
         }
 
         $decoder = new QueryStringDecoder($this->contentLength, $this->values);

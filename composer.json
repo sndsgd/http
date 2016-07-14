@@ -18,12 +18,14 @@
     "require": {
         "php": ">=7.0.0",
         "sndsgd/util": "~1.0.5",
-        "sndsgd/error": "~0.0.3",
+        "sndsgd/error": "~0.0.4",
         "sndsgd/form": "~0.1.0",
         "sndsgd/fs": "~0.2.4"
     },
     "require-dev": {
         "mikey179/vfsStream": "1.6.2",
+        "php-mock/php-mock-phpunit": "^1.1",
+        "guzzlehttp/psr7": "^1.3",
         "satooshi/php-coveralls": "~1.0"
     },
     "autoload": {
