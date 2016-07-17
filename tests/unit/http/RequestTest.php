@@ -116,6 +116,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getScheme
+     * @dataProvider providerGetScheme
+     */
+    public function testGetScheme($server, $expect)
+    {
+        $req = new Request($server);
+        $this->assertSame($expect, $req->getScheme());
+    }
+
+    public function providerGetScheme()
+    {
+        return [
+            [["HTTP_X_FORWARDED_PROTO" => "https"], "https"],
+            [["HTTP_X_FORWARDED_PROTO" => "http"], "http"],
+            [["HTTP_X_FORWARDED_PROTO" => "asd"], "asd"],
+            [["HTTPS" => "on"], "https"],
+            [["HTTPS" => "whatever"], "https"],
+            [["SERVER_PORT" => 443], "https"],
+            [["SERVER_PORT" => "443"], "https"],
+            [["SERVER_PORT" => 80], "http"],
+            [["SERVER_PORT" => 42], "http"],
+            [[], "http"],
+        ];
+    }
+
+    /**
      * @covers ::getHost
      * @dataProvider providerGetHost
      */

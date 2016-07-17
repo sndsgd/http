@@ -103,6 +103,32 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
+     * Get the request scheme
+     *
+     * @return string Either 'https' or 'http'
+     */
+    public function getScheme(): string
+    {
+        # commonly provided by load balancers
+        if (isset($this->server["HTTP_X_FORWARDED_PROTO"])) {
+            return $this->server["HTTP_X_FORWARDED_PROTO"];
+        }
+
+        # allow for setting `fastcgi_param HTTPS on;` in nginx config
+        if (isset($this->server["HTTPS"])) {
+            return "https";
+        }
+
+        # fallback to using the port
+        $port = $this->server["SERVER_PORT"] ?? 80;
+        if ($port == 443) {
+            return "https";
+        }
+
+        return "http";
+    }
+
+    /**
      * Get the host that is handling this request
      *
      * @return string
