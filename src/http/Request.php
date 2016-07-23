@@ -7,11 +7,18 @@ use \sndsgd\http\data\decoder;
 class Request implements RequestParameterDecoderInterface
 {
     /**
-     * A copy of the $_SERVER superglobal
+     * The request environment
      *
-     * @var array<string,string|integer|float>
+     * @var \sndsgd\Environment|array
      */
-    protected $server;
+    protected $environment;
+
+    /**
+     * When a client instance is created, it will be cached here
+     *
+     * @var \sndsgd\http\request\Client
+     */
+    protected $client;
 
     /**
      * The uri path
@@ -61,11 +68,24 @@ class Request implements RequestParameterDecoderInterface
     /**
      * Create a request instance
      *
-     * @param array $server The PHP $_SERVER superglobal
+     * @param \sndsgd\Environment $environment
      */
-    public function __construct(array $server)
+    public function __construct(\sndsgd\Environment $environment)
     {
-        $this->server = $server;
+        $this->environment = $environment;
+    }
+
+    public function getEnvironment(): \sndsgd\Environment
+    {
+        return $this->environment;
+    }
+
+    public function getClient(): \sndsgd\http\request\ClientInterface
+    {
+        if ($this->client === null) {
+            $this->client = new \sndsgd\http\request\Client($this);
+        }
+        return $this->client;
     }
 
     /**
@@ -73,7 +93,7 @@ class Request implements RequestParameterDecoderInterface
      */
     public function getMethod(): string
     {
-        return $this->server["REQUEST_METHOD"] ?? "GET";
+        return $this->environment["REQUEST_METHOD"] ?? "GET";
     }
 
     /**
@@ -81,9 +101,9 @@ class Request implements RequestParameterDecoderInterface
      */
     public function getPath(): string
     {
-        if (!$this->path) {
-            if (isset($this->server["REQUEST_URI"])) {
-                $path = parse_url($this->server["REQUEST_URI"], PHP_URL_PATH);
+        if ($this->path === null) {
+            if (isset($this->environment["REQUEST_URI"])) {
+                $path = parse_url($this->environment["REQUEST_URI"], PHP_URL_PATH);
                 $this->path = rawurldecode($path);
             } else {
                 $this->path = "/";
@@ -99,7 +119,7 @@ class Request implements RequestParameterDecoderInterface
      */
     public function getProtocol(): string
     {
-        return $this->server["SERVER_PROTOCOL"] ?? "HTTP/1.1";
+        return $this->environment["SERVER_PROTOCOL"] ?? "HTTP/1.1";
     }
 
     /**
@@ -110,17 +130,17 @@ class Request implements RequestParameterDecoderInterface
     public function getScheme(): string
     {
         # commonly provided by load balancers
-        if (isset($this->server["HTTP_X_FORWARDED_PROTO"])) {
-            return $this->server["HTTP_X_FORWARDED_PROTO"];
+        if (isset($this->environment["HTTP_X_FORWARDED_PROTO"])) {
+            return $this->environment["HTTP_X_FORWARDED_PROTO"];
         }
 
         # allow for setting `fastcgi_param HTTPS on;` in nginx config
-        if (isset($this->server["HTTPS"])) {
+        if (isset($this->environment["HTTPS"])) {
             return "https";
         }
 
         # fallback to using the port
-        $port = $this->server["SERVER_PORT"] ?? 80;
+        $port = $this->environment["SERVER_PORT"] ?? 80;
         if ($port == 443) {
             return "https";
         }
@@ -135,22 +155,7 @@ class Request implements RequestParameterDecoderInterface
      */
     public function getHost(): string
     {
-        return $this->server["HTTP_HOST"] ?? "";
-    }
-
-    /**
-     * Get the remote ip address
-     *
-     * @return string
-     */
-    public function getIp(): string
-    {
-        foreach (["HTTP_X_FORWARDED_FOR", "X_FORWARDED_FOR"] as $key) {
-            if (isset($this->server[$key])) {
-                return $this->server[$key];
-            }
-        }
-        return $this->server["REMOTE_ADDR"] ?? "";
+        return $this->environment["HTTP_HOST"] ?? "";
     }
 
     /**
@@ -181,10 +186,10 @@ class Request implements RequestParameterDecoderInterface
      *
      * @return array<string,string>
      */
-    private function readHeaders()
+    protected function readHeaders()
     {
         $ret = [];
-        foreach ($this->server as $key => $value) {
+        foreach ($this->environment as $key => $value) {
             # Note: the content-type and content-length headers always come
             # after the `CONTENT_TYPE` and `CONTENT_LENGTH` values in the
             # $_SERVER superglobal; if you use the values for the non `HTTP_...`
@@ -251,8 +256,8 @@ class Request implements RequestParameterDecoderInterface
     public function getBasicAuth(): array
     {
         return [
-            ($this->server["PHP_AUTH_USER"] ?? ""),
-            ($this->server["PHP_AUTH_PW"] ?? ""),
+            ($this->environment["PHP_AUTH_USER"] ?? ""),
+            ($this->environment["PHP_AUTH_PW"] ?? ""),
         ];
     }
 
@@ -263,12 +268,12 @@ class Request implements RequestParameterDecoderInterface
     {
         if ($this->queryParameters === null) {
             if (
-                isset($this->server["QUERY_STRING"]) &&
-                $this->server["QUERY_STRING"] !== ""
+                isset($this->environment["QUERY_STRING"]) &&
+                $this->environment["QUERY_STRING"] !== ""
             ) {
                 $decoder = new decoder\QueryStringDecoder(0);
                 $this->queryParameters = $decoder->decode(
-                    $this->server["QUERY_STRING"]
+                    $this->environment["QUERY_STRING"]
                 );
             } else {
                 $this->queryParameters = [];

@@ -17,7 +17,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function createResponse(array $server = [])
     {
-        $this->request = new Request($server);
+        $environment = createTestEnvironment($server);
+        $this->request = new Request($environment);
         $this->response = new Response($this->request);
     }
 
@@ -174,8 +175,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectOutputString($body);
 
-        $request = new Request(["SERVER_PROTOCOL" => $protocol]);
-        $response = (new Response($request))
+        $this->createResponse(["SERVER_PROTOCOL" => $protocol]);
+        $this->response
             ->setStatus($code)
             ->setHeaders($headers)
             ->setBody($body)

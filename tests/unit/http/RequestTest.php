@@ -9,15 +9,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers ::__construct
+     * @covers ::getEnvironment
      * @dataProvider providerConstructor
      */
     public function testConstructor(array $server)
     {
-        $req = new Request($server);
-        $rc = new \ReflectionClass($req);
-        $property = $rc->getProperty("server");
-        $property->setAccessible(true);
-        $this->assertSame($server, $property->getValue($req));
+        $environment = createTestEnvironment($server);
+        $request = new Request($environment);
+        $this->assertSame($environment, $request->getEnvironment());
     }
 
     public function providerConstructor()
@@ -44,12 +43,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getClient
+     */
+    public function testGetClient()
+    {
+        $request = new Request(createTestEnvironment());
+        $client = $request->getClient();
+    }
+
+    /**
      * @covers ::getMethod
      * @dataProvider providerGetMethod
      */
     public function testGetMethod(array $server, $expect)
     {
-        $req = new Request($server);
+        $req = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $req->getMethod());
         $this->assertSame($expect, $req->getMethod());
     }
@@ -81,7 +89,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPath(array $server, $expect)
     {
-        $req = new Request($server);
+        $req = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $req->getPath());
         $this->assertSame($expect, $req->getPath());
     }
@@ -103,7 +111,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetProtocol($server, $expect)
     {
-        $req = new Request($server);
+        $req = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $req->getProtocol());
     }
 
@@ -121,7 +129,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetScheme($server, $expect)
     {
-        $req = new Request($server);
+        $req = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $req->getScheme());
     }
 
@@ -147,7 +155,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHost(array $server, $expect)
     {
-        $req = new Request($server);
+        $req = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $req->getHost());
     }
 
@@ -160,32 +168,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers ::getIp
-     * @dataProvider providerGetIp
-     */
-    public function testGetIp(array $server, $expect)
-    {
-        $req = new Request($server);
-        $this->assertSame($expect, $req->getIp());
-    }
-
-    public function providerGetIp()
-    {
-        return [
-            [[], ""],
-            [["HTTP_X_FORWARDED_FOR" => "123"], "123"],
-            [["X_FORWARDED_FOR" => "456"], "456"],
-            [["REMOTE_ADDR" => "789"], "789"],
-        ];
-    }
-
-    /**
      * @covers ::getAcceptContentTypes
      * @dataProvider acceptContentTypeProviders
      */
     public function testGetAcceptContentTypes($header, $expect)
     {
-        $req = new Request(["HTTP_ACCEPT" => $header]);
+        $environment = createTestEnvironment(["HTTP_ACCEPT" => $header]);
+        $req = new Request($environment);
         $this->assertEquals($expect, $req->getAcceptContentTypes());
     }
 
@@ -233,7 +222,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHeader($server, $header, $default, $expect)
     {
-        $request = new Request($server);
+        $request = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $request->getHeader($header, $default));
     }
 
@@ -266,7 +255,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHeaders($server, $expect)
     {
-        $request = new Request($server);
+        $request = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $request->getHeaders());
     }
 
@@ -285,7 +274,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContentType($server, $expect)
     {
-        $request = new Request($server);
+        $request = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $request->getContentType());
     }
 
@@ -312,7 +301,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetContentLength($server, $expect)
     {
-        $request = new Request($server);
+        $request = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $request->getContentLength());
     }
 
@@ -329,7 +318,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetBasicAuth($server, $expect)
     {
-        $request = new Request($server);
+        $request = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $request->getBasicAuth());
     }
 
@@ -353,7 +342,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetQueryParameters($server, $expect)
     {
-        $request = new Request($server);
+        $request = new Request(createTestEnvironment($server));
         $this->assertSame($expect, $request->getQueryParameters());
     }
 
@@ -376,7 +365,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetBodyDecoder()
     {
-        $request = new Request([]);
+        $environment = createTestEnvironment([]);
+        $request = new Request($environment);
         $rc = new \ReflectionClass($request);
         $method = $rc->getMethod('getBodyDecoder');
         $method->setAccessible(true);
@@ -396,8 +386,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $bodyDecoder->method('decode')->willReturn($expect);
 
+        $environment = createTestEnvironment($server);
         $request = $this->getMockBuilder(Request::class)
-            ->setConstructorArgs([$server])
+            ->setConstructorArgs([$environment])
             ->setMethods(['getBodyDecoder'])
             ->getMock();
 
