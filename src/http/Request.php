@@ -38,11 +38,11 @@ class Request implements RequestParameterDecoderInterface
     protected $acceptContentTypes;
 
     /**
-     * The decoded querystring
+     * The decoded query parameters
      *
      * @var array<string,mixed>
      */
-    protected $query;
+    protected $queryParameters;
 
     /**
      * The decoded request body parameters
@@ -261,18 +261,20 @@ class Request implements RequestParameterDecoderInterface
      */
     public function getQueryParameters(): array
     {
-        if ($this->query === null) {
+        if ($this->queryParameters === null) {
             if (
                 isset($this->server["QUERY_STRING"]) &&
                 $this->server["QUERY_STRING"] !== ""
             ) {
                 $decoder = new decoder\QueryStringDecoder(0);
-                $this->query = $decoder->decode($this->server["QUERY_STRING"]);
+                $this->queryParameters = $decoder->decode(
+                    $this->server["QUERY_STRING"]
+                );
             } else {
-                $this->query = [];
+                $this->queryParameters = [];
             }
         }
-        return $this->query;
+        return $this->queryParameters;
     }
 
     /**
