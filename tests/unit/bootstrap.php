@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__."/../../vendor/autoload.php";
+require __DIR__."/functions.php";
 
 # create mocks for the following namspaced functions
 # this way we don't have to worry about them being called first
