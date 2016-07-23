@@ -35,18 +35,18 @@ class Client implements ClientInterface
     public function getIp(): string
     {
         if ($this->ip === null) {
-            $this->ip = $this->environment["REMOTE_ADDR"] ?? "";
             foreach (["HTTP_X_FORWARDED_FOR", "X_FORWARDED_FOR"] as $key) {
-                if (!isset($this->environment[$key])) {
-                    continue;
+                $proxyIpList = $this->environment[$key] ?? "";
+                if ($proxyIpList) {
+                    if (strpos($proxyIpList, ",") !== false) {
+                        list($this->ip) = preg_split("/,\s?/", $proxyIpList);
+                    } else {
+                        $this->ip = $proxyIpList;
+                    }
+                    return $this->ip;
                 }
-
-                $this->ip = $this->environment[$key];
-                if (strpos($this->ip, ",") !== false) {
-                    list($this->ip) = preg_split("/,\s?/", $this->ip);
-                }
-                break;
             }
+            $this->ip = $this->environment["REMOTE_ADDR"] ?? "";
         }
         return $this->ip;
     }
