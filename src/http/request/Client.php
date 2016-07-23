@@ -25,13 +25,17 @@ class Client implements ClientInterface
      */
     protected $ip;
 
-
     public function __construct(\sndsgd\http\Request $request)
     {
         $this->request = $request;
         $this->environment = $request->getEnvironment();
     }
 
+    /**
+     * Retrieve the client ip address
+     *
+     * @return string
+     */
     public function getIp(): string
     {
         if ($this->ip === null) {

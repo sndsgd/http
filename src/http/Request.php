@@ -68,7 +68,7 @@ class Request implements RequestParameterDecoderInterface
     /**
      * Create a request instance
      *
-     * @param array $server The PHP $_SERVER superglobal
+     * @param \sndsgd\Environment $environment
      */
     public function __construct(\sndsgd\Environment $environment)
     {
