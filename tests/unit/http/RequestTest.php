@@ -43,6 +43,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers ::getHost
+     */
+    public function testGetHost()
+    {
+        $request = new Request(createTestEnvironment());
+        $host = $request->getHost();
+    }
+
+    /**
      * @covers ::getClient
      */
     public function testGetClient()
@@ -146,24 +155,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             [["SERVER_PORT" => 80], "http"],
             [["SERVER_PORT" => 42], "http"],
             [[], "http"],
-        ];
-    }
-
-    /**
-     * @covers ::getHost
-     * @dataProvider providerGetHost
-     */
-    public function testGetHost(array $server, $expect)
-    {
-        $req = new Request(createTestEnvironment($server));
-        $this->assertSame($expect, $req->getHost());
-    }
-
-    public function providerGetHost()
-    {
-        return [
-            [[], ""],
-            [["HTTP_HOST" => "asd"], "asd"],
         ];
     }
 

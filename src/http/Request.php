@@ -4,7 +4,7 @@ namespace sndsgd\http;
 
 use \sndsgd\http\data\decoder;
 
-class Request implements RequestParameterDecoderInterface
+class Request implements RequestInterface
 {
     /**
      * The request environment
@@ -14,9 +14,16 @@ class Request implements RequestParameterDecoderInterface
     protected $environment;
 
     /**
+     * When a host instance is created, it will be cached here
+     *
+     * @var \sndsgd\http\request\HostInterface
+     */
+    protected $host;
+
+    /**
      * When a client instance is created, it will be cached here
      *
-     * @var \sndsgd\http\request\Client
+     * @var \sndsgd\http\request\ClientInterface
      */
     protected $client;
 
@@ -59,13 +66,6 @@ class Request implements RequestParameterDecoderInterface
     protected $bodyParameters;
 
     /**
-     * Once values are computed, they can be cached here
-     *
-     * @var array<string,mixed>
-     */
-    protected $cache = [];
-
-    /**
      * Create a request instance
      *
      * @param \sndsgd\Environment $environment
@@ -75,11 +75,28 @@ class Request implements RequestParameterDecoderInterface
         $this->environment = $environment;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment(): \sndsgd\Environment
     {
         return $this->environment;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getHost(): \sndsgd\http\request\HostInterface
+    {
+        if ($this->host === null) {
+            $this->host = new \sndsgd\http\request\Host($this);
+        }
+        return $this->host;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getClient(): \sndsgd\http\request\ClientInterface
     {
         if ($this->client === null) {
@@ -89,7 +106,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getMethod(): string
     {
@@ -97,7 +114,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getPath(): string
     {
@@ -113,9 +130,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * Get the request protocol
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getProtocol(): string
     {
@@ -123,9 +138,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * Get the request scheme
-     *
-     * @return string Either 'https' or 'http'
+     * {@inheritdoc}
      */
     public function getScheme(): string
     {
@@ -149,19 +162,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * Get the host that is handling this request
-     *
-     * @return string
-     */
-    public function getHost(): string
-    {
-        return $this->environment["HTTP_HOST"] ?? "";
-    }
-
-    /**
-     * @param string $name The name of the header to get
-     * @param string $default A value to use if the header does not exist
-     * @return string
+     * {@inheritdoc}
      */
     public function getHeader(string $name, string $default = ""): string
     {
@@ -171,7 +172,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * @return array<string,string>
+     * {@inheritdoc}
      */
     public function getHeaders(): array
     {
@@ -205,7 +206,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getContentType(): string
     {
@@ -217,7 +218,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getContentLength(): int
     {
@@ -225,9 +226,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * Get client specified acceptable content types
-     *
-     * @return array<string,string>
+     * {@inheritdoc}
      */
     public function getAcceptContentTypes(): array
     {
@@ -249,9 +248,7 @@ class Request implements RequestParameterDecoderInterface
     }
 
     /**
-     * Get the basic auth credentials
-     *
-     * @return array<string>
+     * {@inheritdoc}
      */
     public function getBasicAuth(): array
     {
@@ -309,7 +306,7 @@ class Request implements RequestParameterDecoderInterface
      *
      * @return \sndsgd\http\request\BodyDecoder
      */
-    protected function getBodyDecoder()
+    protected function getBodyDecoder(): request\BodyDecoder
     {
         return new request\BodyDecoder();
     }
