@@ -25,6 +25,9 @@ class Client implements ClientInterface
      */
     protected $ip;
 
+    /**
+     * @param \sndsgd\http\Request $request
+     */
     public function __construct(\sndsgd\http\Request $request)
     {
         $this->request = $request;
