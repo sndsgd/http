@@ -7,35 +7,30 @@ namespace sndsgd\http;
  */
 class ResponseTest extends \PHPUnit_Framework_TestCase
 {
-    protected $request;
     protected $response;
 
     public function setup()
     {
-        $this->createResponse();
-    }
-
-    public function createResponse(array $server = [])
-    {
-        $environment = createTestEnvironment($server);
-        $this->request = new Request($environment);
-        $this->response = new Response($this->request);
+        $this->response = new Response();
     }
 
     /**
      * @covers ::__construct
+     * @dataProvider providerConstructor
      */
-    public function testConstructor()
+    public function testConstructor($statusCode, $body)
     {
-        $this->createResponse();
+        $response = new Response($statusCode, null, $body);
+        $this->assertSame($statusCode, $response->getStatusCode());
+        $this->assertSame($body, $response->getBody());
     }
 
-    /**
-     * @covers ::getRequest
-     */
-    public function testGetRequest()
+    public function providerConstructor()
     {
-        $this->assertSame($this->request, $this->response->getRequest());
+        return [
+            [\sndsgd\http\Status::CREATED, ""],
+            [\sndsgd\http\Status::OK, "test"],
+        ];
     }
 
     /**
@@ -175,12 +170,11 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectOutputString($body);
 
-        $this->createResponse(["SERVER_PROTOCOL" => $protocol]);
         $this->response
             ->setStatus($code)
             ->setHeaders($headers)
             ->setBody($body)
-            ->send();
+            ->send($protocol);
 
         $this->getAndTestHeaders($expectHeaders);
     }

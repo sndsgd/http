@@ -5,13 +5,6 @@ namespace sndsgd\http;
 class Response
 {
     /**
-     * A reference to the request this instance is a response to
-     *
-     * @var \sndsgd\http\Request
-     */
-    protected $request;
-
-    /**
      * The http status code
      *
      * @var integer
@@ -40,18 +33,15 @@ class Response
     /**
      * @param \sndsgd\http\Request $request
      */
-    public function __construct(Request $request)
+    public function __construct(
+        int $statusCode = \sndsgd\http\Status::OK,
+        \sndsgd\http\HeaderCollection $headers = null,
+        string $body = ""
+    )
     {
-        $this->request = $request;
-        $this->headers = new \sndsgd\http\HeaderCollection();
-    }
-
-    /**
-     * @return \sndsgd\http\Request
-     */
-    public function getRequest(): Request
-    {
-        return $this->request;
+        $this->setStatus($statusCode);
+        $this->headers = $headers ?? new \sndsgd\http\HeaderCollection();
+        $this->setBody($body);
     }
 
     /**
@@ -135,11 +125,15 @@ class Response
      */
     public function setBody(string $body): Response
     {
-        $this->setHeader("Content-Length", mb_strlen($body));
+        $contentLength = mb_strlen($body);
+        if ($contentLength > 0) {
+            $this->setHeader("Content-Length", $contentLength);
+        }
+
         $this->body = $body;
         return $this;
     }
-    
+
     /**
      * @return string
      */
@@ -148,9 +142,14 @@ class Response
         return $this->body;
     }
 
-    public function send()
+    /**
+     * Send the request
+     *
+     * @param string $protocol The request protocol
+     * @return void
+     */
+    public function send(string $protocol)
     {
-        $protocol = $this->request->getProtocol();
         header("$protocol {$this->statusCode} {$this->statusText}");
         foreach ($this->headers->getStringifiedArray() as $header) {
             header($header);
