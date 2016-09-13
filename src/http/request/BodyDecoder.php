@@ -9,7 +9,7 @@ class BodyDecoder
 {
     /**
      * A map of content types and decoder classnames
-     * 
+     *
      * @var array<string,string>
      */
     protected static $decoders = [
@@ -52,7 +52,7 @@ class BodyDecoder
         # if the `enable_post_data_reading` ini setting is on
         # use the already parsed $_POST and $_FILES data
         if (
-            $method === "POST" && 
+            $method === "POST" &&
             !\sndsgd\Str::beginsWith($contentType, "application/json") &&
             $options->getPostDataReadingEnabled()
         ) {
@@ -70,8 +70,8 @@ class BodyDecoder
 
     /**
      * Stubbable method for creating a decoder instance
-     * 
-     * @param string $stream 
+     *
+     * @param string $stream
      * @param string $contentType
      * @param int $contentLength
      * @param \sndsgd\http\data\DecoderOptions $options
@@ -117,7 +117,7 @@ class BodyDecoder
                             "error" => $info["error"][$i] ?? 0,
                             "size" => $info["size"][$i] ?? 0,
                         ]);
-                        \sndsgd\Arr::addValue($ret, $name, $file);    
+                        \sndsgd\Arr::addValue($ret, $name, $file);
                     }
                 } else {
                     $file = $this->createUploadedFile($info);
@@ -139,13 +139,9 @@ class BodyDecoder
             $info["name"],
             $info["type"],
             $info["size"],
-            $info["tmp_name"]
+            $info["tmp_name"],
+            $info["error"]
         );
-
-        if ($info["error"] !== UPLOAD_ERR_OK) {
-            $error = new \sndsgd\http\UploadedFileError($info["error"]);
-            $file->setError($error);
-        }
 
         return $file;
     }

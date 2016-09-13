@@ -168,7 +168,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             [
                 "image.jpg",
                 "image/jpeg",
-                "app/evil", 
+                "app/evil",
                 ["image/png", "image/gif", "image/jpeg"],
                 false,
                 false,
@@ -201,12 +201,12 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
     {
         $file = new UploadedFile("test.txt", "text/plain", 123, $tempPath);
         if ($exception === null) {
-            $this->assertSame($expect, $file->getTempPath());    
+            $this->assertSame($expect, $file->getTempPath());
         }
         else {
             $this->setExpectedException($exception);
             $file->getTempPath();
-        }   
+        }
     }
 
     public function providerGetTempPath()
@@ -215,14 +215,6 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             ["/test/path", "/test/path"],
             ["", null, "RuntimeException"],
         ];
-    }
-
-    public function testSetGetError()
-    {
-        $error = new UploadedFileError(UPLOAD_ERR_INI_SIZE);
-        $file = new UploadedFile("test.txt", "text/plain");
-        $file->setError($error);
-        $this->assertSame($error, $file->getError());
     }
 
     /**
