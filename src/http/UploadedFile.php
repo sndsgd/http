@@ -6,7 +6,7 @@ class UploadedFile implements \JsonSerializable
 {
     /**
      * The name of the file as provided by the client's device
-     * 
+     *
      * @var string
      */
     protected $clientFilename;
@@ -52,15 +52,22 @@ class UploadedFile implements \JsonSerializable
         string $clientFilename,
         string $unverifiedContentType,
         int $size = 0,
-        string $tempPath = ""
+        string $tempPath = "",
+        int $errorCode = UPLOAD_ERR_OK
     )
     {
         $this->clientFilename = $clientFilename;
         $this->unverifiedContentType = strtolower($unverifiedContentType);
         $this->size = $size;
         $this->tempPath = $tempPath;
+        if ($errorCode !== UPLOAD_ERR_OK) {
+            $this->error = new \sndsgd\http\UploadedFileError($errorCode);
+        }
     }
 
+    /**
+     * Remove the temp file when the object is destroyed
+     */
     public function __destruct()
     {
         if ($this->tempPath !== "" && file_exists($this->tempPath)) {
@@ -80,7 +87,7 @@ class UploadedFile implements \JsonSerializable
 
     /**
      * Get the content type
-     * 
+     *
      * @param bool $allowUnverified
      * @return string
      */
@@ -111,7 +118,7 @@ class UploadedFile implements \JsonSerializable
      * Determine whether the file type matches any that are provided
      *
      * @param array<string> $mimeTypes Acceptable mime types
-     * @param bool $allowUnverified Whether to trust the client provided type 
+     * @param bool $allowUnverified Whether to trust the client provided type
      * @return bool
      */
     public function isType(
@@ -150,16 +157,6 @@ class UploadedFile implements \JsonSerializable
             throw new \RuntimeException("failed to retrieve uploaded file path");
         }
         return $this->tempPath;
-    }
-
-    /**
-     * @param \sndsgd\ErrorInterface $error
-     * @return \sndsgd\http\UploadedFile
-     */
-    public function setError(\sndsgd\ErrorInterface $error): UploadedFile
-    {
-        $this->error = $error;
-        return $this;
     }
 
     /**

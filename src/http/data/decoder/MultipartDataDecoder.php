@@ -371,7 +371,7 @@ class MultipartDataDecoder extends DecoderAbstract
     /**
      * Handle an invalid file upload
      *
-     * @param int $code The relevant PHP file upload error
+     * @param int $errorCode The relevant PHP file upload error
      * @param string $tempPath The absolute path to the temp file
      * @param resource $tempHandle The handle for the temp file
      * @param string $filename The file name as provided by the client
@@ -380,7 +380,7 @@ class MultipartDataDecoder extends DecoderAbstract
      * @return \sndsgd\http\UploadedFile
      */
     protected function fileUploadError(
-        int $code,
+        int $errorCode,
         string $tempPath,
         $tempHandle,
         string $filename,
@@ -393,9 +393,12 @@ class MultipartDataDecoder extends DecoderAbstract
             unlink($tempPath);
         }
 
-        $error = new \sndsgd\http\UploadedFileError($code);
-        $file = new \sndsgd\http\UploadedFile($filename, $contentType, $size, "");
-        $file->setError($error);
-        return $file;
+        return new \sndsgd\http\UploadedFile(
+            $filename,
+            $contentType,
+            $size,
+            "",
+            $errorCode
+        );
     }
 }
