@@ -44,6 +44,11 @@ class Host implements HostInterface
      */
     public function getDnsName(): string
     {
-        return $this->environment["SERVER_NAME"] ?? "";
+        $host = $this->environment["HTTP_HOST"] ?? "";
+        $port = strpos($host, ":");
+        if ($port !== false) {
+            return substr($host, 0, $port);
+        }
+        return $host;
     }
 }
