@@ -48,8 +48,9 @@ class HostTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [[], ""],
-            [["SERVER_NAME" => "localhost"], "localhost"],
-            [["SERVER_NAME" => "test.test"], "test.test"],
+            [["HTTP_HOST" => "localhost"], "localhost"],
+            [["HTTP_HOST" => "localhost:1234"], "localhost"],
+            [["HTTP_HOST" => "test.test"], "test.test"],
         ];
     }
 }
