@@ -10,6 +10,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers ::__construct
      * @covers ::getEnvironment
+     * @covers ::getDecoderOptions
      * @dataProvider providerConstructor
      */
     public function testConstructor(array $server)
@@ -17,6 +18,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $environment = createTestEnvironment($server);
         $request = new Request($environment);
         $this->assertSame($environment, $request->getEnvironment());
+        $this->assertInstanceOf(
+            \sndsgd\http\data\decoder\DecoderOptions::class,
+            $request->getDecoderOptions()
+        );
     }
 
     public function providerConstructor()
@@ -335,6 +340,88 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 ["PHP_AUTH_USER" => "user", "PHP_AUTH_PW" => "pass"],
                 ["user", "pass"],
             ]
+        ];
+    }
+
+    /**
+     * @covers ::getCookies
+     * @covers ::parseCookies
+     * @dataProvider providerGetCookies
+     */
+    public function testGetCookies(array $environment, array $expect)
+    {
+        $request = new Request(createTestEnvironment($environment));
+        $this->assertSame($expect, $request->getCookies());
+    }
+
+    public function providerGetCookies(): array
+    {
+        $encoded = "!@#$%^&´∑®¥¨øçß´;";
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                ["HTTP_COOKIE" => "a=1; b=abc; c=123"],
+                ["a" => "1", "b" => "abc", "c" => "123"]
+            ],
+            # indexed array
+            [
+                ["HTTP_COOKIE" => "a=1; b[]=2; b[]=3"],
+                ["a" => "1", "b" => ["2", "3"]],
+            ],
+            # associative array
+            [
+                ["HTTP_COOKIE" => "a=1; b[two]=2; b[three]=3"],
+                ["a" => "1", "b" => ["two" => "2", "three" => "3"]],
+            ],
+            # encoded content
+            [
+                ["HTTP_COOKIE" => sprintf("a=%s", urlencode($encoded))],
+                ["a" => $encoded],
+            ],
+
+            # trailing semicolon
+            [
+                ["HTTP_COOKIE" => "a=1; b=2;"],
+                ["a" => "1", "b" => "2"],
+            ],
+            # missing value
+            [
+                ["HTTP_COOKIE" => "a=1; b="],
+                ["a" => "1"],
+            ],
+            # invalid cookie
+            [
+                ["HTTP_COOKIE" => "a=1; b"],
+                ["a" => "1"],
+            ],
+        ];
+    }
+
+    /**
+     * @covers ::getCookie
+     * @covers ::parseCookies
+     * @dataProvider providerGetCookie
+     */
+    public function testGetCookie(
+        array $environment,
+        string $name,
+        $default,
+        $expect
+    )
+    {
+        $request = new Request(createTestEnvironment($environment));
+        $this->assertSame($expect, $request->getCookie($name, $default));
+    }
+
+    public function providerGetCookie()
+    {
+        return [
+            [["HTTP_COOKIE" => "a=1; b=2"], "a", 0, "1"],
+            [["HTTP_COOKIE" => "a=1; b=2"], "b", 0, "2"],
+            [["HTTP_COOKIE" => "a=1; b=2"], "c", 0, 0],
         ];
     }
 

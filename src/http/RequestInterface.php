@@ -105,6 +105,22 @@ interface RequestInterface extends RequestParameterDecoderInterface
     public function getBasicAuth(): array;
 
     /**
+     * Retrieve all cookies
+     *
+     * @return array<string,mixed>
+     */
+    public function getCookies(): array;
+
+    /**
+     * Retrieve a single cookie
+     *
+     * @param string $name The cookie to retrieve
+     * @param mixed $default The value to return if the cookie does not exist
+     * @return mixed
+     */
+    public function getCookie(string $name, $default = "");
+
+    /**
      * {@inheritdoc}
      *
      * @see \sndsgd\http\RequestParameterDecoderInterface
