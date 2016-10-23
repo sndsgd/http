@@ -14,6 +14,13 @@ class Request implements RequestInterface
     protected $environment;
 
     /**
+     * The decoder options use for query, body, and header decoding
+     *
+     * @var \sndsgd\http\data\decoder\DecoderOptions
+     */
+    protected $decoderOptions;
+
+    /**
      * When a host instance is created, it will be cached here
      *
      * @var \sndsgd\http\request\HostInterface
@@ -52,6 +59,13 @@ class Request implements RequestInterface
     protected $acceptContentTypes;
 
     /**
+     * Once cookies are processed, they'll be cached here
+     *
+     * @var array<string,mixed>
+     */
+    protected $cookies;
+
+    /**
      * The decoded query parameters
      *
      * @var array<string,mixed>
@@ -69,10 +83,15 @@ class Request implements RequestInterface
      * Create a request instance
      *
      * @param \sndsgd\Environment $environment
+     * @param \sndsgd\http\data\decoder\DecoderOptions|null $decoderOptions
      */
-    public function __construct(\sndsgd\Environment $environment)
+    public function __construct(
+        \sndsgd\Environment $environment,
+        \sndsgd\http\data\decoder\DecoderOptions $decoderOptions = null
+    )
     {
         $this->environment = $environment;
+        $this->decoderOptions = $decoderOptions ?? new data\decoder\DecoderOptions();
     }
 
     /**
@@ -81,6 +100,14 @@ class Request implements RequestInterface
     public function getEnvironment(): \sndsgd\Environment
     {
         return $this->environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDecoderOptions(): \sndsgd\http\data\decoder\DecoderOptions
+    {
+        return $this->decoderOptions;
     }
 
     /**
@@ -272,6 +299,66 @@ class Request implements RequestInterface
     /**
      * {@inheritdoc}
      */
+    public function getCookies(): array
+    {
+        if ($this->cookies === null) {
+            $this->cookies = $this->parseCookies();
+        }
+        return $this->cookies;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCookie(string $name, $default = "")
+    {
+        if ($this->cookies === null) {
+            $this->cookies = $this->parseCookies();
+        }
+        return $this->cookies[$name] ?? $default;
+    }
+
+    /**
+     * Parse cookies from the `cookie` header
+     *
+     * @return array<string,mixed>
+     */
+    protected function parseCookies(): array
+    {
+        # cookies are encoded in the `cookie` header
+        $header = $this->getHeader("cookie");
+        if (empty($header)) {
+            return [];
+        }
+
+        # create a data collection to gracefully handle arrays
+        $options = $this->getDecoderOptions();
+        $collection = new \sndsgd\http\data\Collection(
+            $options->getMaxVars(),
+            $options->getMaxNestingLevels()
+        );
+
+        foreach (explode(";", $header) as $cookie) {
+            $cookie = trim($cookie);
+            if ($cookie === "") {
+                continue;
+            }
+
+            $pair = explode("=", $cookie, 2);
+            if (!isset($pair[1]) || $pair[1] === "") {
+                continue;
+            }
+
+            list($key, $value) = $pair;
+            $collection->addValue(urldecode($key), urldecode($value));
+        }
+
+        return $collection->getValues();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getQueryParameters(): array
     {
         if ($this->queryParameters === null) {
@@ -305,7 +392,8 @@ class Request implements RequestInterface
                     $this->getMethod(),
                     "php://input",
                     $contentType,
-                    $this->getContentLength()
+                    $this->getContentLength(),
+                    $this->getDecoderOptions()
                 );
             }
         }

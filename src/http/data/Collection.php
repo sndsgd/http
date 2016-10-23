@@ -102,7 +102,7 @@ class Collection implements \Countable
         $levels = (strpos($key, "][") !== false)
             ? explode("][", substr($key, $pos + 1, -1))
             : [substr($key, $pos + 1, -1)];
-        
+
         array_unshift($levels, substr($key, 0, $pos));
 
         # ensure the nesting doesn't exceed `max_nesting_levels`
