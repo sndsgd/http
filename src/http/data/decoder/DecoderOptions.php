@@ -12,24 +12,13 @@ class DecoderOptions
     protected $maxFileSize;
 
     /**
-     * Stubbable method for retrieving ini values
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public function readValue(string $name)
-    {
-        return ini_get($name);
-    }
-
-    /**
      * Retrieve the `max_input_vars` ini setting
      *
      * @return int
      */
     public function getMaxVars(): int
     {
-        return (int) $this->readValue("max_input_vars");
+        return (int) ini_get("max_input_vars");
     }
 
     /**
@@ -39,7 +28,7 @@ class DecoderOptions
      */
     public function getMaxNestingLevels(): int
     {
-        return (int) $this->readValue("max_input_nesting_level");
+        return (int) ini_get("max_input_nesting_level");
     }
 
     /**
@@ -49,7 +38,7 @@ class DecoderOptions
      */
     public function getPostDataReadingEnabled(): bool
     {
-        return (bool) $this->readValue("enable_post_data_reading");
+        return (bool) ini_get("enable_post_data_reading");
     }
 
     /**
@@ -59,7 +48,7 @@ class DecoderOptions
      */
     public function getMaxFileCount(): int
     {
-        return (int) $this->readValue("max_file_uploads");
+        return (int) ini_get("max_file_uploads");
     }
 
     /**
@@ -70,7 +59,7 @@ class DecoderOptions
     public function getMaxFileSize(): int
     {
         if ($this->maxFileSize === null) {
-            $value = $this->readValue("upload_max_filesize");
+            $value = ini_get("upload_max_filesize");
             $units = "BKMGT";
             $unit = preg_replace("/[^$units]/i", "", $value);
             $value = floatval($value);

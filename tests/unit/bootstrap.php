@@ -10,6 +10,7 @@ $mockFunctions = [
     ["sndsgd\\http\\data\\decoder", "feof"],
     ["sndsgd\\http\\data\\decoder", "fread"],
     ["sndsgd\\http\\data\\decoder", "fwrite"],
+    ["sndsgd\\http\\data\\decoder", "ini_get"],
 ];
 
 foreach ($mockFunctions as list($namespace, $name)) {
