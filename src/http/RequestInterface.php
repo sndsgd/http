@@ -54,6 +54,13 @@ interface RequestInterface extends RequestParameterDecoderInterface
     public function getScheme(): string;
 
     /**
+     * Determine whether the request was made over an https connection
+     *
+     * @return bool
+     */
+    public function isHttps(): bool;
+
+    /**
      * Retrieve a header
      *
      * @param string $name The name of the header to get

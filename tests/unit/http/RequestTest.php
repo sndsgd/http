@@ -145,17 +145,28 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     public function providerGetScheme()
     {
         return [
-            [["HTTP_X_FORWARDED_PROTO" => "https"], "https"],
-            [["HTTP_X_FORWARDED_PROTO" => "http"], "http"],
-            [["HTTP_X_FORWARDED_PROTO" => "asd"], "asd"],
-            [["HTTPS" => "on"], "https"],
-            [["HTTPS" => "whatever"], "https"],
-            [["SERVER_PORT" => 443], "https"],
-            [["SERVER_PORT" => "443"], "https"],
-            [["SERVER_PORT" => 80], "http"],
-            [["SERVER_PORT" => 42], "http"],
-            [[], "http"],
+            [["HTTP_X_FORWARDED_PROTO" => "https"], Scheme::HTTPS],
+            [["HTTP_X_FORWARDED_PROTO" => "http"], Scheme::HTTP],
+            [["HTTP_X_FORWARDED_PROTO" => "invalid"], Scheme::HTTP],
+            [["HTTP_X_FORWARDED_PROTO" => "invalid", "HTTPS" => "on"], Scheme::HTTPS],
+            [["HTTPS" => "on"], Scheme::HTTPS],
+            [["HTTPS" => "whatever"], Scheme::HTTPS],
+            [["SERVER_PORT" => 443], Scheme::HTTPS],
+            [["SERVER_PORT" => "443"], Scheme::HTTPS],
+            [["SERVER_PORT" => 80], Scheme::HTTP],
+            [["SERVER_PORT" => 42], Scheme::HTTP],
+            [[], Scheme::HTTP],
         ];
+    }
+
+    /**
+     * @covers ::isHttps
+     * @dataProvider providerGetScheme
+     */
+    public function testIsHttps(array $server, string $scheme)
+    {
+        $req = new Request(createTestEnvironment($server));
+        $this->assertSame($scheme === Scheme::HTTPS, $req->isHttps());
     }
 
     /**
