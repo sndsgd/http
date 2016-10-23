@@ -4,38 +4,17 @@ namespace sndsgd\http\data\decoder;
 
 class DecoderOptionsTest extends \PHPUnit_Framework_TestCase
 {
-    private function getMockWithReadValueStub($readValueResult)
-    {
-        $mock = $this->getMockBuilder(DecoderOptions::class)
-            ->setMethods(["readValue"])
-            ->getMock();
-
-        $mock->method("readValue")->willReturn($readValueResult);
-        return $mock;
-    }
-
-    /**
-     * @dataProvider providerReadValue
-     */
-    public function testReadValue($name, $expect)
-    {
-        $options = new DecoderOptions();
-        $this->assertSame($expect, $options->readValue($name));
-    }
-
-    public function providerReadValue()
-    {
-        return [
-            ["display_errors", ini_get("display_errors")],
-        ];
-    }
+    use \phpmock\phpunit\PHPMock;
 
     /**
      * @dataProvider providerSimpleTests
      */
     public function testSimpleTests($method, $test, $expect)
     {
-        $options = $this->getMockWithReadValueStub($test);
+        $mock = $this->getFunctionMock(__NAMESPACE__, "ini_get");
+        $mock->expects($this->any())->willReturn($test);
+
+        $options = new DecoderOptions();
         $this->assertSame($expect, $options->$method());
     }
 
@@ -55,7 +34,10 @@ class DecoderOptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetMaxFileSize($test, $expect)
     {
-        $options = $this->getMockWithReadValueStub($test);
+        $mock = $this->getFunctionMock(__NAMESPACE__, "ini_get");
+        $mock->expects($this->any())->willReturn($test);
+
+        $options = new DecoderOptions();
         $this->assertSame($expect, $options->getMaxFileSize());
     }
 
