@@ -144,21 +144,32 @@ class Request implements RequestInterface
     {
         # commonly provided by load balancers
         if (isset($this->environment["HTTP_X_FORWARDED_PROTO"])) {
-            return $this->environment["HTTP_X_FORWARDED_PROTO"];
+            $scheme = strtolower($this->environment["HTTP_X_FORWARDED_PROTO"]);
+            if (in_array($scheme, [Scheme::HTTP, Scheme::HTTPS])) {
+                return $scheme;
+            }
         }
 
         # allow for setting `fastcgi_param HTTPS on;` in nginx config
         if (isset($this->environment["HTTPS"])) {
-            return "https";
+            return Scheme::HTTPS;
         }
 
         # fallback to using the port
         $port = $this->environment["SERVER_PORT"] ?? 80;
         if ($port == 443) {
-            return "https";
+            return Scheme::HTTPS;
         }
 
-        return "http";
+        return Scheme::HTTP;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isHttps(): bool
+    {
+        return ($this->getScheme() === Scheme::HTTPS);
     }
 
     /**
@@ -299,7 +310,7 @@ class Request implements RequestInterface
             }
         }
         return $this->bodyParameters;
-    }    
+    }
 
     /**
      * Stubbable method for creating a body decoder
