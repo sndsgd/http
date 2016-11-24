@@ -2,7 +2,8 @@
 
 require __DIR__."/../vendor/autoload.php";
 
-$request = new \sndsgd\http\Request($_SERVER);
+$environment = new \sndsgd\Environment($_SERVER);
+$request = new \sndsgd\http\Request($environment);
 switch ($request->getPath()) {
     case "/query":
         $data = [

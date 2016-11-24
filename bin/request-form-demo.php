@@ -19,7 +19,8 @@ $form = (new \sndsgd\Form())
             )
     );
 
-$request = new \sndsgd\http\Request($_SERVER);
+$environment = new \sndsgd\Environment($_SERVER);
+$request = new \sndsgd\http\Request($environment);
 $validator = new \sndsgd\form\Validator($form);
 try {
     $parameters = $validator->validate($request->getBodyParameters());
