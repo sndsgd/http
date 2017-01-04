@@ -180,16 +180,37 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
      * @covers ::getSize
      * @dataProvider providerGetSize
      */
-    public function testGetSize($size, $expect)
+    public function testGetSize($size)
     {
         $file = new UploadedFile("test.txt", "text/plain", $size, "");
-        $this->assertSame($expect, $file->getSize());
+        $this->assertSame($size, $file->getSize());
     }
 
     public function providerGetSize()
     {
         return [
-            [123456, 123456],
+            [123456],
+        ];
+    }
+
+    /**
+     * @covers ::getFormattedSize
+     * @dataProvider providerGetFormattedSize
+     */
+    public function testGetFormattedSize($size, $precision, $decimal, $sep, $expect)
+    {
+        $file = new UploadedFile("test.txt", "text/plain", $size, "");
+        $result = $file->getFormattedSize($precision, $decimal, $sep);
+        $this->assertSame($expect, $result);
+    }
+
+    public function providerGetFormattedSize()
+    {
+        return [
+            [1023, 2, ".", ",", "1,023 bytes"],
+            [1023, 2, ",", ".", "1.023 bytes"],
+            [123456, 2, ".", ",", "120.56 KB"],
+            [123456, 3, ",", ".", "120,563 KB"],
         ];
     }
 

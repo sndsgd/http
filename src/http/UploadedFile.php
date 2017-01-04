@@ -146,6 +146,23 @@ class UploadedFile implements \JsonSerializable
     }
 
     /**
+     * Retrieve a human readable version of the size
+     *
+     * @param int $precision The number of decimal places to show
+     * @param string $point The decimal point
+     * @param string $sep The thousands separator
+     * @return string
+     */
+    public function getFormattedSize(
+        int $precision = 0,
+        string $point = ".",
+        string $sep = ","
+    ): string
+    {
+        return \sndsgd\Fs::formatSize($this->size, $precision, $point, $sep);
+    }
+
+    /**
      * Retrieve the absolute path to the temp file
      *
      * @return string
