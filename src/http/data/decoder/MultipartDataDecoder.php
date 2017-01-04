@@ -104,15 +104,10 @@ class MultipartDataDecoder extends DecoderAbstract
                 $value = $this->getValueFromField();
                 $this->values->addValue($name, $value);
             } else {
-
-
+                $value = $this->getFileFromField($name, $filename, $contentType);
                 if ($this->fileCount < $this->maxFileCount) {
-                    $value = $this->getFileFromField($name, $filename, $contentType);
                     $this->values->addValue($name, $value);
-                } else {
-
                 }
-
                 $this->fileCount++;
             }
         }
