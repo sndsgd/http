@@ -82,7 +82,7 @@ class MultipartDataDecoder extends DecoderAbstract
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function decode(): array
     {

@@ -8,13 +8,13 @@ namespace sndsgd\form\rule;
 class UploadedFileTypeRule extends RuleAbstract
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     protected $errorMessage = null;
 
     /**
      * The acceptable mime types
-     * 
+     *
      * @var array<string>
      */
     protected $mimeTypes;
@@ -28,7 +28,7 @@ class UploadedFileTypeRule extends RuleAbstract
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getDescription(): string
     {
@@ -52,7 +52,7 @@ class UploadedFileTypeRule extends RuleAbstract
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getErrorMessage(): string
     {
@@ -69,7 +69,7 @@ class UploadedFileTypeRule extends RuleAbstract
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function validate(
         &$value,

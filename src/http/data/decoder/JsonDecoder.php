@@ -8,7 +8,7 @@ namespace sndsgd\http\data\decoder;
 class JsonDecoder extends DecoderAbstract
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function decode(): array
     {

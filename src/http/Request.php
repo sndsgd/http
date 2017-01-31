@@ -95,7 +95,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getEnvironment(): \sndsgd\Environment
     {
@@ -103,7 +103,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getDecoderOptions(): \sndsgd\http\data\decoder\DecoderOptions
     {
@@ -111,7 +111,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getHost(): \sndsgd\http\request\HostInterface
     {
@@ -122,7 +122,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getClient(): \sndsgd\http\request\ClientInterface
     {
@@ -133,7 +133,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getMethod(): string
     {
@@ -141,7 +141,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getPath(): string
     {
@@ -157,7 +157,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getProtocol(): string
     {
@@ -165,7 +165,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getScheme(): string
     {
@@ -192,7 +192,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function isHttps(): bool
     {
@@ -200,7 +200,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getHeader(string $name, string $default = ""): string
     {
@@ -210,7 +210,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getHeaders(): array
     {
@@ -244,7 +244,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getContentType(): string
     {
@@ -256,7 +256,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getContentLength(): int
     {
@@ -264,7 +264,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getAcceptContentTypes(): array
     {
@@ -286,7 +286,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getBasicAuth(): array
     {
@@ -297,7 +297,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getCookies(): array
     {
@@ -308,7 +308,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getCookie(string $name, $default = "")
     {
@@ -357,7 +357,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getQueryParameters(): array
     {
@@ -378,7 +378,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getBodyParameters(): array
     {
