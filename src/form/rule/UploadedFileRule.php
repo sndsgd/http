@@ -5,7 +5,7 @@ namespace sndsgd\form\rule;
 class UploadedFileRule extends RuleAbstract
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getDescription(): string
     {
@@ -13,7 +13,7 @@ class UploadedFileRule extends RuleAbstract
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getErrorMessage(): string
     {
@@ -21,7 +21,7 @@ class UploadedFileRule extends RuleAbstract
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function validate(
         &$value,

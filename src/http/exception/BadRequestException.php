@@ -10,7 +10,7 @@ class BadRequestException extends ExceptionAbstract
     protected $errors;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getStatusCode(): int
     {

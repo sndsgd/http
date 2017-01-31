@@ -5,7 +5,7 @@ namespace sndsgd\http\exception;
 class NotImplementedException extends ExceptionAbstract
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getStatusCode(): int
     {

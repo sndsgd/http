@@ -5,7 +5,7 @@ namespace sndsgd\http\exception;
 class GoneException extends ExceptionAbstract
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function getStatusCode(): int
     {

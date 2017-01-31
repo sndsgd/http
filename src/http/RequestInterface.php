@@ -121,14 +121,14 @@ interface RequestInterface extends RequestParameterDecoderInterface
     public function getCookie(string $name, $default = "");
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @see \sndsgd\http\RequestParameterDecoderInterface
      */
     public function getQueryParameters(): array;
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @see \sndsgd\http\RequestParameterDecoderInterface
      */
