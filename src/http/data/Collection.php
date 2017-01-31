@@ -64,7 +64,7 @@ class Collection implements \Countable
     /**
      * Add a value to the collection
      *
-     * @param string|number $key The index/key to add the value under
+     * @param string $key The key to add the value under
      * @param string|\sndsgd\http\UploadedFile $value The value to add
      */
     public function addValue(string $key, $value)
@@ -75,7 +75,7 @@ class Collection implements \Countable
         }
 
         # if the key has both open and close brackets
-        # and the close comes after the open the key contains nesting
+        # and the close comes after the open, the key contains nesting
         if (
             ($openPos = strpos($key, "[")) !== false &&
             ($closePos = strpos($key, "]")) !== false &&

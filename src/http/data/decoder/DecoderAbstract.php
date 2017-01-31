@@ -31,14 +31,14 @@ abstract class DecoderAbstract implements DecoderInterface
     /**
      * An object containing ini settings related to body decoding
      *
-     * @var \sndsgd\http\data\DecoderOptions
+     * @var \sndsgd\http\data\decoder\DecoderOptions
      */
     protected $options;
 
     /**
      * A collection of decoded values
      *
-     * @var array<string,mixed>
+     * @var \sndsgd\http\data\Collection
      */
     protected $values;
 
