@@ -11,25 +11,25 @@ class UploadedFileError extends \sndsgd\Error
     {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
-                $this->message = "uploaded file exceeds `upload_max_filesize` in php.ini";
+                $message = "uploaded file exceeds `upload_max_filesize` in php.ini";
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                $this->message = "uploaded file exceeds `MAX_FILE_SIZE` in the HTML form";
+                $message = "uploaded file exceeds `MAX_FILE_SIZE` in the HTML form";
                 break;
             case UPLOAD_ERR_PARTIAL:
-                $this->message = "uploaded file was only partially uploaded";
+                $message = "uploaded file was only partially uploaded";
                 break;
             case UPLOAD_ERR_NO_FILE:
-                $this->message = "no file was uploaded";
+                $message = "no file was uploaded";
                 break;
             case UPLOAD_ERR_NO_TMP_DIR:
-                $this->message = "uploaded file temp directory does not exist";
+                $message = "uploaded file temp directory does not exist";
                 break;
             case UPLOAD_ERR_CANT_WRITE:
-                $this->message = "failed to write uploaded file";
+                $message = "failed to write uploaded file";
                 break;
             case UPLOAD_ERR_EXTENSION:
-                $this->message = "file upload failed due to an extension";
+                $message = "file upload failed due to an extension";
                 break;
             default:
                 throw new \InvalidArgumentException(
@@ -37,6 +37,6 @@ class UploadedFileError extends \sndsgd\Error
                     "expecting one of the php `UPLOAD_ERR_*` constants"
                 );
         }
-        $this->code = $code;
+        parent::__construct($message, $code);
     }
 }

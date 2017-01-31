@@ -6,8 +6,6 @@ class NullRoute extends Route
 {
     public function __construct()
     {
-        $this->method = "";
-        $this->path = "";
-        $this->priority = 0;
+        parent::__construct("", "", 0);
     }
 }
