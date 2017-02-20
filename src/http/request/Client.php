@@ -45,8 +45,9 @@ class Client implements ClientInterface
             foreach (["HTTP_X_FORWARDED_FOR", "X_FORWARDED_FOR"] as $key) {
                 $proxyIpList = $this->environment[$key] ?? "";
                 if ($proxyIpList) {
-                    if (strpos($proxyIpList, ",") !== false) {
-                        list($this->ip) = preg_split("/,\s?/", $proxyIpList);
+                    $commaPosition = strpos($proxyIpList, ",");
+                    if ($commaPosition !== false) {
+                        $this->ip = substr($proxyIpList, 0, $commaPosition);
                     } else {
                         $this->ip = $proxyIpList;
                     }
