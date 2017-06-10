@@ -15,6 +15,27 @@ class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider provideHas
+     */
+    public function testHas($collection, $key, $expect)
+    {
+        $this->assertSame($expect, $collection->has($key));
+    }
+
+    public function provideHas(): array
+    {
+        $collection = new HeaderCollection();
+        $collection->set("X-Accel-Redirect", __FILE__);
+
+        return [
+            [$collection, "test", false],
+            [$collection, "X-Accel-Redirect", true],
+            [$collection, "x-accel-redirect", true],
+            [$collection, "x-ACCEL-redirect", true],
+        ];
+    }
+
+    /**
      * @dataProvider providerSetGet
      */
     public function testSetGet($hc, $key, $value, $getKey, $expect)

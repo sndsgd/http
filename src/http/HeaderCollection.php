@@ -17,6 +17,18 @@ class HeaderCollection
     protected $keyMap = [];
 
     /**
+     * Determine whether a particular header exists
+     *
+     * @param string $key The key to check for
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        $key = $this->getKey($key, true);
+        return isset($this->headers[$key]);
+    }
+
+    /**
      * Retrieve a key that can be used in a hashmap to prevent duplicate keys
      *
      * @param string $key
