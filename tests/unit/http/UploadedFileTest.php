@@ -96,10 +96,10 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
     {
         $mock = $this->getMockBuilder(UploadedFile::class)
             ->setConstructorArgs(["test.txt", $unverifiedContentType, 123])
-            ->setMethods(['getContentTypeFromFile'])
+            ->setMethods(["getContentTypeFromFile"])
             ->getMock();
 
-        $mock->method('getContentTypeFromFile')->willReturn($fileContentType);
+        $mock->method("getContentTypeFromFile")->willReturn($fileContentType);
 
         $this->assertSame($expect, $mock->getContentType($allowUnverified));
     }
@@ -242,31 +242,56 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
      * @covers ::toArray
      * @dataProvider providerToArray
      */
-    public function testToArray($filename, $type, $size)
+    public function testToArray($filename, $type, $size, $tempPath, $error, $expect)
     {
         $mock = $this->getMockBuilder(UploadedFile::class)
-            ->setConstructorArgs([$filename, $type, $size, $this->tempPath])
-            ->setMethods(['getContentType'])
+            ->setConstructorArgs([$filename, $type, $size, $tempPath, $error])
+            ->setMethods(["getContentType"])
             ->getMock();
 
-        $mock->method('getContentType')
+        $mock->method("getContentType")
             ->willReturn($type);
-
-        $expect = [
-            "clientFilename" => $filename,
-            "unverifiedContentType" => $type,
-            "verifiedContentType" => $type,
-            "size" => $size,
-            "tempPath" => $this->tempPath,
-        ];
 
         $this->assertSame($expect, $mock->toArray());
     }
 
     public function providerToArray()
     {
+        $filename = "test.txt";
+        $contentType = "text/plain";
+        $size = 123;
+        $tempPath = "/some/fake/path";
         return [
-            ["test.txt", "text/plain", 123],
+            [
+                $filename,
+                $contentType,
+                $size,
+                $tempPath,
+                0,
+                [
+                    "clientFilename" => $filename,
+                    "unverifiedContentType" => $contentType,
+                    "verifiedContentType" => $contentType,
+                    "size" => $size,
+                    "tempPath" => $tempPath,
+                    "error" => "",
+                ],
+            ],
+            [
+                $filename,
+                $contentType,
+                $size,
+                $tempPath,
+                UPLOAD_ERR_NO_FILE,
+                [
+                    "clientFilename" => $filename,
+                    "unverifiedContentType" => "",
+                    "verifiedContentType" => "",
+                    "size" => 0,
+                    "tempPath" => "",
+                    "error" => "no file was uploaded",
+                ],
+            ],
         ];
     }
 
