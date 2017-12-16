@@ -272,12 +272,13 @@ class Request implements RequestInterface
             $this->acceptContentTypes = [];
             $header = $this->getHeader("accept", "");
             if ($header !== "") {
-                $pos = strpos($header, ";");
-                if ($pos !== false) {
-                    $header = substr($header, 0, $pos);
-                }
-                foreach (explode(",", $header) as $type) {
-                    $type = strtolower($type);
+                foreach (explode(",", $header) as $chunk) {
+                    $pos = strpos($chunk, ";");
+                    if ($pos !== false) {
+                        $chunk = substr($chunk, 0, $pos);
+                    }
+
+                    $type = strtolower($chunk);
                     $this->acceptContentTypes[$type] = $type;
                 }
             }

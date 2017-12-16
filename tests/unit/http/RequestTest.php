@@ -205,6 +205,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
             [
+                "text/html,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                [
+                    "text/html" => "text/html",
+                    "application/xml" => "application/xml",
+                    "image/webp" => "image/webp",
+                    "*/*" => "*/*",
+                ],
+            ],
+            [
                 "application/xml,*/*;asd=1.0",
                 [
                     "application/xml" => "application/xml",
