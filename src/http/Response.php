@@ -125,7 +125,7 @@ class Response
      */
     public function setBody(string $body): Response
     {
-        $contentLength = mb_strlen($body);
+        $contentLength = strlen($body);
         if ($contentLength > 0) {
             $this->setHeader("Content-Length", $contentLength);
         }

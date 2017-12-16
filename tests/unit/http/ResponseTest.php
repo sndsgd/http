@@ -213,7 +213,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                     $this->assertEquals($expectHeader, $realHeader);
                 }
                 else {
-                    $this->assertEquals($expectHeader, $realHeader);   
+                    $this->assertEquals($expectHeader, $realHeader);
                 }
             }
         }
