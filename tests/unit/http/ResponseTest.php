@@ -56,10 +56,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             [1, "", \InvalidArgumentException::class],
         ];
 
-        $rc = new \ReflectionClass(Status::class);
-        $property = $rc->getProperty("statuses");
-        $property->setAccessible(true);
-        foreach ($property->getValue() as $code => $text) {
+        foreach (Status::MESSAGES as $code => $text) {
             $ret[] = [$code, $text, ""];
         }
         return $ret;
@@ -213,7 +210,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
                     $this->assertEquals($expectHeader, $realHeader);
                 }
                 else {
-                    $this->assertEquals($expectHeader, $realHeader);   
+                    $this->assertEquals($expectHeader, $realHeader);
                 }
             }
         }
