@@ -7,6 +7,44 @@ namespace sndsgd\http;
  */
 class StatusTest extends \PHPUnit_Framework_TestCase
 {
+    private static $codeMap = [];
+
+    private static function getCodeMap(): array
+    {
+        if (empty(static::$codeMap)) {
+            $reflection = new \ReflectionClass(Status::class);
+            foreach ($reflection->getConstants() as $name => $value) {
+                if (is_int($value)) {
+                    static::$codeMap[$value] = $name;
+                }
+            }
+        }
+
+        return static::$codeMap;
+    }
+
+    private static function getProviderForCodes(int $min, int $max): array
+    {
+        $ret = [];
+        foreach (static::getCodeMap() as $code => $constantName) {
+            $ret[] = [$code, $code >= $min && $code <= $max];
+        }
+        return $ret;
+    }
+
+    public static function setupBeforeClass()
+    {
+        static::getCodeMap();
+    }
+
+    public function testConstants()
+    {
+        $this->assertSame(
+            array_keys(static::$codeMap),
+            array_keys(Status::MESSAGES)
+        );
+    }
+
     /**
      * @dataProvider providerIsValid
      */
@@ -174,5 +212,83 @@ class StatusTest extends \PHPUnit_Framework_TestCase
             [10, null, "InvalidArgumentException"],
             [600, null, "InvalidArgumentException"],
         ];
+    }
+
+    /**
+     * @dataProvider provideIsInformational
+     */
+    public function testIsInformational($code, $expect)
+    {
+        $this->assertSame($expect, Status::isInformational($code));
+    }
+
+    public function provideIsInformational(): array
+    {
+        return static::getProviderForCodes(100, 199);
+    }
+
+    /**
+     * @dataProvider provideIsSuccess
+     */
+    public function testIsSuccess($code, $expect)
+    {
+        $this->assertSame($expect, Status::isSuccess($code));
+    }
+
+    public function provideIsSuccess(): array
+    {
+        return static::getProviderForCodes(200, 299);
+    }
+
+    /**
+     * @dataProvider provideIsRedirect
+     */
+    public function testIsRedirect($code, $expect)
+    {
+        $this->assertSame($expect, Status::isRedirect($code));
+    }
+
+    public function provideIsRedirect(): array
+    {
+        return static::getProviderForCodes(300, 399);
+    }
+
+    /**
+     * @dataProvider provideIsClientError
+     */
+    public function testIsClientError($code, $expect)
+    {
+        $this->assertSame($expect, Status::isClientError($code));
+    }
+
+    public function provideIsClientError(): array
+    {
+        return static::getProviderForCodes(400, 499);
+    }
+
+    /**
+     * @dataProvider provideIsServerError
+     */
+    public function testIsServerError($code, $expect)
+    {
+        $this->assertSame($expect, Status::isServerError($code));
+    }
+
+    public function provideIsServerError(): array
+    {
+        return static::getProviderForCodes(500, 599);
+    }
+
+    /**
+     * @dataProvider provideIsError
+     */
+    public function testIsError($code, $expect)
+    {
+        $this->assertSame($expect, Status::isError($code));
+    }
+
+    public function provideIsError(): array
+    {
+        return static::getProviderForCodes(400, 599);
     }
 }

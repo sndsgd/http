@@ -60,10 +60,10 @@ class Status
 
     /**
      * Http status codes and their respective messages
-     * 
+     *
      * @var array<integer,string>
      */
-    protected static $statuses = [
+    const MESSAGES = [
         self::CONTINUE => "Continue",
         self::SWITCHING_PROTOCOLS => "Switching Protocols",
         self::PROCESSING => "Processing",
@@ -122,7 +122,7 @@ class Status
      */
     public static function isValid(int $code): bool
     {
-        return isset(static::$statuses[$code]);
+        return isset(self::MESSAGES[$code]);
     }
 
     /**
@@ -134,13 +134,13 @@ class Status
      */
     public static function getText(int $code): string
     {
-        if (!isset(static::$statuses[$code])) {
+        if (!isset(self::MESSAGES[$code])) {
             throw new \InvalidArgumentException(
                 "invalid value provided for 'code'; ".
                 "expecting a valid status code as an integer"
             );
         }
-        return static::$statuses[$code];
+        return self::MESSAGES[$code];
     }
 
     /**
@@ -158,5 +158,35 @@ class Status
             );
         }
         return floor($code / 100)."xx";
+    }
+
+    public static function isInformational(int $code): bool
+    {
+        return static::getGroup($code) === "1xx";
+    }
+
+    public static function isSuccess(int $code): bool
+    {
+       return static::getGroup($code) === "2xx";
+    }
+
+    public static function isRedirect(int $code): bool
+    {
+        return static::getGroup($code) === "3xx";
+    }
+
+    public static function isClientError(int $code): bool
+    {
+        return static::getGroup($code) === "4xx";
+    }
+
+    public static function isServerError(int $code): bool
+    {
+        return static::getGroup($code) === "5xx";
+    }
+
+    public static function isError(int $code): bool
+    {
+        return (static::isClientError($code) || static::isServerError($code));
     }
 }
