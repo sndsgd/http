@@ -193,10 +193,11 @@ class UploadedFile implements \JsonSerializable
     {
         return [
             "clientFilename" => $this->getClientFilename(),
-            "unverifiedContentType" => $this->getContentType(true),
-            "verifiedContentType" => $this->getContentType(),
-            "size" => $this->getSize(),
-            "tempPath" => $this->getTempPath(),
+            "unverifiedContentType" => $this->error ? "" : $this->getContentType(true),
+            "verifiedContentType" => $this->error ? "" : $this->getContentType(),
+            "size" => $this->error ? 0 : $this->getSize(),
+            "tempPath" => $this->error ? "" : $this->getTempPath(),
+            "error" => $this->error ? $this->error->getMessage() : "",
         ];
     }
 
