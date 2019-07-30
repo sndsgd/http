@@ -5,7 +5,7 @@ namespace sndsgd\http\request;
 /**
  * @coversDefaultClass \sndsgd\http\request\Host
  */
-class HostTest extends \PHPUnit_Framework_TestCase
+class HostTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers ::__construct
@@ -13,7 +13,9 @@ class HostTest extends \PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $request = createTestRequest();
-        $client = new Host($request);
+        $host = new Host($request);
+        # assert instanceof to prevent "test did not perform any assertions"
+        $this->assertInstanceOf(Host::class, $host);
     }
 
     /**

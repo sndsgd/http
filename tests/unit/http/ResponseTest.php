@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\Response
  */
-class ResponseTest extends \PHPUnit_Framework_TestCase
+class ResponseTest extends \PHPUnit\Framework\TestCase
 {
     protected $response;
 
@@ -42,7 +42,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testSetStatus($code, $text, $exception = "")
     {
         if ($exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $this->response->setStatus($code);

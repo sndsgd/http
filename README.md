@@ -13,7 +13,7 @@ Improved HTTP for PHP.
 
 This project is unstable and subject to changes from release to release.
 
-You need **PHP >= 7.0** to use this library, however, the latest stable version of PHP is recommended.
+You need **PHP >= 7.1** to use this library, however, the latest stable version of PHP is recommended.
 
 
 ## Install

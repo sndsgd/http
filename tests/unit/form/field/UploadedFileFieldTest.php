@@ -5,7 +5,7 @@ namespace sndsgd\form\field;
 /**
  * @coversDefaultClass ::UploadedFileField
  */
-class UploadedFileFieldTest extends \PHPUnit_Framework_TestCase
+class UploadedFileFieldTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider providerConstructor

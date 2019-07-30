@@ -7,7 +7,7 @@ use \org\bovigo\vfs\vfsStream;
 /**
  * @coversDefaultClass \sndsgd\http\data\decoder\MultipartDataDecoder
  */
-class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
+class MultipartDataDecoderTest extends \PHPUnit\Framework\TestCase
 {
     use \phpmock\phpunit\PHPMock;
 
@@ -118,6 +118,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
 
         $decoder = new MultipartDataDecoder($path, $contentType, $length);
         $result = $decoder->decode();
+        $this->assertInstanceOf(\sndsgd\http\UploadedFile::class, $result["file"]);
     }
 
     public function testEmptyFileError()
@@ -193,7 +194,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
      */
     public function testFieldsRemainExceptions($feof, $fread, $exception)
     {
-        $this->setExpectedException($exception);
+        $this->expectException($exception);
 
         list($path, $type, $length) = $this->createMultipartTempFile([
             [
@@ -256,7 +257,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $mock->method("getTempFilePath")->willReturn($tempfile);
-        
+
         $feofMock = $this->getFunctionMock(__NAMESPACE__, "feof");
         $feofMock->expects($this->any())->willReturn(true);
 
@@ -272,15 +273,23 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
     public function testReadUntil()
     {
         $bytesPerRead = 2048;
+        $bytes = \sndsgd\Str::random($bytesPerRead * 3);
         list($path, $type, $length) = $this->createMultipartTempFile([
             [
                 'name' => 'one',
-                'contents' => \sndsgd\Str::random($bytesPerRead * 3),
+                'contents' => $bytes,
+            ],
+            [
+                "name" => "file",
+                "filename" => "test.txt",
+                "contents" => $bytes,
             ],
         ]);
 
         $decoder = new MultipartDataDecoder($path, $type, $length, null, $bytesPerRead);
-        $decoder->decode();
+        $result = $decoder->decode();
+        $this->assertSame($bytes, $result["one"]);
+        $this->assertSame($bytes, file_get_contents($result["file"]->getTempPath()));
     }
 
     /**
@@ -292,7 +301,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
             [
                 "name" => "file",
                 "filename" => "test.txt",
-                "contents" => "file contents",
+                "contents" => "contents...",
             ],
         ]);
 
@@ -349,7 +358,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
 
         $tempfile = $this->getVfsTempPath();
         $mock->method("getTempFilePath")->willReturn($tempfile);
-        
+
         $fwriteMock = $this->getFunctionMock(__NAMESPACE__, "fwrite");
         $fwriteMock
             ->expects($this->any())
@@ -367,7 +376,7 @@ class MultipartDataDecoderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      *
      */
     public function testFileUploadError()

@@ -5,15 +5,16 @@ namespace sndsgd\http\request;
 /**
  * @coversDefaultClass \sndsgd\http\request\Client
  */
-class ClientTest extends \PHPUnit_Framework_TestCase
+class ClientTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers ::__construct
      */
     public function testConstructor()
     {
-        $request = createTestRequest();
-        $client = new Client($request);
+        $client = new Client(createTestRequest());
+        # assert instanceof to prevent "test did not perform any assertions"
+        $this->assertInstanceOf(Client::class, $client);
     }
 
     /**

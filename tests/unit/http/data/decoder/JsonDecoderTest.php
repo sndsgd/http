@@ -4,7 +4,7 @@ namespace sndsgd\http\data\decoder;
 
 use \org\bovigo\vfs\vfsStream;
 
-class JsonDecoderTest extends \PHPUnit_Framework_TestCase
+class JsonDecoderTest extends \PHPUnit\Framework\TestCase
 {
     public function setup()
     {
@@ -19,7 +19,7 @@ class JsonDecoderTest extends \PHPUnit_Framework_TestCase
         vfsStream::newFile("test.json")->at($this->root)->setContent($json);
         $path = vfsStream::url("root/test.json");
         $decoder = new JsonDecoder($path, $type, $length, $options);
-        $this->assertSame($expect, $decoder->decode()); 
+        $this->assertSame($expect, $decoder->decode());
     }
 
     public function providerDecode()
@@ -67,7 +67,7 @@ class JsonDecoderTest extends \PHPUnit_Framework_TestCase
         $message
     )
     {
-        $this->setExpectedException($exception, $message);
+        $this->expectException($exception, $message);
         vfsStream::newFile("test.json")->at($this->root)->setContent($json);
         $path = vfsStream::url("root/test.json");
         (new JsonDecoder($path, "application/json", $length, $options))->decode();
@@ -82,7 +82,7 @@ class JsonDecoderTest extends \PHPUnit_Framework_TestCase
         $ret[] = [
             $json,
             strlen($json),
-            null, 
+            null,
             "sndsgd\\http\\data\\DecodeException",
             "failed to decode JSON request data; Syntax error"
         ];
@@ -97,7 +97,7 @@ class JsonDecoderTest extends \PHPUnit_Framework_TestCase
         $ret[] = [
             $json,
             strlen($json),
-            $options, 
+            $options,
             "sndsgd\\http\\data\\DecodeException",
             "failed to decode JSON request data; Maximum stack depth exceeded"
         ];

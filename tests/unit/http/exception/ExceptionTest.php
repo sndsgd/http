@@ -5,7 +5,7 @@ namespace sndsgd\http\exception;
 /**
  * Finds and tests all the exception classes `getStatusCode` methods
  */
-class ExceptionTest extends \PHPUnit_Framework_TestCase
+class ExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider providerGetStatusCode

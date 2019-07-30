@@ -2,14 +2,14 @@
 
 namespace sndsgd\http\data;
 
-class CollectionTest extends \PHPUnit_Framework_TestCase
+class CollectionTest extends \PHPUnit\Framework\TestCase
 {
     private function createCollection($maxVars = 10, $maxNesting = 10, array $values = [])
     {
         $collection = new Collection($maxVars, $maxNesting, $values);
         foreach ($values as $key => $value) {
             foreach ((array) $value as $val) {
-                $collection->addValue($key, $val);    
+                $collection->addValue($key, $val);
             }
         }
         // $rc = new \ReflectionClass($collection);

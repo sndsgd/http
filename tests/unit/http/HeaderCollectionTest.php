@@ -4,7 +4,7 @@ namespace sndsgd\http;
 
 /*
  */
-class HeaderCollectionTest extends \PHPUnit_Framework_TestCase
+class HeaderCollectionTest extends \PHPUnit\Framework\TestCase
 {
     private function getPropertyValue($class, $property)
     {

@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\Route
  */
-class RouteTest extends \PHPUnit_Framework_TestCase
+class RouteTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers ::__toString

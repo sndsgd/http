@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\UploadedFile
  */
-class UploadedFileTest extends \PHPUnit_Framework_TestCase
+class UploadedFileTest extends \PHPUnit\Framework\TestCase
 {
     protected $tempPath;
 
@@ -225,7 +225,7 @@ class UploadedFileTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($expect, $file->getTempPath());
         }
         else {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
             $file->getTempPath();
         }
     }

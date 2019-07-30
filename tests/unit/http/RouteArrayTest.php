@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\RouteArray
  */
-class RouteArrayTest extends \PHPUnit_Framework_TestCase
+class RouteArrayTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @expectedException \BadMethodCallException
@@ -15,9 +15,19 @@ class RouteArrayTest extends \PHPUnit_Framework_TestCase
         new RouteArray();
     }
 
-    public function testConstructor()
+    /**
+     * @dataProvider provideConstructor
+     */
+    public function testConstructor(array $routes)
     {
-        new RouteArray(new Route("GET", "/v1"));
-        new RouteArray(new Route("GET", "/v1"), new Route("GET", "/v2"));
+        $this->assertCount(count($routes), new RouteArray(...$routes));
+    }
+
+    public function provideConstructor()
+    {
+        return [
+            [[new Route("GET", "/v1")]],
+            [[new Route("GET", "/v1"), new Route("GET", "/v2")]],
+        ];
     }
 }

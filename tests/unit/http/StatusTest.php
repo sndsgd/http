@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\Status
  */
-class StatusTest extends \PHPUnit_Framework_TestCase
+class StatusTest extends \PHPUnit\Framework\TestCase
 {
     private static $codeMap = [];
 
@@ -123,7 +123,7 @@ class StatusTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($expect, Status::getText($code));
         }
         else {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
             Status::getText($code);
         }
     }
@@ -195,7 +195,7 @@ class StatusTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($expect, Status::getGroup($code));
         }
         else {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
             Status::getGroup($code);
         }
     }
