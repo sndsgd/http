@@ -114,7 +114,7 @@ class BodyDecoderTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         $result = $method->invoke($bodyDecoder, "", $contentType, 42, $options);
         $expect = "sndsgd\\http\\data\\decoder\\DecoderInterface";
-        
+
         $this->assertInstanceOf($expect, $result);
     }
 
@@ -160,10 +160,12 @@ class BodyDecoderTest extends \PHPUnit_Framework_TestCase
         $_FILES = $files;
 
         $bodyDecoder = new BodyDecoder();
-        $rc = new \ReflectionClass($bodyDecoder);
-        $method = $rc->getMethod("parsePost");
+        $method = new \ReflectionMethod($bodyDecoder, "parsePost");
         $method->setAccessible(true);
         $result = $method->invoke($bodyDecoder);
+        if ($result["file"] instanceof \sndsgd\http\UploadedFile) {
+            $result["file"] = [$result["file"]];
+        }
         $this->assertSame(count($result["file"]), $expectCount);
     }
 
