@@ -375,19 +375,13 @@ class MultipartDataDecoderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     *
-     *
-     */
     public function testFileUploadError()
     {
         $stream = $this->getVfsTempPath("stream");
         $tempfile = $this->getVfsTempPath("temp");
 
         $decoder = new MultipartDataDecoder($stream, "", 123);
-
-        $rc = new \ReflectionClass($decoder);
-        $method = $rc->getMethod("fileUploadError");
+        $method = new \ReflectionMethod($decoder, "fileUploadError");
         $method->setAccessible(true);
         $file = $method->invoke(
             $decoder,
