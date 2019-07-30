@@ -23,9 +23,9 @@
         "sndsgd/fs": ">=0.4.0"
     },
     "require-dev": {
-        "mikey179/vfsStream": "1.6.4",
-        "phpunit/phpunit": "~5",
-        "php-mock/php-mock-phpunit": "^1.1",
+        "mikey179/vfsstream": "1.6.4",
+        "phpunit/phpunit": "~6",
+        "php-mock/php-mock-phpunit": "^2.1.0",
         "guzzlehttp/psr7": "^1.3",
         "satooshi/php-coveralls": "~1.0"
     },
