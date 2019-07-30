@@ -2,7 +2,7 @@
 
 namespace sndsgd\form\rule;
 
-class UploadedFileRuleTest extends \PHPUnit_Framework_TestCase
+class UploadedFileRuleTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetDescription()
     {

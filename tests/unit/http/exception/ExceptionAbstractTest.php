@@ -2,7 +2,7 @@
 
 namespace sndsgd\http\exception;
 
-class ExceptionAbstractTest extends \PHPUnit_Framework_TestCase
+class ExceptionAbstractTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetStatusCode()
     {

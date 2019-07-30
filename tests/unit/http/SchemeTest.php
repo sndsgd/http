@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\Scheme
  */
-class SchemeTest extends \PHPUnit_Framework_TestCase
+class SchemeTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstants()
     {

@@ -5,7 +5,7 @@ namespace sndsgd\http\data\decoder;
 /**
  * @coversDefaultClass \sndsgd\http\data\decoder\QueryStringDecoder
  */
-class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
+class QueryStringDecoderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provideConstructor
@@ -13,6 +13,8 @@ class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
     public function testConstructor($contentLength, $values)
     {
         $decoder = new QueryStringDecoder($contentLength, $values);
+        # assert instanceof to prevent "test did not perform any assertions"
+        $this->assertInstanceOf(QueryStringDecoder::class, $decoder);
     }
 
     public function provideConstructor()
@@ -57,7 +59,7 @@ class QueryStringDecoderTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'test=~%60%21%40%23%24%25%5E%26%2A%28%29_-%3D%2B',
-                'test', 
+                'test',
                 '~`!@#$%^&*()_-=+',
             ],
             [

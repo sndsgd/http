@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\Request
  */
-class RequestTest extends \PHPUnit_Framework_TestCase
+class RequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers ::__construct
@@ -52,8 +52,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHost()
     {
-        $request = new Request(createTestEnvironment());
+        $domain = "example.com";
+        $request = new Request(createTestEnvironment(["HTTP_HOST" => "example.com"]));
         $host = $request->getHost();
+        $this->assertSame($domain, $host->getDnsName());
     }
 
     /**
@@ -61,8 +63,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClient()
     {
-        $request = new Request(createTestEnvironment());
+        $ip = "1.1.1.1";
+        $request = new Request(createTestEnvironment(["REMOTE_ADDR" => $ip]));
         $client = $request->getClient();
+        $this->assertSame($ip, $client->getIp());
     }
 
     /**

@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\UploadedFileError
  */
-class UploadedFileErrorTest extends \PHPUnit_Framework_TestCase
+class UploadedFileErrorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers ::__construct
@@ -14,10 +14,12 @@ class UploadedFileErrorTest extends \PHPUnit_Framework_TestCase
     public function testConstructor($code, $exception = "")
     {
         if ($exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $error = new UploadedFileError($code);
+        # assert instanceof to prevent "test did not perform any assertions"
+        $this->assertInstanceOf(UploadedFileError::class, $error);
     }
 
     public function providerConstructor()

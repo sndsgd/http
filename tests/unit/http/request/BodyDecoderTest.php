@@ -7,7 +7,7 @@ use \org\bovigo\vfs\vfsStream;
 /**
  * @coversDefaultClass \sndsgd\http\request\BodyDecoder
  */
-class BodyDecoderTest extends \PHPUnit_Framework_TestCase
+class BodyDecoderTest extends \PHPUnit\Framework\TestCase
 {
     const PARSE_POST = ["post-was-parsed"];
     const DECODE = ["body-was-decoded"];
@@ -103,7 +103,7 @@ class BodyDecoderTest extends \PHPUnit_Framework_TestCase
     public function testGetDecoder($contentType, $exception = "")
     {
         if ($exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $options = new \sndsgd\http\data\decoder\DecoderOptions();
@@ -114,7 +114,7 @@ class BodyDecoderTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible(true);
         $result = $method->invoke($bodyDecoder, "", $contentType, 42, $options);
         $expect = "sndsgd\\http\\data\\decoder\\DecoderInterface";
-        
+
         $this->assertInstanceOf($expect, $result);
     }
 
@@ -160,10 +160,12 @@ class BodyDecoderTest extends \PHPUnit_Framework_TestCase
         $_FILES = $files;
 
         $bodyDecoder = new BodyDecoder();
-        $rc = new \ReflectionClass($bodyDecoder);
-        $method = $rc->getMethod("parsePost");
+        $method = new \ReflectionMethod($bodyDecoder, "parsePost");
         $method->setAccessible(true);
         $result = $method->invoke($bodyDecoder);
+        if ($result["file"] instanceof \sndsgd\http\UploadedFile) {
+            $result["file"] = [$result["file"]];
+        }
         $this->assertSame(count($result["file"]), $expectCount);
     }
 

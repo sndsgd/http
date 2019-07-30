@@ -2,7 +2,7 @@
 
 namespace sndsgd\http\exception;
 
-class BadRequestExceptionTest extends \PHPUnit_Framework_TestCase
+class BadRequestExceptionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider providerSetGetErrors

@@ -4,7 +4,7 @@ namespace sndsgd\http\data\decoder;
 
 use \org\bovigo\vfs\vfsStream;
 
-class UrlDecoderTest extends \PHPUnit_Framework_TestCase
+class UrlDecoderTest extends \PHPUnit\Framework\TestCase
 {
     const CONTENT_TYPE = "application/x-www-form-urlencoded";
 
@@ -21,7 +21,7 @@ class UrlDecoderTest extends \PHPUnit_Framework_TestCase
         vfsStream::newFile("test")->at($this->root)->setContent($content);
         $path = vfsStream::url("root/test");
         $decoder = new UrlDecoder($path, $type, $length, $options);
-        $this->assertSame($expect, $decoder->decode()); 
+        $this->assertSame($expect, $decoder->decode());
     }
 
     public function providerDecode()

@@ -5,7 +5,7 @@ namespace sndsgd\http;
 /**
  * @coversDefaultClass \sndsgd\http\NullRoute
  */
-class NullRouteTest extends \PHPUnit_Framework_TestCase
+class NullRouteTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {

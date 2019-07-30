@@ -2,7 +2,7 @@
 
 namespace sndsgd\http\data\decoder;
 
-class DecoderOptionsTest extends \PHPUnit_Framework_TestCase
+class DecoderOptionsTest extends \PHPUnit\Framework\TestCase
 {
     use \phpmock\phpunit\PHPMock;
 
